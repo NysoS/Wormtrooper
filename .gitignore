@@ -39,7 +39,7 @@ bld/
 
 bin/
 bin-int/
-JavaEngine/vendor/
+##JavaEngine/vendor/
 .user
 
 # Visual Studio 2017 auto generated files

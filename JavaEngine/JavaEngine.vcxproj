@@ -19,12 +19,14 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\JavaEngine\Log.h" />
     <ClInclude Include="src\JavaEngine.h" />
     <ClInclude Include="src\JavaEngine\Application.h" />
     <ClInclude Include="src\JavaEngine\Core.h" />
     <ClInclude Include="src\JavaEngine\EntryPoint.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\JavaEngine\Log.cpp" />
     <ClCompile Include="src\JavaEngine\Application.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
@@ -123,6 +125,7 @@
       <PreprocessorDefinitions>JE_PLATFORM_WINDOWS;JE_BUILD_DLL;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <AdditionalIncludeDirectories>$(SolutionDir)JavaEngine\vendor\spdlog\include;</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -138,6 +141,7 @@
       <PreprocessorDefinitions>JE_PLATFORM_WINDOWS;JE_BUILD_DLL;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <AdditionalIncludeDirectories>$(SolutionDir)JavaEngine\vendor\spdlog\include;</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

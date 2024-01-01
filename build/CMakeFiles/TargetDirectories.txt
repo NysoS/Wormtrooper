@@ -1,0 +1,5 @@
+D:/GitHub/Wormtrooper/build/CMakeFiles/ALL_BUILD.dir
+D:/GitHub/Wormtrooper/build/CMakeFiles/ZERO_CHECK.dir
+D:/GitHub/Wormtrooper/build/JavaEngine/CMakeFiles/JavaEngine.dir
+D:/GitHub/Wormtrooper/build/JavaEngine/CMakeFiles/ALL_BUILD.dir
+D:/GitHub/Wormtrooper/build/Wormtrooper/CMakeFiles/Wormtrooper.dir

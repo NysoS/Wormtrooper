@@ -1,5 +1,5 @@
 ## WORM TROOPER ##
 
 Mourgues Paul
-Juvetin Ariitea
+Juventin Ariitea
 Ledoux Kristofer

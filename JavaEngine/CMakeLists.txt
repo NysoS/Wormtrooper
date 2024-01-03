@@ -3,11 +3,6 @@ project(JavaEngine)
 set (PATH_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src)
 set (PATH_VENDOR_DIR ${CMAKE_CURRENT_SOURCE_DIR}/vendor/)
 
-# set (FULL_OUTPUT_DIR ${CMAKE_CURRENT_SOURCE_DIR}/bin/${CMAKE_SYSTEM_NAME}-${CMAKE_BUILD_TYPE}/${PROJECT_NAME})
-# set (CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${FULL_OUTPUT_DIR}/static_libs)
-# set (CMAKE_LIBRARY_OUTPUT_DIRECTORY ${FULL_OUTPUT_DIR})
-# set (CMAKE_RUNTIME_OUTPUT_DIRECTORY ${FULL_OUTPUT_DIR})
-
 include_directories(
 	"${PATH_DIR}"
 	"${PATH_DIR}/JavaEngine"
@@ -30,7 +25,7 @@ macro(GroupSources curdir)
     endforeach()
 endmacro()
 
-GroupSources(${PATH_DIR})
+GroupSources(src)
 
 set(HEADERS
 	"${PATH_DIR}/JavaEngine/Application.h"
@@ -61,7 +56,6 @@ target_include_directories(
 )
 
 include_directories(${PATH_VENDOR_DIR}spdlog)
-add_subdirectory(${PATH_VENDOR_DIR}spdlog)
 
 target_link_libraries(${PROJECT_NAME} PRIVATE spdlog)
 target_link_libraries(${PROJECT_NAME} PRIVATE Threads::Threads)

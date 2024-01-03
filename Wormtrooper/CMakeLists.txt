@@ -10,6 +10,25 @@ set(SOURCES
 	"${PATH_DIR}/GameApp.cpp"
 )
 
+# not stolen at all
+macro(GroupSources curdir)
+    file(GLOB children RELATIVE ${PROJECT_SOURCE_DIR}/${curdir}
+    ${PROJECT_SOURCE_DIR}/${curdir}/* ${PROJECT_SOURCE_DIR}/${curdir}/${curdir}/*)
+
+    foreach(child ${children})
+
+        if(IS_DIRECTORY ${PROJECT_SOURCE_DIR}/${curdir}/${child})
+            GroupSources(${curdir}/${child})
+        else()
+            string(REPLACE "/" "\\" groupname ${curdir})
+            source_group(${groupname} FILES
+            ${PROJECT_SOURCE_DIR}/${curdir}/${child})
+        endif()
+    endforeach()
+endmacro()
+
+GroupSources(src)
+
 include_directories(JavaEngine)
 
 add_executable(${PROJECT_NAME} ${SOURCES})

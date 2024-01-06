@@ -2,7 +2,6 @@
 #define MOUSE_EVENT_H
 
 #include "Event.h"
-#include <sstream>
 
 namespace JavaEngine
 {

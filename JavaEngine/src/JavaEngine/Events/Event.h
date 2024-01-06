@@ -3,8 +3,6 @@
 
 #include "JavaEngine/Core.h"
 
-#include <string>
-#include <functional>
 
 namespace JavaEngine
 {

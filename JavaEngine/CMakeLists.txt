@@ -6,6 +6,7 @@ set (PATH_VENDOR_DIR ${CMAKE_CURRENT_SOURCE_DIR}/vendor/)
 include_directories(
 	"${PATH_DIR}"
 	"${PATH_DIR}/JavaEngine"
+    "${PATH_DIR}/JavaEngine/Events"
 )
 
 # not stolen at all
@@ -33,6 +34,7 @@ set(HEADERS
 	"${PATH_DIR}/JavaEngine/EntryPoint.h"
 	"${PATH_DIR}/JavaEngine/Log.h"
 	"${PATH_DIR}/JavaEngine.h"
+    "${PATH_DIR}/JavaEngine/Events/Event.h"
 )
 
 set(SOURCES
@@ -56,6 +58,7 @@ target_include_directories(
 )
 
 include_directories(${PATH_VENDOR_DIR}spdlog)
+add_subdirectory(${PATH_VENDOR_DIR}spdlog)
 
 target_link_libraries(${PROJECT_NAME} PRIVATE spdlog)
 target_link_libraries(${PROJECT_NAME} PRIVATE Threads::Threads)

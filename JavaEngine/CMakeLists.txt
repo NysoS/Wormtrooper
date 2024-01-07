@@ -60,10 +60,17 @@ target_include_directories(
     ${PATH_DIR}
 )
 
-include_directories(${PATH_VENDOR_DIR}spdlog)
-add_subdirectory(${PATH_VENDOR_DIR}spdlog)
+set (OTHER_LIBRARIES 
+    spdlog
+    SFML
+)
 
-target_link_libraries(${PROJECT_NAME} PRIVATE spdlog)
+foreach(lib IN LISTS OTHER_LIBRARIES)
+    include_directories(${PATH_VENDOR_DIR}${lib})
+    add_subdirectory(${PATH_VENDOR_DIR}${lib})
+    target_link_libraries(${PROJECT_NAME} PRIVATE ${lib})
+endforeach()
+
 target_link_libraries(${PROJECT_NAME} PRIVATE Threads::Threads)
 
 if(CMAKE_VERSION VERSION_GREATER 3.8)

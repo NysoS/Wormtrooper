@@ -1,7 +1,10 @@
 #ifndef APPLICATION_H
 #define APPLICATION_H
 
+#include "jepch.h"
+
 #include "Core.h"
+#include "Window.h"
 
 namespace JavaEngine
 {
@@ -12,6 +15,13 @@ namespace JavaEngine
 		virtual ~Application();
 
 		void Run();
+
+	private:
+		void OnUpdate();
+
+	private:
+		std::unique_ptr<Window> m_Window;
+		bool m_isRunning = true;
 	};
 
 	Application* CreateApplication();

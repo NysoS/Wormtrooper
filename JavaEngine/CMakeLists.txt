@@ -35,12 +35,15 @@ set(HEADERS
     "${PATH_DIR}/JavaEngine/Events/ApplicationEvent.h"
     "${PATH_DIR}/JavaEngine/Events/KeyEvent.h"
     "${PATH_DIR}/JavaEngine/Events/MouseEvent.h"
+    "${PATH_DIR}/JavaEngine/Window.h"
+    "${PATH_DIR}/JavaEngine/Renderer/SFML/SFMLWindow.h"
 )
 
 set(SOURCES
 	"${PATH_DIR}/JavaEngine/Application.cpp"
 	"${PATH_DIR}/JavaEngine/Log.cpp"
 	"${PATH_DIR}/jepch.cpp"
+    "${PATH_DIR}/JavaEngine/Renderer/SFML/SFMLWindow.cpp"
 )
 
 find_package(Threads REQUIRED)
@@ -62,9 +65,12 @@ target_include_directories(
 
 include_directories(${PATH_VENDOR_DIR}spdlog)
 add_subdirectory(${PATH_VENDOR_DIR}spdlog)
-
 target_link_libraries(${PROJECT_NAME} PRIVATE spdlog)
 target_link_libraries(${PROJECT_NAME} PRIVATE Threads::Threads)
+
+include_directories(${PATH_VENDOR_DIR}SFML)
+add_subdirectory(${PATH_VENDOR_DIR}SFML)
+target_link_libraries(${PROJECT_NAME} PRIVATE sfml-graphics)
 
 if(CMAKE_VERSION VERSION_GREATER 3.8)
     set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 20)

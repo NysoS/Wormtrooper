@@ -2,6 +2,7 @@
 #define MOUSE_EVENT_H
 
 #include "Event.h"
+#include "MouseButton.h"
 
 namespace JavaEngine
 {
@@ -56,23 +57,23 @@ namespace JavaEngine
 	class JE_API MouseButtonEvent : public Event
 	{
 	public:
-		MouseMovedEvent(int button) : m_Button(button)
+		MouseButtonEvent(const MouseButton button) : m_Button(button)
 		{
 		}
 
-		inline int GetMouseButton() const { return m_Button; }
+		inline MouseButton GetMouseButton() const { return m_Button; }
 
 		EVENT_CLASS_CATEGORY(EventCategoryMouseButton | EventCategoryInput)
 
 	protected:
 
-		int m_Button;
+		MouseButton m_Button;
 	};
 
-	class JE_API MouseButtonPressedEvent : MouseButtonEvent
+	class JE_API MouseButtonPressedEvent : public MouseButtonEvent
 	{
 	public:
-		MouseButtonPressedEvent(int button) : MouseButtonEvent(button)
+		MouseButtonPressedEvent(const MouseButton button) : MouseButtonEvent(button)
 		{
 		}
 
@@ -86,10 +87,10 @@ namespace JavaEngine
 		EVENT_CLASS_TYPE(MouseButtonPressed)
 	};
 
-	class JE_API MouseButtonReleasedEvent : MouseButtonEvent
+	class JE_API MouseButtonReleasedEvent : public MouseButtonEvent
 	{
 	public:
-		MouseButtonReleasedEvent(int button) : MouseButtonEvent(button)
+		MouseButtonReleasedEvent(const MouseButton button) : MouseButtonEvent(button)
 		{
 		}
 

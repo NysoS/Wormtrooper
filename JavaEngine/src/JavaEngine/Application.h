@@ -5,6 +5,7 @@
 
 #include "Core.h"
 #include "Window.h"
+#include "Events/ApplicationEvent.h"
 
 namespace JavaEngine
 {
@@ -15,9 +16,11 @@ namespace JavaEngine
 		virtual ~Application();
 
 		void Run();
+		void OnEvent(Event& event);
 
 	private:
 		void OnUpdate();
+		bool OnCloseWindow(WindowCloseEvent& event);
 
 	private:
 		std::unique_ptr<Window> m_Window;

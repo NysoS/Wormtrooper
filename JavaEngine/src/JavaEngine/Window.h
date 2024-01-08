@@ -28,6 +28,7 @@ namespace JavaEngine
 
 		virtual void OnUpdate() = 0;
 		virtual void OnRenderer() = 0;
+		virtual void HandleEvent() = 0;
 
 		virtual unsigned int GetWidth() const = 0;
 		virtual unsigned int GetHeight() const = 0;

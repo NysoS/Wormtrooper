@@ -39,7 +39,7 @@ namespace JavaEngine
 
 	void WindowsWindow::Shutdown()
 	{
-		delete m_Window;
+		m_Window->close();
 	}
 
 	void WindowsWindow::OnUpdate()

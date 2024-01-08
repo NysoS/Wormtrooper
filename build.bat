@@ -13,3 +13,5 @@ cd build
 cmake ..
 echo -- Build successful
 pause
+
+start Wormtrooper.sln

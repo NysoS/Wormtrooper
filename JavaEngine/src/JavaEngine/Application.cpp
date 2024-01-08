@@ -1,4 +1,3 @@
-#include "jepch.h"
 #include "Application.h"
 
 #include "Log.h"
@@ -16,19 +15,16 @@ namespace JavaEngine
 
 	void Application::Run()
 	{
-		std::thread UpdateThread(std::bind(&Application::OnUpdate, this));
 		while (m_isRunning)
 		{
+			m_Window->OnUpdate();
 			m_Window->OnRenderer();
 		}
 	}
 
 	void Application::OnUpdate()
 	{
-		while (m_isRunning)
-		{
-			m_Window->OnUpdate();
-		}
+		
 	}
 
 }

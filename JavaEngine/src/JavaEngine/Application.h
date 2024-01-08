@@ -1,6 +1,8 @@
 #ifndef APPLICATION_H
 #define APPLICATION_H
 
+#include "jepch.h"
+
 #include "Core.h"
 #include "Window.h"
 

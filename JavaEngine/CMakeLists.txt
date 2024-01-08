@@ -36,14 +36,14 @@ set(HEADERS
     "${PATH_DIR}/JavaEngine/Events/KeyEvent.h"
     "${PATH_DIR}/JavaEngine/Events/MouseEvent.h"
     "${PATH_DIR}/JavaEngine/Window.h"
-    "${PATH_DIR}/Plateform/Windows/WindowsWindow.h"
+    "${PATH_DIR}/JavaEngine/Renderer/SFML/SFMLWindow.h"
 )
 
 set(SOURCES
 	"${PATH_DIR}/JavaEngine/Application.cpp"
 	"${PATH_DIR}/JavaEngine/Log.cpp"
 	"${PATH_DIR}/jepch.cpp"
-    "${PATH_DIR}/Plateform/Windows/WindowsWindow.cpp"
+    "${PATH_DIR}/JavaEngine/Renderer/SFML/SFMLWindow.cpp"
 )
 
 find_package(Threads REQUIRED)
@@ -61,11 +61,6 @@ target_include_directories(
     ${PROJECT_NAME}
     PUBLIC
     ${PATH_DIR}
-)
-
-set (OTHER_LIBRARIES 
-    spdlog
-    SFML
 )
 
 include_directories(${PATH_VENDOR_DIR}spdlog)

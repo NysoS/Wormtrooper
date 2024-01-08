@@ -1,6 +1,6 @@
 #include "jepch.h"
 
-#include "WindowsWindow.h"
+#include "SFMLWindow.h"
 #include "JavaEngine/Log.h"
 
 namespace JavaEngine
@@ -9,20 +9,20 @@ namespace JavaEngine
 
 	Window* Window::Create(const WindowProps& props)
 	{
-		return new WindowsWindow(props);
+		return new SFMLWindow(props);
 	}
 
-	WindowsWindow::WindowsWindow(const WindowProps& props)
+	SFMLWindow::SFMLWindow(const WindowProps& props)
 	{
 		Init(props);
 	}
 
-	WindowsWindow::~WindowsWindow()
+	SFMLWindow::~SFMLWindow()
 	{
 		Shutdown();
 	}
 
-	void WindowsWindow::Init(const WindowProps& props)
+	void SFMLWindow::Init(const WindowProps& props)
 	{
 		m_Data.Title = props.Title;
 		m_Data.Width = props.Width;
@@ -37,24 +37,24 @@ namespace JavaEngine
 		shape.setFillColor(sf::Color::Green);
 	}
 
-	void WindowsWindow::Shutdown()
+	void SFMLWindow::Shutdown()
 	{
 		m_Window->close();
 	}
 
-	void WindowsWindow::OnUpdate()
+	void SFMLWindow::OnUpdate()
 	{
 		JE_CORE_INFO("OnUpdate SFML Window!");
 	}
 
-	void WindowsWindow::OnRenderer()
+	void SFMLWindow::OnRenderer()
 	{
 		m_Window->clear();
 		m_Window->draw(shape);
 		m_Window->display();
 	}
 
-	void WindowsWindow::SetVSync(bool enable)
+	void SFMLWindow::SetVSync(bool enable)
 	{
 		if (enable)
 		{
@@ -67,10 +67,8 @@ namespace JavaEngine
 		m_Data.VSync = enable;
 	}
 
-	bool WindowsWindow::IsVSync() const
+	bool SFMLWindow::IsVSync() const
 	{
 		return m_Data.VSync;
 	}
-
-
 };

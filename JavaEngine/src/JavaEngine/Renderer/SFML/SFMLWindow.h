@@ -6,11 +6,11 @@
 
 namespace JavaEngine
 {
-	class WindowsWindow : public Window
+	class SFMLWindow : public Window
 	{
 	public:
-		WindowsWindow(const WindowProps& props);
-		virtual ~WindowsWindow();
+		SFMLWindow(const WindowProps& props);
+		virtual ~SFMLWindow();
 
 		void OnUpdate() override;
 		void OnRenderer() override;

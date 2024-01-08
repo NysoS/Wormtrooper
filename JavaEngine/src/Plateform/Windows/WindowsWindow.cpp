@@ -1,4 +1,3 @@
-#include "E:/Personal/Wormtrooper/build/JavaEngine/CMakeFiles/JavaEngine.dir/Debug/cmake_pch.hxx"
 #include "jepch.h"
 
 #include "WindowsWindow.h"
@@ -45,7 +44,7 @@ namespace JavaEngine
 
 	void WindowsWindow::OnUpdate()
 	{
-		
+		JE_CORE_INFO("OnUpdate SFML Window!");
 	}
 
 	void WindowsWindow::OnRenderer()

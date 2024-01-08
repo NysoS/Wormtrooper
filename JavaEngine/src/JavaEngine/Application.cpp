@@ -2,12 +2,12 @@
 #include "Application.h"
 
 #include "Log.h"
-#include "JavaEngine/Events/ApplicationEvent.h"
 
 namespace JavaEngine
 {
 	Application::Application()
 	{
+		m_Window = std::unique_ptr<Window>(Window::Create());
 	}
 
 	Application::~Application()
@@ -16,18 +16,19 @@ namespace JavaEngine
 
 	void Application::Run()
 	{
-		WindowResizeEvent resizeEvent(1100, 600);
-		if(resizeEvent.IsInCategory(EventCategoryApplication))
+		std::thread UpdateThread(std::bind(&Application::OnUpdate, this));
+		while (m_isRunning)
 		{
-			JE_TRACE(resizeEvent);
-		}
-		if(resizeEvent.IsInCategory(EventCategoryInput))
-		{
-			JE_TRACE(resizeEvent);
-		}
-		
-		while (true)
-		{
+			m_Window->OnRenderer();
 		}
 	}
+
+	void Application::OnUpdate()
+	{
+		while (m_isRunning)
+		{
+			m_Window->OnUpdate();
+		}
+	}
+
 }

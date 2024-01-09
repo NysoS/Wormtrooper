@@ -48,7 +48,7 @@ namespace JavaEngine
 
 	void SFMLWindow::OnUpdate()
 	{
-		//JE_CORE_INFO("OnUpdate SFML Window!");
+		
 	}
 
 	void SFMLWindow::OnRenderer()

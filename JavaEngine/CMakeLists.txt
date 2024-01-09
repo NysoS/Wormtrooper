@@ -29,6 +29,8 @@ set(HEADERS
 	"${PATH_DIR}/JavaEngine/Core.h"
 	"${PATH_DIR}/JavaEngine/EntryPoint.h"
 	"${PATH_DIR}/JavaEngine/Log.h"
+	"${PATH_DIR}/JavaEngine/Layer.h"
+	"${PATH_DIR}/JavaEngine/LayerStack.h"
 	"${PATH_DIR}/JavaEngine.h"
 	"${PATH_DIR}/jepch.h"
     "${PATH_DIR}/JavaEngine/Events/Event.h"
@@ -42,6 +44,8 @@ set(HEADERS
 set(SOURCES
 	"${PATH_DIR}/JavaEngine/Application.cpp"
 	"${PATH_DIR}/JavaEngine/Log.cpp"
+    "${PATH_DIR}/JavaEngine/Layer.cpp"
+	"${PATH_DIR}/JavaEngine/LayerStack.cpp"
 	"${PATH_DIR}/jepch.cpp"
     "${PATH_DIR}/JavaEngine/Renderer/SFML/SFMLWindow.cpp"
 )

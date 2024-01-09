@@ -24,12 +24,16 @@ public:
 	GameApp()
 	{
 		PushLayer(new ExampleLayer());
+		imguiTest = new JavaEngine::ImguiTest();
 	}
 
 	~GameApp()
 	{
 		
 	}
+
+private:
+	ImguiTest* imguiTest;
 };
 
 JavaEngine::Application* JavaEngine::CreateApplication()

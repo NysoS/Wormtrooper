@@ -1,5 +1,4 @@
 #include "Application.h"
-
 #include "Log.h"
 
 #define BIND_CALLBACK(fn) (std::bind(&fn, this, std::placeholders::_1))

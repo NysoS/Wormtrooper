@@ -48,6 +48,7 @@ set(SOURCES
 	"${PATH_DIR}/JavaEngine/LayerStack.cpp"
 	"${PATH_DIR}/jepch.cpp"
     "${PATH_DIR}/JavaEngine/Renderer/SFML/SFMLWindow.cpp"
+    "${PATH_DIR}/JavaEngine/ImguiTest.cpp"
 )
 
 find_package(Threads REQUIRED)
@@ -75,6 +76,9 @@ target_link_libraries(${PROJECT_NAME} PRIVATE Threads::Threads)
 include_directories(${PATH_VENDOR_DIR}SFML)
 add_subdirectory(${PATH_VENDOR_DIR}SFML)
 target_link_libraries(${PROJECT_NAME} PRIVATE sfml-graphics)
+
+include_directories(${PATH_VENDOR_DIR}imgui)
+target_include_directories(${PROJECT_NAME} PRIVATE ${PATH_VENDOR_DIR}imgui)
 
 if(CMAKE_VERSION VERSION_GREATER 3.8)
     set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 20)

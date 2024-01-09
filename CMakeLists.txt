@@ -9,3 +9,5 @@ set (CMAKE_RUNTIME_OUTPUT_DIRECTORY ${FULL_OUTPUT_DIR})
 
 add_subdirectory(JavaEngine)
 add_subdirectory(Wormtrooper)
+
+set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT Wormtrooper)

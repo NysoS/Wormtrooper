@@ -39,6 +39,7 @@ set(HEADERS
     "${PATH_DIR}/JavaEngine/Events/MouseEvent.h"
     "${PATH_DIR}/JavaEngine/Window.h"
     "${PATH_DIR}/JavaEngine/Renderer/SFML/SFMLWindow.h"
+    "${PATH_DIR}/JavaEngine/ImguiTest.h"
 )
 
 set(SOURCES
@@ -78,7 +79,7 @@ add_subdirectory(${PATH_VENDOR_DIR}SFML)
 target_link_libraries(${PROJECT_NAME} PRIVATE sfml-graphics)
 
 include_directories(${PATH_VENDOR_DIR}imgui)
-target_include_directories(${PROJECT_NAME} PRIVATE ${PATH_VENDOR_DIR}imgui)
+target_link_directories(${PROJECT_NAME} PUBLIC ${PATH_VENDOR_DIR}imgui)
 
 if(CMAKE_VERSION VERSION_GREATER 3.8)
     set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 20)

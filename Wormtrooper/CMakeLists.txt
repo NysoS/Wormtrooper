@@ -38,7 +38,6 @@ add_compile_definitions(
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE JavaEngine)
-target_link_libraries(${PROJECT_NAME} PRIVATE spdlog)
 
 if(CMAKE_VERSION VERSION_GREATER 3.8)
     set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 20)

@@ -69,17 +69,12 @@ target_include_directories(
     ${PATH_DIR}
 )
 
-include_directories(${PATH_VENDOR_DIR}spdlog)
-add_subdirectory(${PATH_VENDOR_DIR}spdlog)
-target_link_libraries(${PROJECT_NAME} PRIVATE spdlog)
-target_link_libraries(${PROJECT_NAME} PRIVATE Threads::Threads)
-
-include_directories(${PATH_VENDOR_DIR}SFML)
-add_subdirectory(${PATH_VENDOR_DIR}SFML)
-target_link_libraries(${PROJECT_NAME} PRIVATE sfml-graphics)
-
-include_directories(${PATH_VENDOR_DIR}imgui)
-target_link_directories(${PROJECT_NAME} PUBLIC ${PATH_VENDOR_DIR}imgui)
+# target_link_libraries(${PROJECT_NAME}
+#     PUBLIC
+#     sfml-system sfml-graphics sfml-window sfml-audio
+#     spdlog::spdlog
+#     imgui::imgui
+# )
 
 if(CMAKE_VERSION VERSION_GREATER 3.8)
     set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 20)

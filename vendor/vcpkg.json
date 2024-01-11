@@ -1,0 +1,8 @@
+{
+    "name": "javaengine",
+    "dependencies": [
+        "sfml",
+        "imgui",
+        "spdlog"
+    ]
+}

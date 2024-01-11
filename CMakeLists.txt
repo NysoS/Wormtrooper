@@ -7,6 +7,14 @@ set (CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${FULL_OUTPUT_DIR}/static_libs)
 set (CMAKE_LIBRARY_OUTPUT_DIRECTORY ${FULL_OUTPUT_DIR})
 set (CMAKE_RUNTIME_OUTPUT_DIRECTORY ${FULL_OUTPUT_DIR})
 
+set(VCPKG_DIR ${CMAKE_CURRENT_SOURCE_DIR}/vendor/vcpkg)
+set(CMAKE_TOOLCHAIN_FILE ${VCPKG_DIR}/scripts/buildsystem/vcpkg.cmake CACHE STRING "Vcpkg toolchain file")
+
+set(CMAKE_PREFIX_PATH ${CMAKE_CURRENT_SOURCE_DIR}/vendor/vcpkg_installed/x64_window/share)
+find_package(SFML COMPONENTS system window audio graphics CONFIG REQUIRED)
+find_package(imgui CONFIG REQUIRED)
+find_package(spdlog CONFIG REQUIRED)
+
 add_subdirectory(JavaEngine)
 add_subdirectory(Wormtrooper)
 

@@ -2,7 +2,7 @@
 #define WINDOWS_WINDOW_H
 
 #include "JavaEngine/Window.h"
-#include <include/SFML/Graphics.hpp>
+#include <SFML/Graphics.hpp>
 
 namespace JavaEngine
 {

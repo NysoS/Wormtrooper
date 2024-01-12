@@ -33,6 +33,29 @@ include_directories(JavaEngine)
 
 add_executable(${PROJECT_NAME} ${SOURCES})
 
+set(VCPKG_INSTALLED ${CMAKE_SOURCE_DIR}/vendor/vcpkg_installed/x64-windows)
+macro(InstallDLL dllName)
+    
+endmacro()
+
+add_custom_command(
+        TARGET ${PROJECT_NAME} POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_directory "${VCPKG_INSTALLED}/debug/bin/" "$<TARGET_FILE_DIR:${PROJECT_NAME}>"
+        COMMAND_EXPAND_LISTS
+    )
+    # add_custom_command(
+    #     TARGET ${PROJECT_NAME} POST_BUILD
+    #     COMMAND $<$<CONFIG:Release>:${CMAKE_COMMAND} -E copy_directory "${VCPKG_INSTALLED}/bin/" "$<TARGET_FILE_DIR:${PROJECT_NAME}>"
+    #     COMMAND_EXPAND_LISTS
+    # )
+
+set(DLL_LIB_LIST sfml-graphics sfml-window sfml-audio sfml-system spdlog imgui)
+
+foreach(dllName IN LISTS DLL_LIB_LIST)
+message("DLL NAME " ${dllName})
+InstallDLL(${dllName})
+endforeach()
+
 add_compile_definitions(
     JE_PLATFORM_WINDOWS
 )

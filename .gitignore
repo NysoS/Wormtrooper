@@ -41,6 +41,7 @@ bin/
 bin-int/
 ##JavaEngine/vendor/
 build/
+vendor/vcpkg_installed
 .user
 
 # Visual Studio 2017 auto generated files

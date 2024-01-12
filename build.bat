@@ -6,7 +6,7 @@ exit
 :clean
 echo -- Cleaning old files
 rmdir /s /q build
-goto :build
+goto :gitmodule
 
 :gitmodule
 echo -- Update submodule
@@ -17,7 +17,7 @@ goto :vcpkg_install
 :vcpkg_install
 echo -- Install vcpkg
 cd vendor/vcpkg
-cmd /c "bootstrap-vcpkg.bat --disable-metrics"
+cmd /c "bootstrap-vcpkg.bat -disableMetrics"
 goto :vcpkg_module
 
 :vcpkg_module

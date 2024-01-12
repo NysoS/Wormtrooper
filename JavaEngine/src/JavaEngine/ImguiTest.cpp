@@ -1,5 +1,3 @@
-#include "jepch.h"
-
 #include "ImguiTest.h"
 
 #include <imgui.h>

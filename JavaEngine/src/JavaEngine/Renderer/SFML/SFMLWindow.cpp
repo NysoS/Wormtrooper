@@ -34,7 +34,7 @@ namespace JavaEngine
 
 		JE_CORE_INFO("Creating window {0} ({1}, {2})", props.Title, props.Width, props.Height);
 
-		m_Window = new sf::RenderWindow(sf::VideoMode(sf::Vector2u(m_Data.Width, m_Data.Height)), m_Data.Title);
+		m_Window = new sf::RenderWindow(sf::VideoMode(m_Data.Width, m_Data.Height), m_Data.Title);
 
 		SetVSync(true);
 

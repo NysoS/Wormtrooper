@@ -29,6 +29,8 @@ set(HEADERS
 	"${PATH_DIR}/JavaEngine/Core.h"
 	"${PATH_DIR}/JavaEngine/EntryPoint.h"
 	"${PATH_DIR}/JavaEngine/Log.h"
+	"${PATH_DIR}/JavaEngine/Layer.h"
+	"${PATH_DIR}/JavaEngine/LayerStack.h"
 	"${PATH_DIR}/JavaEngine.h"
 	"${PATH_DIR}/jepch.h"
     "${PATH_DIR}/JavaEngine/Events/Event.h"
@@ -37,13 +39,17 @@ set(HEADERS
     "${PATH_DIR}/JavaEngine/Events/MouseEvent.h"
     "${PATH_DIR}/JavaEngine/Window.h"
     "${PATH_DIR}/JavaEngine/Renderer/SFML/SFMLWindow.h"
+    "${PATH_DIR}/JavaEngine/ImguiTest.h"
 )
 
 set(SOURCES
 	"${PATH_DIR}/JavaEngine/Application.cpp"
 	"${PATH_DIR}/JavaEngine/Log.cpp"
+    "${PATH_DIR}/JavaEngine/Layer.cpp"
+	"${PATH_DIR}/JavaEngine/LayerStack.cpp"
 	"${PATH_DIR}/jepch.cpp"
     "${PATH_DIR}/JavaEngine/Renderer/SFML/SFMLWindow.cpp"
+    "${PATH_DIR}/JavaEngine/ImguiTest.cpp"
 )
 
 find_package(Threads REQUIRED)
@@ -63,14 +69,12 @@ target_include_directories(
     ${PATH_DIR}
 )
 
-include_directories(${PATH_VENDOR_DIR}spdlog)
-add_subdirectory(${PATH_VENDOR_DIR}spdlog)
-target_link_libraries(${PROJECT_NAME} PRIVATE spdlog)
-target_link_libraries(${PROJECT_NAME} PRIVATE Threads::Threads)
-
-include_directories(${PATH_VENDOR_DIR}SFML)
-add_subdirectory(${PATH_VENDOR_DIR}SFML)
-target_link_libraries(${PROJECT_NAME} PRIVATE sfml-graphics)
+target_link_libraries(${PROJECT_NAME}
+    PUBLIC
+    sfml-system sfml-graphics sfml-window sfml-audio
+    spdlog::spdlog
+    imgui::imgui
+)
 
 if(CMAKE_VERSION VERSION_GREATER 3.8)
     set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 20)

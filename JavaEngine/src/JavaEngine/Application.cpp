@@ -25,7 +25,7 @@ namespace JavaEngine
 		{
 			m_Window->HandleEvent();
 			OnUpdate();
-			m_Window->OnRenderer();
+			OnRenderer();
 		}
 	}
 
@@ -51,6 +51,15 @@ namespace JavaEngine
 		for (auto it = m_LayerStack.end(); it != m_LayerStack.begin(); )
 		{
 			(*--it)->OnUpdate();
+		}
+	}
+
+	void Application::OnRenderer()
+	{
+		m_Window->OnRenderer();
+		for (auto it = m_LayerStack.end(); it != m_LayerStack.begin(); )
+		{
+			(*--it)->OnRederer();
 		}
 	}
 

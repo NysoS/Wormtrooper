@@ -1,6 +1,11 @@
 #pragma once
 
+#include <SFML/System/Clock.hpp>
+
 #include "JavaEngine/Layer.h"
+#include "JavaEngine/Events/ApplicationEvent.h"
+#include "JavaEngine/Events/KeyEvent.h"
+#include "JavaEngine/Events/MouseEvent.h"
 
 namespace JavaEngine
 {
@@ -13,6 +18,7 @@ namespace JavaEngine
 		void OnAttach() override;
 		void OnDetach() override;
 		void OnUpdate() override;
+		void OnRederer() override;
 		void OnEvent(Event& event) override;
 	};
 }

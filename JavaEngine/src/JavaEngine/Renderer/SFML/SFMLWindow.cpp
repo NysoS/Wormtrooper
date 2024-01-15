@@ -3,6 +3,7 @@
 #include "SFMLWindow.h"
 
 #include <imgui-SFML.h>
+#include <imgui.h>
 
 #include "JavaEngine/Log.h"
 #include "JavaEngine/Events/ApplicationEvent.h"
@@ -61,6 +62,7 @@ namespace JavaEngine
 		m_Window->clear();
 
 		m_Window->draw(shape);
+
 		ImGui::SFML::Render(*m_Window);
 
 		m_Window->display();
@@ -71,6 +73,8 @@ namespace JavaEngine
 		sf::Event sfEvent;
 		while (m_Window->pollEvent(sfEvent))
 		{
+			ImGui::SFML::ProcessEvent(*m_Window, sfEvent);
+
 			if(sfEvent.type == sf::Event::Resized)
 			{
 				m_Data.Width = sfEvent.size.width;

@@ -29,6 +29,7 @@ namespace JavaEngine
 
 	private:
 		void OnUpdate();
+		void OnRenderer();
 		bool OnCloseWindow(WindowCloseEvent& event);
 
 	private:

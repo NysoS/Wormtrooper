@@ -3,12 +3,16 @@
 #include "ImGuiLayer.h"
 
 #include <imgui-SFML.h>
-#include <imgui.h>
+
+#include "imgui.h"
 #include "JavaEngine/Application.h"
+#include "JavaEngine/Log.h"
 #include "JavaEngine/Renderer/SFML/SFMLWindow.h"
 
 namespace JavaEngine
 {
+#define BIND_CALLBACK(fn) (std::bind(&fn, this, std::placeholders::_1))
+
 	ImGuiLayer::ImGuiLayer()
 		: Layer("ImGuiLayer")
 	{
@@ -20,6 +24,12 @@ namespace JavaEngine
 
 	void ImGuiLayer::OnAttach()
 	{
+		ImGui::CreateContext();
+		ImGui::StyleColorsDark();
+
+		ImGuiIO& io = ImGui::GetIO();
+		io.BackendFlags |= ImGuiBackendFlags_HasMouseCursors;
+		io.BackendFlags |= ImGuiBackendFlags_HasSetMousePos;
 	}
 
 	void ImGuiLayer::OnDetach()
@@ -28,13 +38,11 @@ namespace JavaEngine
 
 	void ImGuiLayer::OnUpdate()
 	{
-		Application& application = Application::Get();
-
 		ImGui::ShowDemoWindow();
+	}
 
-		ImGui::Begin("Hello, world!");
-		ImGui::Button("Look at this pretty button");
-		ImGui::End();
+	void ImGuiLayer::OnRederer()
+	{
 	}
 
 	void ImGuiLayer::OnEvent(Event& event)

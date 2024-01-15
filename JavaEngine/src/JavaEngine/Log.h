@@ -1,7 +1,7 @@
 #ifndef LOG_H
 #define LOG_H
 
-#include "Core.h"
+#include "JavaEngine/Core.h"
 #include "spdlog/spdlog.h"
 #include "spdlog/fmt/ostr.h"
 

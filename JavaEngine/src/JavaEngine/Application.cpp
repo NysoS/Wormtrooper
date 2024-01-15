@@ -1,12 +1,16 @@
 #include "Application.h"
 #include "Log.h"
 
-#define BIND_CALLBACK(fn) (std::bind(&fn, this, std::placeholders::_1))
-
 namespace JavaEngine
 {
+#define BIND_CALLBACK(fn) (std::bind(&fn, this, std::placeholders::_1))
+
+	Application* Application::s_Instance = nullptr;
+
 	Application::Application()
 	{
+		s_Instance = this;
+
 		m_Window = std::unique_ptr<Window>(Window::Create());
 		m_Window->SetEventCallback(BIND_CALLBACK(Application::OnEvent));
 	}
@@ -16,7 +20,7 @@ namespace JavaEngine
 	}
 
 	void Application::Run()
-	{
+	{;
 		while (m_isRunning)
 		{
 			m_Window->HandleEvent();
@@ -43,6 +47,7 @@ namespace JavaEngine
 
 	void Application::OnUpdate()
 	{
+		m_Window->OnUpdate();
 		for (auto it = m_LayerStack.end(); it != m_LayerStack.begin(); )
 		{
 			(*--it)->OnUpdate();
@@ -59,11 +64,13 @@ namespace JavaEngine
 	void Application::PushLayer(Layer* layer)
 	{
 		m_LayerStack.PushLayer(layer);
+		layer->OnAttach();
 	}
 
 	void Application::PushOverlay(Layer* overlay)
 	{
 		m_LayerStack.PushOverlay(overlay);
+		overlay->OnAttach();
 	}
 
 

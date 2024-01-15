@@ -22,6 +22,7 @@ namespace JavaEngine
 		inline void SetEventCallback(const EventCallbackFn& callback) override { m_Data.EventCallack = callback; }
 		void SetVSync(bool enable) override;
 		bool IsVSync() const override;
+
 	private:
 		virtual void Init(const WindowProps& props);
 		virtual void Shutdown();
@@ -39,6 +40,7 @@ namespace JavaEngine
 		};
 
 		WindowData m_Data;
+		sf::Clock m_DeltaClock;
 
 		//Test RenderShape
 		sf::CircleShape shape = sf::CircleShape(100.f);

@@ -1,6 +1,6 @@
 @echo off
 set currentDir=%cd%
-if exist build (goto :clean) else (goto :build)
+if exist build (goto :clean) else (goto :gitmodule)
 exit
 
 :clean

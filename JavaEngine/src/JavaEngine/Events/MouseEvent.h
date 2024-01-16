@@ -1,5 +1,4 @@
-#ifndef MOUSE_EVENT_H
-#define MOUSE_EVENT_H
+#pragma once
 
 #include "Event.h"
 #include "MouseButton.h"
@@ -104,5 +103,3 @@ namespace JavaEngine
 		EVENT_CLASS_TYPE(MouseButtonReleased)
 	};
 }
-
-#endif

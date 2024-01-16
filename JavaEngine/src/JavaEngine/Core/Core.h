@@ -1,5 +1,4 @@
-#ifndef CORE_H
-#define CORE_H
+#pragma once
 
 #ifdef JE_PLATFORM_WINDOWS
 	#ifdef JE_BUILD_DLL
@@ -12,5 +11,3 @@
 #endif
 
 #define BIT(x) (1 << x)
- 
-#endif

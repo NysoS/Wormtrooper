@@ -1,7 +1,6 @@
-#ifndef WINDOWS_WINDOW_H
-#define WINDOWS_WINDOW_H
+#pragma once
 
-#include "JavaEngine/Window.h"
+#include "JavaEngine/Core/Window.h"
 #include <SFML/Graphics.hpp>
 
 namespace JavaEngine
@@ -20,6 +19,8 @@ namespace JavaEngine
 		inline unsigned int GetHeight() const override { return m_Data.Height; }
 
 		inline void SetEventCallback(const EventCallbackFn& callback) override { m_Data.EventCallack = callback; }
+		inline void SetEventRenderCallback(const EventRenderCallbackFn& callback) override { m_Data.EventRenderCallback = callback; }
+
 		void SetVSync(bool enable) override;
 		bool IsVSync() const override;
 
@@ -37,14 +38,9 @@ namespace JavaEngine
 			bool VSync;
 
 			EventCallbackFn EventCallack;
+			EventRenderCallbackFn EventRenderCallback;
 		};
 
 		WindowData m_Data;
-		sf::Clock m_DeltaClock;
-
-		//Test RenderShape
-		sf::CircleShape shape = sf::CircleShape(100.f);
 	};
 }
-
-#endif

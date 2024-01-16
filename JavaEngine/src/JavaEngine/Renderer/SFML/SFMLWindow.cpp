@@ -5,7 +5,7 @@
 #include <imgui-SFML.h>
 #include <imgui.h>
 
-#include "JavaEngine/Log.h"
+#include "JavaEngine/Core/Log.h"
 #include "JavaEngine/Events/ApplicationEvent.h"
 #include "JavaEngine/Events/KeyEvent.h"
 #include "JavaEngine/Events/MouseButton.h"
@@ -61,7 +61,7 @@ namespace JavaEngine
 	{
 		m_Window->clear();
 
-		m_Window->draw(shape);
+		m_Data.EventRenderCallback();
 
 		ImGui::SFML::Render(*m_Window);
 

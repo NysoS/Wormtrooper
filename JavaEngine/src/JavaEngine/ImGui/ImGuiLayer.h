@@ -1,11 +1,7 @@
 #pragma once
 
-#include <SFML/System/Clock.hpp>
-
-#include "JavaEngine/Layer.h"
+#include "JavaEngine/Core/Layer.h"
 #include "JavaEngine/Events/ApplicationEvent.h"
-#include "JavaEngine/Events/KeyEvent.h"
-#include "JavaEngine/Events/MouseEvent.h"
 
 namespace JavaEngine
 {

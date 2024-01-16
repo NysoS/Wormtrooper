@@ -1,10 +1,7 @@
-#ifndef JAVA_ENGINE_H
-#define JAVA_ENGINE_H
+#pragma once
 
-#include "JavaEngine/Application.h"
-#include "JavaEngine/Log.h"
+#include "JavaEngine/Core/Application.h"
+#include "JavaEngine/Core/Log.h"
 #include "JavaEngine/ImGui/ImGuiLayer.h"
 
-#include "JavaEngine/EntryPoint.h"
-
-#endif
+#include "JavaEngine/Core/EntryPoint.h"

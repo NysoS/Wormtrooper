@@ -1,7 +1,6 @@
-#ifndef LAYER_STACK_H
-#define LAYER_STACK_H
+#pragma once
 
-#include "JavaEngine/Core.h"
+#include "JavaEngine/Core/Core.h"
 #include "Layer.h"
 
 namespace JavaEngine
@@ -25,5 +24,3 @@ namespace JavaEngine
 		std::vector<Layer*>::iterator m_LayerInsert;
 	};
 }
-
-#endif

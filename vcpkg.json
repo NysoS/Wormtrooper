@@ -1,9 +1,0 @@
-{
-    "name": "javaengine",
-    "version": "1.0.0",
-    "dependencies": [
-        "spdlog",
-        "sfml",
-        "imgui"
-    ]
-}

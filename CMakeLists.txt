@@ -7,7 +7,7 @@ set(CMAKE_TOOLCHAIN_FILE ${VCPKG_DIR}/scripts/buildsystem/vcpkg.cmake CACHE STRI
 
 set(CMAKE_PREFIX_PATH ${CMAKE_CURRENT_SOURCE_DIR}/vendor/vcpkg_installed/x64-windows/share)
 find_package(SFML COMPONENTS system window audio graphics CONFIG REQUIRED)
-find_package(imgui CONFIG REQUIRED)
+find_package(imgui-sfml CONFIG REQUIRED)
 find_package(spdlog CONFIG REQUIRED)
 
 set (FULL_OUTPUT_DIR ${CMAKE_CURRENT_SOURCE_DIR}/bin/${CMAKE_SYSTEM_NAME}/${PROJECT_NAME})

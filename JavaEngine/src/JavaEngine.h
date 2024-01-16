@@ -3,6 +3,7 @@
 
 #include "JavaEngine/Application.h"
 #include "JavaEngine/Log.h"
+#include "JavaEngine/ImGui/ImGuiLayer.h"
 
 #include "JavaEngine/EntryPoint.h"
 

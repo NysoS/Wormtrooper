@@ -39,7 +39,7 @@ set(HEADERS
     "${PATH_DIR}/JavaEngine/Events/MouseEvent.h"
     "${PATH_DIR}/JavaEngine/Window.h"
     "${PATH_DIR}/JavaEngine/Renderer/SFML/SFMLWindow.h"
-    "${PATH_DIR}/JavaEngine/ImguiTest.h"
+    "${PATH_DIR}/JavaEngine/ImGui/ImGuiLayer.h"
 )
 
 set(SOURCES
@@ -49,7 +49,7 @@ set(SOURCES
 	"${PATH_DIR}/JavaEngine/LayerStack.cpp"
 	"${PATH_DIR}/jepch.cpp"
     "${PATH_DIR}/JavaEngine/Renderer/SFML/SFMLWindow.cpp"
-    "${PATH_DIR}/JavaEngine/ImguiTest.cpp"
+    "${PATH_DIR}/JavaEngine/ImGui/ImGuiLayer.cpp"
 )
 
 find_package(Threads REQUIRED)
@@ -73,7 +73,7 @@ target_link_libraries(${PROJECT_NAME}
     PUBLIC
     sfml-system sfml-graphics sfml-window sfml-audio
     spdlog::spdlog
-    imgui::imgui
+    ImGui-SFML::ImGui-SFML
 )
 
 if(CMAKE_VERSION VERSION_GREATER 3.8)

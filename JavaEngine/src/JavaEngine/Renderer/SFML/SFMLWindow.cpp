@@ -1,6 +1,10 @@
 #include "jepch.h"
 
 #include "SFMLWindow.h"
+
+#include <imgui-SFML.h>
+#include <imgui.h>
+
 #include "JavaEngine/Log.h"
 #include "JavaEngine/Events/ApplicationEvent.h"
 #include "JavaEngine/Events/KeyEvent.h"
@@ -39,6 +43,8 @@ namespace JavaEngine
 		SetVSync(true);
 
 		shape.setFillColor(sf::Color::Green);
+		ImGui::SFML::Init(*m_Window);
+		m_DeltaClock = sf::Clock();
 	}
 
 	void SFMLWindow::Shutdown()
@@ -48,13 +54,17 @@ namespace JavaEngine
 
 	void SFMLWindow::OnUpdate()
 	{
-		
+		ImGui::SFML::Update(*m_Window, m_DeltaClock.restart());
 	}
 
 	void SFMLWindow::OnRenderer()
 	{
 		m_Window->clear();
+
 		m_Window->draw(shape);
+
+		ImGui::SFML::Render(*m_Window);
+
 		m_Window->display();
 	}
 
@@ -63,6 +73,8 @@ namespace JavaEngine
 		sf::Event sfEvent;
 		while (m_Window->pollEvent(sfEvent))
 		{
+			ImGui::SFML::ProcessEvent(*m_Window, sfEvent);
+
 			if(sfEvent.type == sf::Event::Resized)
 			{
 				m_Data.Width = sfEvent.size.width;

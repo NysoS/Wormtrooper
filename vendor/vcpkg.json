@@ -2,7 +2,7 @@
     "name": "javaengine",
     "dependencies": [
         "sfml",
-        "imgui",
+        "imgui-sfml",
         "spdlog"
     ]
 }

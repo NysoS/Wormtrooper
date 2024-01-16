@@ -3,10 +3,12 @@
 
 #include "jepch.h"
 
-#include "Core.h"
+#include "JavaEngine/Core.h"
 #include "LayerStack.h"
 #include "Window.h"
 #include "Events/ApplicationEvent.h"
+
+#include <SFML/System/Clock.hpp> //Test only
 
 namespace JavaEngine
 {
@@ -22,14 +24,20 @@ namespace JavaEngine
 		void PushLayer(Layer* layer);
 		void PushOverlay(Layer* overlay);
 
+		inline static Application& Get() { return *s_Instance; }
+		inline Window& GetWindow() { return *m_Window; }
+
 	private:
 		void OnUpdate();
+		void OnRenderer();
 		bool OnCloseWindow(WindowCloseEvent& event);
 
 	private:
 		std::unique_ptr<Window> m_Window;
 		bool m_isRunning = true;
 		LayerStack m_LayerStack;
+
+		static Application* s_Instance;
 	};
 
 	Application* CreateApplication();

@@ -34,6 +34,7 @@ public:
 	GameApp()
 	{
 		//PushLayer(new ExampleLayer);
+		PushOverlay(new JavaEngine::ImGuiLayer());
 	}
 
 	~GameApp()

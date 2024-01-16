@@ -42,7 +42,6 @@ namespace JavaEngine
 
 		SetVSync(true);
 
-		shape.setFillColor(sf::Color::Green);
 		ImGui::SFML::Init(*m_Window);
 		m_DeltaClock = sf::Clock();
 	}

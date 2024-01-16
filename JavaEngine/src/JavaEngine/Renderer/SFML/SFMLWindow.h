@@ -30,6 +30,7 @@ namespace JavaEngine
 
 	private:
 		sf::RenderWindow* m_Window;
+		sf::Clock m_DeltaClock;
 
 		struct WindowData
 		{

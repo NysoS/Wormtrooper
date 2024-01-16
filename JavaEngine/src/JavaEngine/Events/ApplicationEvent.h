@@ -1,5 +1,4 @@
-#ifndef APPLICATION_EVENT_H
-#define APPLICATION_EVENT_H
+#pragma once
 
 #include "Event.h"
 
@@ -73,5 +72,3 @@ namespace JavaEngine
 		EVENT_CLASS_CATEGORY(EventCategoryApplication)
 	};
 }
-
-#endif

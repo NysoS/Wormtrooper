@@ -1,5 +1,4 @@
-#ifndef KEY_EVENT_H
-#define KEY_EVENT_H
+#pragma once
 
 #include "Event.h"
 #include "KeyCode.h"
@@ -58,5 +57,3 @@ namespace JavaEngine
 		EVENT_CLASS_TYPE(KeyReleased)
 	};
 }
-
-#endif

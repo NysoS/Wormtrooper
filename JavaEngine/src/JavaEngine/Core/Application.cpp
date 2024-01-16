@@ -3,7 +3,8 @@
 
 namespace JavaEngine
 {
-#define BIND_CALLBACK(fn) (std::bind(&fn, this, std::placeholders::_1))
+#define BIND_CALLBACK(fn) (std::bind(&fn, this))
+#define BIND_CALLBACK_ONE_PARAM(fn) (std::bind(&fn, this, std::placeholders::_1))
 
 	Application* Application::s_Instance = nullptr;
 
@@ -12,7 +13,8 @@ namespace JavaEngine
 		s_Instance = this;
 
 		m_Window = std::unique_ptr<Window>(Window::Create());
-		m_Window->SetEventCallback(BIND_CALLBACK(Application::OnEvent));
+		m_Window->SetEventCallback(BIND_CALLBACK_ONE_PARAM(Application::OnEvent));
+		m_Window->SetEventRenderCallback(BIND_CALLBACK(Application::OnRenderer));
 	}
 
 	Application::~Application()
@@ -25,14 +27,14 @@ namespace JavaEngine
 		{
 			m_Window->HandleEvent();
 			OnUpdate();
-			OnRenderer();
+			m_Window->OnRenderer();
 		}
 	}
 
 	void Application::OnEvent(Event& event)
 	{
 		EventDispatcher dispatcher(event);
-		dispatcher.Dispatch<WindowCloseEvent>(BIND_CALLBACK(Application::OnCloseWindow));
+		dispatcher.Dispatch<WindowCloseEvent>(BIND_CALLBACK_ONE_PARAM(Application::OnCloseWindow));
 
 		for(auto it = m_LayerStack.end(); it != m_LayerStack.begin(); )
 		{
@@ -56,7 +58,6 @@ namespace JavaEngine
 
 	void Application::OnRenderer()
 	{
-		m_Window->OnRenderer();
 		for (auto it = m_LayerStack.end(); it != m_LayerStack.begin(); )
 		{
 			(*--it)->OnRederer();

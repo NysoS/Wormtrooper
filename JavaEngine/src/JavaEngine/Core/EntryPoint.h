@@ -1,5 +1,4 @@
-#ifndef ENTRY_POINT_H
-#define ENTRY_POINT_H
+#pragma once
 
 #ifdef JE_PLATFORM_WINDOWS
 
@@ -17,6 +16,4 @@ extern JavaEngine::Application* JavaEngine::CreateApplication();
 	}
 #else
 	#error JavaEngine only supports Windows!
-#endif
-
 #endif

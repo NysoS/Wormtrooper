@@ -1,8 +1,6 @@
-#ifndef EVENT_H
-#define EVENT_H
+#pragma once
 
-#include "JavaEngine/Core.h"
-
+#include "JavaEngine/Core/Core.h"
 
 namespace JavaEngine
 {
@@ -83,5 +81,3 @@ namespace JavaEngine
 		return os << e.ToString();
 	}
 }
-
-#endif

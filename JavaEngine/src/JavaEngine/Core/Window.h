@@ -1,8 +1,7 @@
-#ifndef WINDOW_H
-#define WINDOW_H
+#pragma once
 
 #include "jepch.h"
-#include "JavaEngine/Core.h"
+#include "JavaEngine/Core/Core.h"
 #include "JavaEngine/Events/Event.h"
 
 namespace JavaEngine
@@ -23,6 +22,7 @@ namespace JavaEngine
 	{
 	public:
 		using EventCallbackFn = std::function<void(Event&)>;
+		using EventRenderCallbackFn = std::function<void()>;
 
 		virtual ~Window() {}
 
@@ -34,11 +34,10 @@ namespace JavaEngine
 		virtual unsigned int GetHeight() const = 0;
 
 		virtual void SetEventCallback(const EventCallbackFn& callback) = 0;
+		virtual void SetEventRenderCallback(const EventRenderCallbackFn& callback) = 0;
 		virtual void SetVSync(bool enable) = 0;
 		virtual bool IsVSync() const = 0;
 
 		static Window* Create(const WindowProps& props = WindowProps());
 	};
 }
-
-#endif

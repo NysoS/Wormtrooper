@@ -2,11 +2,8 @@
 
 #include "ImGuiLayer.h"
 
-#include <imgui-SFML.h>
-
 #include "imgui.h"
-#include "JavaEngine/Application.h"
-#include "JavaEngine/Log.h"
+#include "JavaEngine/Core/Application.h"
 #include "JavaEngine/Renderer/SFML/SFMLWindow.h"
 
 namespace JavaEngine

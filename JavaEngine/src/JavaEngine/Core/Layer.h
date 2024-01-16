@@ -1,7 +1,6 @@
-#ifndef LAYER_H
-#define LAYER_H
+#pragma once
 
-#include "JavaEngine/Core.h"
+#include "JavaEngine/Core/Core.h"
 #include "JavaEngine/Events/Event.h"
 
 namespace JavaEngine
@@ -24,5 +23,3 @@ namespace JavaEngine
 		std::string m_DebugName;
 	};
 }
-
-#endif

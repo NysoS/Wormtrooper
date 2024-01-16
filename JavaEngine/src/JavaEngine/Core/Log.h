@@ -1,7 +1,6 @@
-#ifndef LOG_H
-#define LOG_H
+#pragma once
 
-#include "JavaEngine/Core.h"
+#include "JavaEngine/Core/Core.h"
 #include "spdlog/spdlog.h"
 #include "spdlog/fmt/ostr.h"
 
@@ -20,8 +19,6 @@ namespace JavaEngine {
 	};
 
 }
-
-#endif
 
 // Core log macros
 #define JE_CORE_TRACE(...)	::JavaEngine::Log::GetCoreLogger()->trace(__VA_ARGS__)

@@ -1,5 +1,4 @@
-#ifndef JE_PCH_H
-#define JE_PCH_H
+#pragma once
 
 #include <iostream>
 #include <memory>
@@ -13,5 +12,3 @@
 #include <map>
 #include <unordered_map>
 #include <unordered_set>
-
-#endif

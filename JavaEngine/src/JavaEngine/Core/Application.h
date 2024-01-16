@@ -1,14 +1,11 @@
-#ifndef APPLICATION_H
-#define APPLICATION_H
+#pragma once
 
 #include "jepch.h"
 
-#include "JavaEngine/Core.h"
+#include "JavaEngine/Core/Core.h"
 #include "LayerStack.h"
 #include "Window.h"
-#include "Events/ApplicationEvent.h"
-
-#include <SFML/System/Clock.hpp> //Test only
+#include "JavaEngine/Events/ApplicationEvent.h"
 
 namespace JavaEngine
 {
@@ -42,5 +39,3 @@ namespace JavaEngine
 
 	Application* CreateApplication();
 }
-
-#endif

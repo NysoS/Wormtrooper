@@ -41,6 +41,7 @@ set(HEADERS
     "${PATH_DIR}/JavaEngine/Renderer/SFML/SFMLWindow.h"
     "${PATH_DIR}/JavaEngine/ImGui/ImGuiLayer.h"
     "${PATH_DIR}/JavaEngine/LevelRenderer/Scene.h"
+    "${PATH_DIR}/JavaEngine/Gameplay/JObject.h"
 )
 
 set(SOURCES
@@ -52,6 +53,7 @@ set(SOURCES
     "${PATH_DIR}/JavaEngine/Renderer/SFML/SFMLWindow.cpp"
     "${PATH_DIR}/JavaEngine/ImGui/ImGuiLayer.cpp"
     "${PATH_DIR}/JavaEngine/LevelRenderer/Scene.cpp"
+    "${PATH_DIR}/JavaEngine/Gameplay/JObject.cpp"
 )
 
 find_package(Threads REQUIRED)

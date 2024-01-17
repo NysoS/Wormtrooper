@@ -33,6 +33,7 @@ namespace JavaEngine
 		std::unique_ptr<Window> m_Window;
 		bool m_isRunning = true;
 		LayerStack m_LayerStack;
+		std::unique_ptr<class Scene> m_BasicScene;
 
 		static Application* s_Instance;
 	};

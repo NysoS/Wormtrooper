@@ -40,6 +40,7 @@ set(HEADERS
     "${PATH_DIR}/JavaEngine/Core/Window.h"
     "${PATH_DIR}/JavaEngine/Renderer/SFML/SFMLWindow.h"
     "${PATH_DIR}/JavaEngine/ImGui/ImGuiLayer.h"
+    "${PATH_DIR}/JavaEngine/LevelRenderer/Scene.h"
 )
 
 set(SOURCES
@@ -50,6 +51,7 @@ set(SOURCES
 	"${PATH_DIR}/jepch.cpp"
     "${PATH_DIR}/JavaEngine/Renderer/SFML/SFMLWindow.cpp"
     "${PATH_DIR}/JavaEngine/ImGui/ImGuiLayer.cpp"
+    "${PATH_DIR}/JavaEngine/LevelRenderer/Scene.cpp"
 )
 
 find_package(Threads REQUIRED)

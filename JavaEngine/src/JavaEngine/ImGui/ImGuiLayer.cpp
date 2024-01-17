@@ -35,11 +35,12 @@ namespace JavaEngine
 
 	void ImGuiLayer::OnUpdate()
 	{
-		ImGui::ShowDemoWindow();
+		
 	}
 
 	void ImGuiLayer::OnRederer()
 	{
+		ImGui::ShowDemoWindow();
 	}
 
 	void ImGuiLayer::OnEvent(Event& event)

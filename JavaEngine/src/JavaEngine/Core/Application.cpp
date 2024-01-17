@@ -1,5 +1,6 @@
 #include "Application.h"
 #include "Log.h"
+#include "JavaEngine/LevelRenderer/Scene.h"
 
 namespace JavaEngine
 {
@@ -15,10 +16,13 @@ namespace JavaEngine
 		m_Window = std::unique_ptr<Window>(Window::Create());
 		m_Window->SetEventCallback(BIND_CALLBACK_ONE_PARAM(Application::OnEvent));
 		m_Window->SetEventRenderCallback(BIND_CALLBACK(Application::OnRenderer));
+
+		m_BasicScene = std::unique_ptr<Scene>(new Scene);
 	}
 
 	Application::~Application()
 	{
+	
 	}
 
 	void Application::Run()
@@ -36,6 +40,8 @@ namespace JavaEngine
 		EventDispatcher dispatcher(event);
 		dispatcher.Dispatch<WindowCloseEvent>(BIND_CALLBACK_ONE_PARAM(Application::OnCloseWindow));
 
+		m_BasicScene->OnEvent(event);
+
 		for(auto it = m_LayerStack.end(); it != m_LayerStack.begin(); )
 		{
 			(*--it)->OnEvent(event);
@@ -50,6 +56,7 @@ namespace JavaEngine
 	void Application::OnUpdate()
 	{
 		m_Window->OnUpdate();
+		m_BasicScene->OnUpate();
 		for (auto it = m_LayerStack.end(); it != m_LayerStack.begin(); )
 		{
 			(*--it)->OnUpdate();
@@ -58,6 +65,8 @@ namespace JavaEngine
 
 	void Application::OnRenderer()
 	{
+		m_BasicScene->OnRenderer();
+
 		for (auto it = m_LayerStack.end(); it != m_LayerStack.begin(); )
 		{
 			(*--it)->OnRederer();

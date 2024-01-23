@@ -24,41 +24,44 @@ endmacro()
 
 GroupSources(src)
 
-set(HEADERS
-	"${PATH_DIR}/JavaEngine/Core/Application.h"
-	"${PATH_DIR}/JavaEngine/Core/Core.h"
-	"${PATH_DIR}/JavaEngine/Core/EntryPoint.h"
-	"${PATH_DIR}/JavaEngine/Core/Log.h"
-	"${PATH_DIR}/JavaEngine/Core/Layer.h"
-	"${PATH_DIR}/JavaEngine/Core/LayerStack.h"
-	"${PATH_DIR}/JavaEngine.h"
-	"${PATH_DIR}/jepch.h"
-    "${PATH_DIR}/JavaEngine/Events/Event.h"
-    "${PATH_DIR}/JavaEngine/Events/ApplicationEvent.h"
-    "${PATH_DIR}/JavaEngine/Events/KeyEvent.h"
-    "${PATH_DIR}/JavaEngine/Events/MouseEvent.h"
-    "${PATH_DIR}/JavaEngine/Core/Window.h"
-    "${PATH_DIR}/JavaEngine/Renderer/SFML/SFMLWindow.h"
-    "${PATH_DIR}/JavaEngine/ImGui/ImGuiLayer.h"
-    "${PATH_DIR}/JavaEngine/LevelRenderer/Scene.h"
-    "${PATH_DIR}/JavaEngine/Gameplay/JObject.h"
-)
+# set(HEADERS
+# 	"${PATH_DIR}/JavaEngine/Core/Application.h"
+# 	"${PATH_DIR}/JavaEngine/Core/Core.h"
+# 	"${PATH_DIR}/JavaEngine/Core/EntryPoint.h"
+# 	"${PATH_DIR}/JavaEngine/Core/Log.h"
+# 	"${PATH_DIR}/JavaEngine/Core/Layer.h"
+# 	"${PATH_DIR}/JavaEngine/Core/LayerStack.h"
+# 	"${PATH_DIR}/JavaEngine.h"
+# 	"${PATH_DIR}/jepch.h"
+#     "${PATH_DIR}/JavaEngine/Events/Event.h"
+#     "${PATH_DIR}/JavaEngine/Events/ApplicationEvent.h"
+#     "${PATH_DIR}/JavaEngine/Events/KeyEvent.h"
+#     "${PATH_DIR}/JavaEngine/Events/MouseEvent.h"
+#     "${PATH_DIR}/JavaEngine/Core/Window.h"
+#     "${PATH_DIR}/JavaEngine/Renderer/SFML/SFMLWindow.h"
+#     "${PATH_DIR}/JavaEngine/ImGui/ImGuiLayer.h"
+#     "${PATH_DIR}/JavaEngine/LevelRenderer/Scene.h"
+#     "${PATH_DIR}/JavaEngine/Gameplay/JObject.h"
+# )
 
-set(SOURCES
-	"${PATH_DIR}/JavaEngine/Core/Application.cpp"
-	"${PATH_DIR}/JavaEngine/Core/Log.cpp"
-    "${PATH_DIR}/JavaEngine/Core/Layer.cpp"
-	"${PATH_DIR}/JavaEngine/Core/LayerStack.cpp"
-	"${PATH_DIR}/jepch.cpp"
-    "${PATH_DIR}/JavaEngine/Renderer/SFML/SFMLWindow.cpp"
-    "${PATH_DIR}/JavaEngine/ImGui/ImGuiLayer.cpp"
-    "${PATH_DIR}/JavaEngine/LevelRenderer/Scene.cpp"
-    "${PATH_DIR}/JavaEngine/Gameplay/JObject.cpp"
-)
+# set(SOURCES
+# 	"${PATH_DIR}/JavaEngine/Core/Application.cpp"
+# 	"${PATH_DIR}/JavaEngine/Core/Log.cpp"
+#     "${PATH_DIR}/JavaEngine/Core/Layer.cpp"
+# 	"${PATH_DIR}/JavaEngine/Core/LayerStack.cpp"
+# 	"${PATH_DIR}/jepch.cpp"
+#     "${PATH_DIR}/JavaEngine/Renderer/SFML/SFMLWindow.cpp"
+#     "${PATH_DIR}/JavaEngine/ImGui/ImGuiLayer.cpp"
+#     "${PATH_DIR}/JavaEngine/LevelRenderer/Scene.cpp"
+#     "${PATH_DIR}/JavaEngine/Gameplay/JObject.cpp"
+# )
+
+file(GLOB_RECURSE PROJECT_HEADER_FILES "*.h" "*.hxx")
+file(GLOB_RECURSE PROJECT_SOURCE_FILES "*.cpp")
 
 find_package(Threads REQUIRED)
 
-add_library(${PROJECT_NAME} SHARED ${HEADERS} ${SOURCES})
+add_library(${PROJECT_NAME} SHARED ${PROJECT_HEADER_FILES} ${PROJECT_SOURCE_FILES})
 
 add_compile_definitions(
     JE_PLATFORM_WINDOWS

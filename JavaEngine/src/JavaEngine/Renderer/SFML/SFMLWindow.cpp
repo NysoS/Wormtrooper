@@ -53,6 +53,8 @@ namespace JavaEngine
 
 	void SFMLWindow::OnUpdate()
 	{
+		m_Data.EventUpdateCallback();
+
 		ImGui::SFML::Update(*m_Window, m_DeltaClock.restart());
 	}
 

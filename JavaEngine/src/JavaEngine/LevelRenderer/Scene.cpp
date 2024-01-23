@@ -1,49 +1,50 @@
 #include "Scene.h"
 
 #include "JavaEngine/Core/Log.h"
+#include "JavaEngine/Gameplay/JActor.h"
 
 namespace JavaEngine
 {
 	Scene::Scene()
 	{
 		//TODO: Remove test
-		JObject* tomate = AddObjectToScene<JObject>(new JObject());
+		JObject* tomate = AddObjectToScene<JActor>();
 		tomate->m_Name = "Tomate";
 
 		//TODO: Remove test
-		JObject* pomme = AddObjectToScene<JObject>(new JObject());
+		JObject* pomme = AddObjectToScene<JActor>();
 		pomme->m_Name = "Pomme";
 	}
 
 	Scene::~Scene()
 	{
-		for(auto* object : m_ObjectList)
+		for (auto* object : m_ObjectList)
 		{
-			JE_WARN("Delete : {0}", object->m_Name); //TODO: Remove test
 			delete object;
 		}
-
 		m_ObjectList.clear();
 	}
 
 	void Scene::OnUpate()
 	{
 		//JE_INFO("Scene Update");
-		const std::vector<JObject*> objectListCopy = m_ObjectList;
-		for(auto* object : objectListCopy)
+		for(const auto& object : m_ObjectList)
 		{
-			object->Update();
+			if(object->IsTickableObject())
+			{
+				object->Update();
+			}
 		}
 	}
 
 	void Scene::OnRenderer()
 	{
 		//JE_INFO("Scene Renderer");
-		const std::vector<JObject*> objectListCopy = m_ObjectList;
+		/*const std::vector<JObject*> objectListCopy = m_ObjectList;
 		for (auto* object : objectListCopy)
 		{
 			object->Renderer();
-		}
+		}*/
 	}
 
 	void Scene::OnEvent(Event& event)

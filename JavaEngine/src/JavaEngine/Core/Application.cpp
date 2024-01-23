@@ -16,8 +16,9 @@ namespace JavaEngine
 		m_Window = std::unique_ptr<Window>(Window::Create());
 		m_Window->SetEventCallback(BIND_CALLBACK_ONE_PARAM(Application::OnEvent));
 		m_Window->SetEventRenderCallback(BIND_CALLBACK(Application::OnRenderer));
+		m_Window->SetUpdateCallback(BIND_CALLBACK(Application::OnUpdate));
 
-		m_BasicScene = std::unique_ptr<Scene>(new Scene);
+		m_BasicScene = std::make_unique<Scene>();
 	}
 
 	Application::~Application()
@@ -26,11 +27,11 @@ namespace JavaEngine
 	}
 
 	void Application::Run()
-	{;
+	{
 		while (m_isRunning)
 		{
 			m_Window->HandleEvent();
-			OnUpdate();
+			m_Window->OnUpdate();
 			m_Window->OnRenderer();
 		}
 	}
@@ -55,8 +56,9 @@ namespace JavaEngine
 
 	void Application::OnUpdate()
 	{
-		m_Window->OnUpdate();
+		JE_CORE_INFO("Application Update");
 		m_BasicScene->OnUpate();
+
 		for (auto it = m_LayerStack.end(); it != m_LayerStack.begin(); )
 		{
 			(*--it)->OnUpdate();

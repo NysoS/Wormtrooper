@@ -22,6 +22,7 @@ namespace JavaEngine
 	{
 	public:
 		using EventCallbackFn = std::function<void(Event&)>;
+		using EventUpdateCallbackFn = std::function<void()>;
 		using EventRenderCallbackFn = std::function<void()>;
 
 		virtual ~Window() {}
@@ -34,6 +35,7 @@ namespace JavaEngine
 		virtual unsigned int GetHeight() const = 0;
 
 		virtual void SetEventCallback(const EventCallbackFn& callback) = 0;
+		virtual void SetUpdateCallback(const EventUpdateCallbackFn& callback) = 0;
 		virtual void SetEventRenderCallback(const EventRenderCallbackFn& callback) = 0;
 		virtual void SetVSync(bool enable) = 0;
 		virtual bool IsVSync() const = 0;

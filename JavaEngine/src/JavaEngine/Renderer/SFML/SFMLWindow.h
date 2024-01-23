@@ -19,6 +19,7 @@ namespace JavaEngine
 		inline unsigned int GetHeight() const override { return m_Data.Height; }
 
 		inline void SetEventCallback(const EventCallbackFn& callback) override { m_Data.EventCallack = callback; }
+		inline void SetUpdateCallback(const EventUpdateCallbackFn& callback) override { m_Data.EventUpdateCallback = callback; }
 		inline void SetEventRenderCallback(const EventRenderCallbackFn& callback) override { m_Data.EventRenderCallback = callback; }
 
 		void SetVSync(bool enable) override;
@@ -39,6 +40,7 @@ namespace JavaEngine
 			bool VSync;
 
 			EventCallbackFn EventCallack;
+			EventUpdateCallbackFn EventUpdateCallback;
 			EventRenderCallbackFn EventRenderCallback;
 		};
 

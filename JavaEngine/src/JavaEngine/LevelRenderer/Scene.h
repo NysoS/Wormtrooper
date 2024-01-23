@@ -2,6 +2,7 @@
 
 #include "jepch.h"
 #include "JavaEngine/Core/Core.h"
+#include "JavaEngine/Core/Log.h"
 #include "JavaEngine/Events/Event.h"
 #include "JavaEngine/Gameplay/JObject.h"
 
@@ -17,30 +18,33 @@ namespace JavaEngine
 		virtual void OnRenderer();
 		virtual void OnEvent(Event& event);
 
-		//TODO: Move to hxx file
 		template<typename ObjectType>
-		ObjectType* AddObjectToScene(ObjectType* object)
+		ObjectType* AddObjectToScene()
 		{
-			if(!dynamic_cast<ObjectType*>(object))
+			if (!std::is_base_of<JObject, ObjectType>())
 			{
 				return nullptr;
 			}
 
-			m_ObjectList.push_back(object);
+			ObjectType* element = new ObjectType();
+			m_ObjectList.push_back(element);
 
-			return object;
+			return element;
 		}
 
-		//TODO: Move to hxx file
 		template<typename ObjectType>
 		void RemoveObjectToScene(ObjectType* object)
 		{
-			if(!dynamic_cast<ObjectType*>(object))
+			if (!std::is_base_of<JObject, ObjectType>())
 			{
 				return;
 			}
 
-			m_ObjectList.erase(std::find(m_ObjectList.begin(), m_ObjectList.end(), object));
+			if (auto it = std::find(m_ObjectList.begin(), m_ObjectList.end(), object); it != m_ObjectList.end())
+			{
+				m_ObjectList.erase(it);
+				delete object;
+			}
 		}
 
 	protected:

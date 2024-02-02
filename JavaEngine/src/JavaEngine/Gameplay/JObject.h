@@ -5,7 +5,7 @@
 
 #include "JavaEngine/Core/Core.h"
 
-class ObjectComponent;
+class JObjectComponent;
 
 namespace JavaEngine
 {
@@ -19,9 +19,9 @@ namespace JavaEngine
 		virtual void Renderer(); //Move to renderer component
 
 		template<typename Component>
-		ObjectComponent* CreateObjectComponent()
+		JObjectComponent* CreateObjectComponent()
 		{
-			if(!std::is_base_of<ObjectComponent, Component>())
+			if(!std::is_base_of<JObjectComponent, Component>())
 			{
 				return nullptr;
 			}
@@ -35,7 +35,7 @@ namespace JavaEngine
 		template<typename Component>
 		void RemoveObjectComponent(Component* component)
 		{
-			if (!std::is_base_of<ObjectComponent, Component>())
+			if (!std::is_base_of<JObjectComponent, Component>())
 			{
 				return;
 			}
@@ -49,7 +49,7 @@ namespace JavaEngine
 	public:
 		//Move to protected after ECS added
 		std::string m_Name;
-		std::vector<ObjectComponent*> m_ObjectComponents;
+		std::vector<JObjectComponent*> m_ObjectComponents;
 
 	protected:
 		bool m_IsTickableObject = true;

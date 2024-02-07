@@ -1,5 +1,7 @@
 #pragma once
 
+#include <SFML/Graphics/Drawable.hpp>
+
 #include "jepch.h"
 #include "JavaEngine/Core/Core.h"
 #include "JavaEngine/Events/Event.h"
@@ -39,6 +41,9 @@ namespace JavaEngine
 		virtual void SetEventRenderCallback(const EventRenderCallbackFn& callback) = 0;
 		virtual void SetVSync(bool enable) = 0;
 		virtual bool IsVSync() const = 0;
+
+		//TODO:for test physics
+		virtual void Draw(const sf::Drawable&) = 0;
 
 		static Window* Create(const WindowProps& props = WindowProps());
 	};

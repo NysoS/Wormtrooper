@@ -5,6 +5,12 @@
 #include "JavaEngine/Core/Log.h"
 #include "JavaEngine/Events/Event.h"
 #include "JavaEngine/Gameplay/JObject.h"
+#include "JavaEngine/Physics/RigidBody.h"
+
+namespace JavaEngine
+{
+	class Window;
+}
 
 namespace JavaEngine
 {
@@ -15,8 +21,10 @@ namespace JavaEngine
 		virtual ~Scene();
 
 		virtual void OnUpate();
-		virtual void OnRenderer();
+		virtual void OnRenderer(Window& window);
 		virtual void OnEvent(Event& event);
+
+		std::vector<JPhysics::RigidBodyf*> rigidBodyList;
 
 		template<typename ObjectType>
 		ObjectType* AddObjectToScene()

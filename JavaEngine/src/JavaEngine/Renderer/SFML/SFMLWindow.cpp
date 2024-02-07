@@ -147,4 +147,9 @@ namespace JavaEngine
 	{
 		return m_Data.VSync;
 	}
+
+	void SFMLWindow::Draw(const sf::Drawable& drawable)
+	{
+		m_Window->draw(drawable);
+	}
 };

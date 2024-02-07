@@ -56,7 +56,7 @@ namespace JavaEngine
 
 	void Application::OnUpdate()
 	{
-		JE_CORE_INFO("Application Update");
+		//JE_CORE_INFO("Application Update");
 		m_BasicScene->OnUpate();
 
 		for (auto it = m_LayerStack.end(); it != m_LayerStack.begin(); )
@@ -67,7 +67,7 @@ namespace JavaEngine
 
 	void Application::OnRenderer()
 	{
-		m_BasicScene->OnRenderer();
+		m_BasicScene->OnRenderer(*m_Window.get());
 
 		for (auto it = m_LayerStack.end(); it != m_LayerStack.begin(); )
 		{

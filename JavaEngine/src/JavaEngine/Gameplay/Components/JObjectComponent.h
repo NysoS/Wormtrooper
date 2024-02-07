@@ -10,7 +10,8 @@ namespace JavaEngine
 	class JE_API JObjectComponent
 	{
 	public:
-		JObjectComponent();
+		explicit JObjectComponent(const std::string& name = std::string("Component"));
+		virtual ~JObjectComponent();
 
 		std::string& GetName();
 

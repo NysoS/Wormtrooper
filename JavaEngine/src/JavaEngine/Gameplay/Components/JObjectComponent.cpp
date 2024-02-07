@@ -2,7 +2,12 @@
 
 namespace JavaEngine
 {
-	JObjectComponent::JObjectComponent()
+	JObjectComponent::JObjectComponent(const std::string& name)
+	{
+		m_Name = name;
+	}
+
+	JObjectComponent::~JObjectComponent()
 	{
 	}
 

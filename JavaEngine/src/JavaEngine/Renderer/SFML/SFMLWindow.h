@@ -25,6 +25,8 @@ namespace JavaEngine
 		void SetVSync(bool enable) override;
 		bool IsVSync() const override;
 
+		void Draw(const sf::Drawable&) override;
+
 	private:
 		virtual void Init(const WindowProps& props);
 		virtual void Shutdown();

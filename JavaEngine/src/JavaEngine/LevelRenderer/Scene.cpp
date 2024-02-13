@@ -2,6 +2,8 @@
 
 #include <random>
 #include <SFML/Graphics/CircleShape.hpp>
+#include <SFML/Graphics/ConvexShape.hpp>
+#include <SFML/Graphics/RectangleShape.hpp>
 #include <SFML/Window/Keyboard.hpp>
 
 #include "JavaEngine/Core/Application.h"
@@ -30,9 +32,13 @@ namespace JavaEngine
 			float x = dist(gen);
 			float y = dist(gen);
 
-			JPhysics::RigidBodyf* body = JPhysics::RigidBodyf::CreateCircleBody(10.f, JMaths::Vector2Df(x, y), 2.f, false, 0.5f);
-
-			rigidBodyList.push_back(body);
+			/*if(i%2==0)
+			{
+				rigidBodyList.push_back(JPhysics::RigidBodyf::CreateCircleBody(10.f, JMaths::Vector2Df(x, y), 2.f, false, 0.5f));
+			}else*/
+			//{
+				rigidBodyList.push_back(JPhysics::RigidBodyf::CreateBoxBody(20.f, 20.f , JMaths::Vector2Df(x, y), 2.f, false, 0.5f));
+			//}
 		}
 	}
 
@@ -94,6 +100,12 @@ namespace JavaEngine
 			rigidBodyList[0]->Move(velocity);
 		}
 
+		for(int i = 0; i < rigidBodyList.size(); ++i)
+		{
+			JPhysics::RigidBodyf* bodyA = rigidBodyList[i];
+			//bodyA->Rotate(0.01f * 0.01f);
+		}
+
 		for(int i = 0; i < rigidBodyList.size() - 1; ++i)
 		{
 			JPhysics::RigidBodyf* bodyA = rigidBodyList[i];
@@ -104,15 +116,22 @@ namespace JavaEngine
 				JMaths::Vector2Df normal{};
 				float depth{0};
 
-				if(JPhysics::Collisions<float>::IntersectCircles(
-					bodyA->GetPosition(), bodyA->radius,
-					bodyB->GetPosition(), bodyB->radius,
-					normal, depth))
+				if (JPhysics::Collisions<float>::IntersectPolygons(bodyA->GetTransformVertices(), bodyB->GetTransformVertices(), normal, depth))
 				{
-					JE_INFO("depth {0} {1}", normal.x, normal.y);
+					JE_INFO("depth {0}", depth);
 					bodyA->Move(JMaths::Vector2Df(-normal.x, -normal.y) * (depth / 2.f));
 					bodyB->Move(normal * (depth / 2.f));
 				}
+
+				//if(JPhysics::Collisions<float>::IntersectCircles(
+				//	bodyA->GetPosition(), bodyA->radius,
+				//	bodyB->GetPosition(), bodyB->radius,
+				//	normal, depth))
+				//{
+				//	JE_INFO("depth {0} {1}", normal.x, normal.y);
+				//	bodyA->Move(JMaths::Vector2Df(-normal.x, -normal.y) * (depth / 2.f));
+				//	bodyB->Move(normal * (depth / 2.f));
+				//}
 			}
 		}
 	}
@@ -130,12 +149,27 @@ namespace JavaEngine
 
 		for(auto* body : rigidBodyList)
 		{
-
-			sf::CircleShape shape{body->radius};
-			shape.setOutlineThickness(3);
-			shape.setPosition(body->GetPosition().x, body->GetPosition().y);
-			shape.setOutlineColor(sf::Color(250, 150, 100));
-			window.Draw(shape);
+			if(body->shapeType == JPhysics::Circle)
+			{
+				sf::CircleShape shape{ body->radius };
+				shape.setOutlineThickness(3);
+				shape.setPosition(body->GetPosition().x, body->GetPosition().y);
+				shape.setOutlineColor(sf::Color(250, 150, 100));
+				window.Draw(shape);
+			}else if(body->shapeType == JPhysics::Box)
+			{
+				sf::ConvexShape shape{ 4 };
+				shape.setOrigin(body->GetPosition().x, body->GetPosition().y);
+				for(int i = 0; i < 4; ++i)
+				{
+					shape.setPoint(i, sf::Vector2f(body->GetTransformVertices()[i].x, body->GetTransformVertices()[i].y));
+				}
+				shape.setOutlineThickness(3);
+				shape.setPosition(body->GetPosition().x, body->GetPosition().y);
+				shape.setOutlineColor(sf::Color(250, 150, 100));
+				window.Draw(shape);
+			}
+			
 		}
 	}
 

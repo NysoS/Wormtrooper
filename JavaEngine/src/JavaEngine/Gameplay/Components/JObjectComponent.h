@@ -11,7 +11,7 @@ namespace JavaEngine
 	{
 	public:
 		explicit JObjectComponent(const std::string& name = std::string("Component"));
-		virtual ~JObjectComponent();
+		virtual ~JObjectComponent() = default;
 
 		std::string& GetName();
 

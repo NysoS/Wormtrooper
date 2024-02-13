@@ -1,22 +1,23 @@
 #pragma once
 
+#include "jepch.h"
 #include "JavaEngine/Core/Core.h"
-#include <cmath>
 
 namespace JMaths
 {
 	template<typename Type>
-	class JE_API Vector2D
+	struct JE_API Vector2D
 	{
-	public:
-
-		explicit Vector2D(const Type& _x = 0, const Type& _y = 0);
+		explicit Vector2D(const Type& _x = 0.f, const Type& _y = 0.f);
 
 		Type dotProduct(const Vector2D& vector);
 		Vector2D getNormarlized() const;
 		Vector2D& normalilze();
 		Type squareLength() const;
 		Type getLength() const;
+
+		Vector2D GetLeftNormal() const;
+		Vector2D GetRightNormal() const;
 
 		Type x, y;
 
@@ -66,6 +67,19 @@ namespace JMaths
 	{
 		return std::sqrt(squareLength());
 	}
+
+	template <typename Type>
+	Vector2D<Type> Vector2D<Type>::GetLeftNormal() const
+	{
+		return JMaths::Vector2D<Type>{-y, x};
+	}
+
+	template <typename Type>
+	Vector2D<Type> Vector2D<Type>::GetRightNormal() const
+	{
+		return JMaths::Vector2D<Type>{y, -x};
+	}
+
 
 	template <typename Type>
 	Type Vector2D<Type>::Distance(const Vector2D& one, const Vector2D& two)

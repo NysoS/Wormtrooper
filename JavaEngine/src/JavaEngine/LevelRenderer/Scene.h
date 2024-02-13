@@ -1,5 +1,7 @@
 #pragma once
 
+#include <SFML/Graphics/ConvexShape.hpp>
+
 #include "jepch.h"
 #include "JavaEngine/Core/Core.h"
 #include "JavaEngine/Core/Log.h"
@@ -59,5 +61,6 @@ namespace JavaEngine
 		std::string m_Name;
 
 		std::vector<JObject*> m_ObjectList;
+		sf::ConvexShape boxShape{ 4 };
 	};
 }

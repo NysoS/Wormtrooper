@@ -23,7 +23,7 @@ namespace JavaEngine
 		JMaths::Vector2D<Type> getPosition() const;
 		JMaths::Vector2D<Type> getRotation() const;
 
-		JMaths::Vector2D<Type> vector(const JMaths::Vector2D<Type>& vector);
+		JMaths::Vector2D<Type> vector(const JMaths::Vector2D<Type>& vector) const;
 
 	protected:
 		JMaths::Vector2D<Type> m_position;
@@ -66,7 +66,7 @@ namespace JavaEngine
 	}
 
 	template <typename Type>
-	JMaths::Vector2D<Type> Transform<Type>::vector(const JMaths::Vector2D<Type>& vector)
+	JMaths::Vector2D<Type> Transform<Type>::vector(const JMaths::Vector2D<Type>& vector) const
 	{
 		//m_rotation.x = cos, m_rotation.y = sin
 		Type rx = m_rotation.x * vector.x - m_rotation.y * vector.y;

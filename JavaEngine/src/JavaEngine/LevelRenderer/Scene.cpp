@@ -3,17 +3,18 @@
 #include <random>
 #include <SFML/Graphics/CircleShape.hpp>
 #include <SFML/Graphics/ConvexShape.hpp>
-#include <SFML/Graphics/RectangleShape.hpp>
 #include <SFML/Window/Keyboard.hpp>
 
 #include "JavaEngine/Core/Application.h"
 #include "JavaEngine/Core/Log.h"
 #include "JavaEngine/Gameplay/JActor.h"
 #include "JavaEngine/Physics/Collisions.h"
+#include "JavaEngine/Physics/RigidBody.h"
 
 namespace JavaEngine
 {
 	Scene::Scene()
+		:	m_Name("Scene"), m_World(std::make_unique<JPhysics::JWorld>())
 	{
 		//TODO: Remove test
 		JObject* tomate = AddObjectToScene<JActor>();
@@ -32,13 +33,15 @@ namespace JavaEngine
 			float x = dist(gen);
 			float y = dist(gen);
 
-			/*if(i%2==0)
+
+
+			if(i%2==0)
 			{
-				rigidBodyList.push_back(JPhysics::RigidBodyf::CreateCircleBody(10.f, JMaths::Vector2Df(x, y), 2.f, false, 0.5f));
-			}else*/
-			//{
-				rigidBodyList.push_back(JPhysics::RigidBodyf::CreateBoxBody(20.f, 20.f , JMaths::Vector2Df(x, y), 2.f, false, 0.5f));
-			//}
+				m_World->AddRigidbody(JPhysics::RigidBodyf::CreateCircleBody(10.f, JMaths::Vector2Df(x, y), 2.f, false, 0.5f));
+			}else
+			{
+				m_World->AddRigidbody(JPhysics::RigidBodyf::CreateBoxBody(20.f, 20.f , JMaths::Vector2Df(x, y), 2.f, false, 0.5f));
+			}
 		}
 	}
 
@@ -50,11 +53,11 @@ namespace JavaEngine
 		}
 		m_ObjectList.clear();
 
-		for (auto body : rigidBodyList)
+		/*for (auto body : rigidBodyList)
 		{
 			delete body;
 		}
-		rigidBodyList.clear();
+		rigidBodyList.clear();*/
 	}
 
 	void Scene::OnUpate()
@@ -96,44 +99,15 @@ namespace JavaEngine
 		{
 			JMaths::Vector2Df direction = JMaths::Vector2Df(dx, dy).normalilze();
 			JMaths::Vector2Df velocity = direction * speed;
-			
-			rigidBodyList[0]->Move(velocity);
-		}
 
-		for(int i = 0; i < rigidBodyList.size(); ++i)
-		{
-			JPhysics::RigidBodyf* bodyA = rigidBodyList[i];
-			//bodyA->Rotate(0.01f * 0.01f);
-		}
-
-		for(int i = 0; i < rigidBodyList.size() - 1; ++i)
-		{
-			JPhysics::RigidBodyf* bodyA = rigidBodyList[i];
-			for (int j = 1; j < rigidBodyList.size(); ++j)
+			auto* body = m_World->GetRigidbody(0);
+			if(body != nullptr)
 			{
-				JPhysics::RigidBodyf* bodyB = rigidBodyList[j];
-
-				JMaths::Vector2Df normal{};
-				float depth{0};
-
-				if (JPhysics::Collisions<float>::IntersectPolygons(bodyA->GetTransformVertices(), bodyB->GetTransformVertices(), normal, depth))
-				{
-					JE_INFO("depth {0}", depth);
-					bodyA->Move(JMaths::Vector2Df(-normal.x, -normal.y) * (depth / 2.f));
-					bodyB->Move(normal * (depth / 2.f));
-				}
-
-				//if(JPhysics::Collisions<float>::IntersectCircles(
-				//	bodyA->GetPosition(), bodyA->radius,
-				//	bodyB->GetPosition(), bodyB->radius,
-				//	normal, depth))
-				//{
-				//	JE_INFO("depth {0} {1}", normal.x, normal.y);
-				//	bodyA->Move(JMaths::Vector2Df(-normal.x, -normal.y) * (depth / 2.f));
-				//	bodyB->Move(normal * (depth / 2.f));
-				//}
+				body->Move(velocity);
 			}
 		}
+
+		m_World->Step(0.1f);
 	}
 
 	void Scene::OnRenderer(Window& window)
@@ -147,24 +121,31 @@ namespace JavaEngine
 
 		//JE_INFO("Move {0} {1}", rigidBodyList[0]->GetPosition().x, rigidBodyList[0]->GetPosition().y);
 
-		for(auto* body : rigidBodyList)
+		for(int i = 0; i < m_World->RigidbodyCount(); ++i)
 		{
+			auto* body = m_World->GetRigidbody(i);
+			if(body == nullptr)
+			{
+				continue;
+			}
+
 			if(body->shapeType == JPhysics::Circle)
 			{
-				sf::CircleShape shape{ body->radius };
-				shape.setOutlineThickness(3);
+				sf::CircleShape shape{};
+				shape.setRadius(10.f);
+				shape.setOutlineThickness(1);
 				shape.setPosition(body->GetPosition().x, body->GetPosition().y);
 				shape.setOutlineColor(sf::Color(250, 150, 100));
 				window.Draw(shape);
 			}else if(body->shapeType == JPhysics::Box)
 			{
 				sf::ConvexShape shape{ 4 };
-				shape.setOrigin(body->GetPosition().x, body->GetPosition().y);
 				for(int i = 0; i < 4; ++i)
 				{
 					shape.setPoint(i, sf::Vector2f(body->GetTransformVertices()[i].x, body->GetTransformVertices()[i].y));
 				}
-				shape.setOutlineThickness(3);
+				shape.setOrigin(body->GetPosition().x - 10.f, body->GetPosition().y - 10.f);
+				shape.setOutlineThickness(1);
 				shape.setPosition(body->GetPosition().x, body->GetPosition().y);
 				shape.setOutlineColor(sf::Color(250, 150, 100));
 				window.Draw(shape);

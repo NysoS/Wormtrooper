@@ -11,6 +11,11 @@ namespace JPhysics
 	class JE_API Collisions
 	{
 	public:
+		static bool IntersectCirclePolygons(
+			const JMaths::Vector2D<Type>& _circlCenter, Type _circleRadius, const std::vector<JMaths::Vector2D<Type>>& _vertices,
+			JMaths::Vector2D<Type>& _normal, Type& _depth
+		);
+
 		static bool IntersectPolygons(
 			const std::vector<JMaths::Vector2D<Type>>& _verticesA, const std::vector<JMaths::Vector2D<Type>>& _verticesB,
 			JMaths::Vector2D<Type>& _normal, Type& _depth
@@ -109,7 +114,7 @@ namespace JPhysics
 			}
 
 			_normal = _centerB - _centerA;
-			_normal.normalilze();
+			_normal.getNormarlized();
 
 			_depth = radius - distance;
 
@@ -118,8 +123,87 @@ namespace JPhysics
 
 	private:
 		static void ProjectVertices(const std::vector<JMaths::Vector2D<Type>>& _vertices, const JMaths::Vector2D<Type>& _axis, Type& _min, Type& _max);
+		static void ProjectCircle(const JMaths::Vector2D<Type>& _center, const Type& _radius, const JMaths::Vector2D<Type>& _axis, Type& _min, Type& _max);
 		static JMaths::Vector2D<Type> FindArithmeticMean(const std::vector<JMaths::Vector2D<Type>>& _vertices);
+		static Type FindClosePointOnPolygon(const JMaths::Vector2D<Type>& _circleCenter, const std::vector<JMaths::Vector2D<Type>>& _vertices);
 	};
+
+	template <typename Type>
+	bool Collisions<Type>::IntersectCirclePolygons(const JMaths::Vector2D<Type>& _circlCenter, Type _circleRadius,
+		const std::vector<JMaths::Vector2D<Type>>& _vertices, JMaths::Vector2D<Type>& _normal, Type& _depth)
+	{
+		_normal = JMaths::Vector2D<Type>::Zero;
+		_depth = std::numeric_limits<Type>::max();
+
+		JMaths::Vector2D<Type> axis = JMaths::Vector2D<Type>::Zero;
+
+		Type minA;
+		Type maxA;
+		Type minB;
+		Type maxB;
+		Type axisDepth = 0.f;
+
+		for (int i = 0; i < _vertices.size(); ++i)
+		{
+			JMaths::Vector2D<Type> currentVerticesA = _vertices[i];
+			JMaths::Vector2D<Type> nextVerticesA = _vertices[(i + 1) % _vertices.size()];
+
+			JMaths::Vector2D<Type> currentEdge = nextVerticesA - currentVerticesA;
+			axis = currentEdge.GetLeftNormal();
+
+			ProjectVertices(_vertices, axis, minA, maxA);
+			ProjectCircle(_circlCenter, _circleRadius, axis, minB, maxB);
+
+			if (minA >= maxB || minB >= maxA)
+			{
+				return false;
+			}
+
+			axisDepth = std::min(maxB - minA, maxA - minB);
+			if (axisDepth < _depth)
+			{
+				_depth = axisDepth;
+				_normal = axis;
+			}
+		}
+
+		int cpIndex = FindClosePointOnPolygon(_circlCenter, _vertices);
+		if(cpIndex <= -1.f)
+		{
+			return false;
+		}
+
+		JMaths::Vector2D<Type> cp = _vertices[cpIndex];
+		axis = cp - _circlCenter;
+
+		ProjectVertices(_vertices, axis, minA, maxA);
+		ProjectCircle(_circlCenter, _circleRadius, axis, minB, maxB);
+
+		if (minA >= maxB || minB >= maxA)
+		{
+			return false;
+		}
+
+		axisDepth = std::min(maxB - minA, maxA - minB);
+		if (axisDepth < _depth)
+		{
+			_depth = axisDepth;
+			_normal = axis;
+		}
+
+		_depth /= _normal.getLength();
+		_normal.normalilze();
+
+		JMaths::Vector2D<Type> polygonCenter = FindArithmeticMean(_vertices);
+
+		JMaths::Vector2D<Type> direction = polygonCenter - _circlCenter;
+		if (direction.dotProduct(_normal) < 0.f)
+		{
+			_normal = JMaths::Vector2D<Type>{ -_normal.x, -_normal.y };
+		}
+
+		return true;
+	}
 
 	template <typename Type>
 	void Collisions<Type>::ProjectVertices(const std::vector<JMaths::Vector2D<Type>>& _vertices, const JMaths::Vector2D<Type>& _axis,
@@ -128,7 +212,7 @@ namespace JPhysics
 		_min = std::numeric_limits<Type>::max();
 		_max = std::numeric_limits<Type>::min();
 
-		for(int i =0; i < _vertices.size(); ++i)
+		for(int i = 0; i < _vertices.size(); ++i)
 		{
 			JMaths::Vector2D<Type> vertices = _vertices[i];
 			Type projection = vertices.dotProduct(_axis);
@@ -142,6 +226,28 @@ namespace JPhysics
 			{
 				_max = projection;
 			}
+		}
+	}
+
+	template <typename Type>
+	void Collisions<Type>::ProjectCircle(const JMaths::Vector2D<Type>& _center, const Type& _radius, const JMaths::Vector2D<Type>& _axis,
+		Type& _min,Type& _max)
+	{
+		JMaths::Vector2D<Type> axis = _axis;
+		JMaths::Vector2D<Type> direction = _axis.getNormarlized();
+		JMaths::Vector2D<Type> radiusDirection = direction * _radius;
+
+		JMaths::Vector2D<Type> pA = _center - radiusDirection;
+		JMaths::Vector2D<Type> pB = _center + radiusDirection;
+
+		_min = axis.dotProduct(pA);
+		_max = axis.dotProduct(pB);
+
+		if(_min > _max)
+		{
+			Type temp = _min;
+			_min = _max;
+			_max = temp;
 		}
 	}
 
@@ -160,5 +266,27 @@ namespace JPhysics
 		}
 
 		return JMaths::Vector2D<Type>{sumX / _vertices.size(), sumY / _vertices.size()};
+	}
+
+	template <typename Type>
+	Type Collisions<Type>::FindClosePointOnPolygon(const JMaths::Vector2D<Type>& _circleCenter,
+		const std::vector<JMaths::Vector2D<Type>>& _vertices)
+	{
+		Type result = -1.f;
+		Type minDistance = std::numeric_limits<Type>::max();
+
+		for(int i = 0; i < _vertices.size(); i++)
+		{
+			JMaths::Vector2D<Type> vertices = _vertices[i];
+			Type distance = JMaths::Vector2D<Type>::Distance(vertices, _circleCenter);
+
+			if(distance < minDistance)
+			{
+				minDistance = distance;
+				result = i;
+			}
+		}
+
+		return result;
 	}
 }

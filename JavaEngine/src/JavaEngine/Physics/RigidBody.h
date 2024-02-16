@@ -1,7 +1,6 @@
 #pragma once
 
 #include "jepch.h"
-#include "JWorld.h"
 #include "JavaEngine/Core/Core.h"
 #include "JavaEngine/Core/Math/Math.h"
 #include "JavaEngine/Core/Math/Vector2D.h"
@@ -10,6 +9,11 @@
 namespace JPhysics
 {
 	constexpr float M_PI = 3.14f;
+	static constexpr float MinBodySize = 0.01f * 0.01f;
+	static constexpr float MaxBodySize = 64.f * 64.f;
+
+	static constexpr float MinDensity = .5f;
+	static constexpr float MaxDensity = 21.4f;
 
 	enum ShapeType
 	{
@@ -35,13 +39,14 @@ namespace JPhysics
 		static RigidBody* CreateBoxBody(Type _width, Type _height, JMaths::Vector2D<Type> _position, Type _density,
 			bool _isStatic, Type _resitution);
 
-		JMaths::Vector2D<Type> GetPosition();
-		Type GetRotation();
+		JMaths::Vector2D<Type> GetPosition() const;
+		Type GetRotation() const;
 
 		static std::vector<JMaths::Vector2D<Type>> CreateBoxVertices(Type _width, Type _height);
 		static std::vector<Type> CreateBoxTriangles();
 		std::vector<JMaths::Vector2D<Type>> GetTransformVertices();
 
+		void Step(Type _time);
 		void Move(JMaths::Vector2D<Type> _amount);
 		void MoveTo(JMaths::Vector2D<Type> _position);
 		void Rotate(Type _amount);
@@ -93,12 +98,12 @@ namespace JPhysics
 		bool _isStatic, Type _resitution)
 	{
 		Type area = _radius * _radius * M_PI;
-		if(area < JWorld::MinBodySize || area > JWorld::MaxBodySize)
+		if(area < MinBodySize || area > MaxBodySize)
 		{
 			return nullptr;
 		}
 
-		if(_density < JWorld::MinDensity || _density > JWorld::MaxDensity)
+		if(_density < MinDensity || _density > MaxDensity)
 		{
 			return nullptr;
 		}
@@ -115,12 +120,12 @@ namespace JPhysics
 		Type _density, bool _isStatic, Type _resitution)
 	{
 		Type area = _width * _height;
-		if (area < JWorld::MinBodySize || area > JWorld::MaxBodySize)
+		if (area < MinBodySize || area > MaxBodySize)
 		{
 			return nullptr;
 		}
 
-		if (_density < JWorld::MinDensity || _density > JWorld::MaxDensity)
+		if (_density < MinDensity || _density > MaxDensity)
 		{
 			return nullptr;
 		}
@@ -133,13 +138,13 @@ namespace JPhysics
 	}
 
 	template <typename Type>
-	JMaths::Vector2D<Type> RigidBody<Type>::GetPosition()
+	JMaths::Vector2D<Type> RigidBody<Type>::GetPosition() const
 	{
 		return m_position;
 	}
 
 	template <typename Type>
-	Type RigidBody<Type>::GetRotation()
+	Type RigidBody<Type>::GetRotation() const
 	{
 		return m_rotation;
 	}
@@ -186,11 +191,17 @@ namespace JPhysics
 	}
 
 	template <typename Type>
-	void RigidBody<Type>::Move(JMaths::Vector2D<Type> amount)
+	void RigidBody<Type>::Step(Type _time)
 	{
-		JE_INFO("x {0}, y {1}", amount.x, amount.y);
-		m_position.x += amount.x;
-		m_position.y += amount.y;
+		m_position += m_linearVelocity * _time;
+		m_rotation += m_rotationVelocity * _time;
+	}
+
+	template <typename Type>
+	void RigidBody<Type>::Move(JMaths::Vector2D<Type> _amount)
+	{
+		m_position.x += _amount.x;
+		m_position.y += _amount.y;
 		m_transformUpdateRequired = true;
 	}
 
@@ -209,6 +220,9 @@ namespace JPhysics
 	}
 
 	using RigidBodyf = RigidBody<float>;
+	using RigidBodyfPtr = RigidBody<float>*;
 	using RigidBodyd = RigidBody<double>;
+	using RigidBodydPtr = RigidBody<double>*;
 	using RigidBodyi = RigidBody<int>;
+	using RigidBodyiPtr = RigidBody<int>*;
 }

@@ -8,6 +8,7 @@
 #include "JavaEngine/Events/Event.h"
 #include "JavaEngine/Gameplay/JObject.h"
 #include "JavaEngine/Physics/RigidBody.h"
+#include "JavaEngine/Physics/JWorld.h"
 
 namespace JavaEngine
 {
@@ -61,6 +62,6 @@ namespace JavaEngine
 		std::string m_Name;
 
 		std::vector<JObject*> m_ObjectList;
-		sf::ConvexShape boxShape{ 4 };
+		std::unique_ptr<JPhysics::JWorld> m_World;
 	};
 }

@@ -21,6 +21,9 @@ namespace JPhysics
 		bool Collide(const RigidBodyf& _bodyA, const RigidBodyf& _bodyB, JMaths::Vector2Df& _normal, float& depth);
 		size_t RigidbodyCount() const;
 
+	protected:
+		void ResolveCollision(RigidBodyf& _bodyA, RigidBodyf& _bodyB, JMaths::Vector2Df& _normal, float& depth);
+
 	private:
 		std::vector<RigidBody<float>*> m_rigidbodyList;
 		JMaths::Vector2Df m_gravity;

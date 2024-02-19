@@ -52,7 +52,6 @@ namespace JPhysics
 		for (int i = 0; i < m_rigidbodyList.size(); ++i)
 		{
 			m_rigidbodyList[i]->Step(_time);
-			m_rigidbodyList[i]->Rotate(2.f * 0.01f);
 		}
 
 		//Collision step
@@ -63,13 +62,29 @@ namespace JPhysics
 			{
 				RigidBodyf* bodyB = m_rigidbodyList[j];
 
+				if(bodyA == bodyB || bodyA->isStatic && bodyB->isStatic)
+				{
+					continue;
+				}
+
 				JMaths::Vector2Df normal{};
 				float depth{ 0 };
 
 				if(Collide(*bodyA, *bodyB, normal, depth))
 				{
-					bodyA->Move(JMaths::Vector2Df{-normal.x, -normal.y} *(depth / 2.f));
-					bodyB->Move(normal * (depth / 2.f));
+					if(bodyA->isStatic)
+					{
+						bodyB->Move(normal * depth);
+					}else if(bodyB->isStatic)
+					{
+						bodyA->Move(JMaths::Vector2Df{ -normal.x, -normal.y } *(depth / 2.f));
+					}else
+					{
+						bodyA->Move(JMaths::Vector2Df{ -normal.x, -normal.y } *(depth / 2.f));
+						bodyB->Move(normal * (depth / 2.f));
+					}
+
+					ResolveCollision(*bodyA, *bodyB, normal, depth);
 				}
 
 				/*
@@ -155,5 +170,27 @@ namespace JPhysics
 	size_t JWorld::RigidbodyCount() const
 	{
 		return m_rigidbodyList.size();
+	}
+
+	void JWorld::ResolveCollision(RigidBodyf& _bodyA, RigidBodyf& _bodyB, JMaths::Vector2Df& _normal,
+		float& depth)
+	{
+		JMaths::Vector2Df relativeVelocity = _bodyB.m_linearVelocity - _bodyA.m_linearVelocity;
+
+		if(relativeVelocity.dotProduct(_normal) > 0.f)
+		{
+			return;
+		}
+
+		const float e = std::min(_bodyA.restitution, _bodyB.restitution);
+
+		float j = -(1.f + e) * relativeVelocity.dotProduct(_normal);
+		j /= _bodyA.invMass + _bodyB.invMass;
+
+		const JMaths::Vector2Df impluse = j * _normal;
+
+		_bodyA.m_linearVelocity -= impluse * _bodyA.invMass;
+		_bodyB.m_linearVelocity += impluse * _bodyB.invMass;
+
 	}
 }

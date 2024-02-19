@@ -50,12 +50,14 @@ namespace JPhysics
 		void Move(JMaths::Vector2D<Type> _amount);
 		void MoveTo(JMaths::Vector2D<Type> _position);
 		void Rotate(Type _amount);
+		void AddForce(JMaths::Vector2D<Type> _amount);
 
 	protected:
 		JMaths::Vector2D<Type> m_position;
-		JMaths::Vector2D<Type> m_linearVelocity;
 		Type m_rotation;
 		Type m_rotationVelocity;
+
+		JMaths::Vector2D<Type> m_force;
 
 		std::vector<JMaths::Vector2D<Type>> m_vertices;
 		std::vector<Type> Triangles;
@@ -65,6 +67,7 @@ namespace JPhysics
 
 	public:
 		Type mass;
+		Type invMass = 0.f;
 		Type density;
 		Type restitution;
 		Type area;
@@ -76,6 +79,8 @@ namespace JPhysics
 		Type height;
 
 		ShapeType shapeType;
+
+		JMaths::Vector2D<Type> m_linearVelocity;
 	};
 
 	template <typename Type>
@@ -91,6 +96,12 @@ namespace JPhysics
 		}
 
 		m_transformUpdateRequired = true;
+		m_force = JMaths::Vector2D<Type>::Zero;
+
+		if(!isStatic)
+		{
+			invMass = 1.f / mass;
+		}
 	}
 
 	template <typename Type>
@@ -193,8 +204,17 @@ namespace JPhysics
 	template <typename Type>
 	void RigidBody<Type>::Step(Type _time)
 	{
+		//force = mass * acc
+		//acc = force / mass
+
+		JMaths::Vector2D<Type> acceleration = m_force / mass;
+		m_linearVelocity += acceleration * _time;
+
 		m_position += m_linearVelocity * _time;
 		m_rotation += m_rotationVelocity * _time;
+
+		m_force = JMaths::Vector2D<Type>::Zero;
+		m_transformUpdateRequired = true;
 	}
 
 	template <typename Type>
@@ -217,6 +237,12 @@ namespace JPhysics
 	{
 		m_rotation += _amount;
 		m_transformUpdateRequired = true;
+	}
+
+	template <typename Type>
+	void RigidBody<Type>::AddForce(JMaths::Vector2D<Type> _amount)
+	{
+		m_force = _amount;
 	}
 
 	using RigidBodyf = RigidBody<float>;

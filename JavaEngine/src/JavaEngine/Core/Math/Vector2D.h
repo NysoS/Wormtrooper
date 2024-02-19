@@ -26,6 +26,11 @@ namespace JMaths
 		static const Vector2D Zero;
 		static const Vector2D Up;
 		static const Vector2D Forward;
+
+		Vector2D& operator+=(const Vector2D& rhs);
+		Vector2D& operator+=(Type rhs);
+		Vector2D& operator-=(const Vector2D& rhs);
+		Vector2D& operator-=(Type rhs);
 	};
 
 	template <typename Type>
@@ -121,9 +126,65 @@ namespace JMaths
 	}
 
 	template <typename Type>
+	Vector2D<Type>& Vector2D<Type>::operator+=(const Vector2D& rhs)
+	{
+		x += rhs.x;
+		y += rhs.y;
+		return *this;
+	}
+
+	template <typename Type>
+	Vector2D<Type>& Vector2D<Type>::operator+=(Type rhs)
+	{
+		x += rhs;
+		y += rhs;
+		return *this;
+	}
+
+	template <typename Type>
+	Vector2D<Type>& Vector2D<Type>::operator-=(const Vector2D& rhs)
+	{
+		x -= rhs.x;
+		y -= rhs.y;
+		return *this;
+	}
+
+	template <typename Type>
+	Vector2D<Type>& Vector2D<Type>::operator-=(Type rhs)
+	{
+		x -= rhs;
+		y -= rhs;
+		return *this;
+	}
+
+	template <typename Type>
 	Vector2D<Type> operator+=(const Vector2D<Type>& lhs, const Vector2D<Type>& rhs)
 	{
 		return Vector2D<Type>(lhs.x + rhs.x, lhs.y + rhs.y);
+	}
+
+	template <typename Type>
+	Vector2D<Type> operator-=(const Vector2D<Type>& lhs, const Vector2D<Type>& rhs)
+	{
+		return Vector2D<Type>(lhs.x - rhs.x, lhs.y - rhs.y);
+	}
+
+	template <typename Type>
+	Vector2D<Type> operator/(const Vector2D<Type>& lhs, const Vector2D<Type>& rhs)
+	{
+		return Vector2D<Type>(lhs.x / rhs.x, lhs.y / rhs.y);
+	}
+
+	template <typename Type>
+	Vector2D<Type> operator/(const Vector2D<Type>& lhs, const Type& rhs)
+	{
+		return Vector2D<Type>(lhs.x / rhs, lhs.y / rhs);
+	}
+
+	template <typename Type>
+	Vector2D<Type> operator/(const Type& lhs, const Vector2D<Type>& rhs)
+	{
+		return Vector2D<Type>(lhs / rhs.x, lhs / rhs.y);
 	}
 
 	template <typename Type> const Vector2D<Type> Vector2D<Type>::Zero(0, 0);

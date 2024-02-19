@@ -16,31 +16,38 @@ namespace JavaEngine
 	Scene::Scene()
 		:	m_Name("Scene"), m_World(std::make_unique<JPhysics::JWorld>())
 	{
-		//TODO: Remove test
-		JObject* tomate = AddObjectToScene<JActor>();
-		tomate->m_Name = "Tomate";
+		////TODO: Remove test
+		//JObject* tomate = AddObjectToScene<JActor>();
+		//tomate->m_Name = "Tomate";
 
-		//TODO: Remove test
-		JObject* pomme = AddObjectToScene<JActor>();
-		pomme->m_Name = "Pomme";
+		////TODO: Remove test
+		//JObject* pomme = AddObjectToScene<JActor>();
+		//pomme->m_Name = "Pomme";
 
-		for(int i = 0; i < 6; ++i)
+
+
+		for(int i = 0; i < 10; ++i)
 		{
 			std::random_device rd;
 			std::mt19937 gen(rd());
-			std::uniform_real_distribution<> dist(10, 400);
+			std::uniform_real_distribution<> dist(10, 600);
+
+			std::uniform_int_distribution<> bo(0, 1);
 
 			float x = dist(gen);
 			float y = dist(gen);
 
+			bool isStatic = false;
 
+			if(i > 0)
+				isStatic = bo(gen)==0?false:true;
 
 			if(i%2==0)
 			{
-				m_World->AddRigidbody(JPhysics::RigidBodyf::CreateCircleBody(10.f, JMaths::Vector2Df(x, y), 2.f, false, 0.5f));
+				m_World->AddRigidbody(JPhysics::RigidBodyf::CreateCircleBody(10.f, JMaths::Vector2Df(x, y), 2.f, isStatic, 0.5f));
 			}else
 			{
-				m_World->AddRigidbody(JPhysics::RigidBodyf::CreateBoxBody(20.f, 20.f , JMaths::Vector2Df(x, y), 2.f, false, 0.5f));
+				m_World->AddRigidbody(JPhysics::RigidBodyf::CreateBoxBody(20.f, 20.f , JMaths::Vector2Df(x, y), 2.f, isStatic, 0.5f));
 			}
 		}
 	}
@@ -74,7 +81,7 @@ namespace JavaEngine
 
 		float dx = 0.f;
 		float dy = 0.f;
-		float speed = 2.f;
+		float forceMagnitude = 25.f;
 		if(sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
 		{
 			dx--;
@@ -97,17 +104,17 @@ namespace JavaEngine
 
 		if (dx != .0f || dy != .0f)
 		{
-			JMaths::Vector2Df direction = JMaths::Vector2Df(dx, dy).normalilze();
-			JMaths::Vector2Df velocity = direction * speed;
+			JMaths::Vector2Df forceDirection = JMaths::Vector2Df(dx, dy).normalilze();
+			JMaths::Vector2Df force = forceDirection * forceMagnitude;
 
 			auto* body = m_World->GetRigidbody(0);
 			if(body != nullptr)
 			{
-				body->Move(velocity);
+				body->AddForce(force);
 			}
 		}
 
-		m_World->Step(0.1f);
+		m_World->Step(0.5f);
 	}
 
 	void Scene::OnRenderer(Window& window)
@@ -136,6 +143,12 @@ namespace JavaEngine
 				shape.setOutlineThickness(1);
 				shape.setPosition(body->GetPosition().x, body->GetPosition().y);
 				shape.setOutlineColor(sf::Color(250, 150, 100));
+
+				if(body->isStatic)
+				{
+					shape.setFillColor(sf::Color::Red);
+				}
+
 				window.Draw(shape);
 			}else if(body->shapeType == JPhysics::Box)
 			{
@@ -148,6 +161,11 @@ namespace JavaEngine
 				shape.setOutlineThickness(1);
 				shape.setPosition(body->GetPosition().x, body->GetPosition().y);
 				shape.setOutlineColor(sf::Color(250, 150, 100));
+
+				if (body->isStatic)
+				{
+					shape.setFillColor(sf::Color::Red);
+				}
 				window.Draw(shape);
 			}
 			

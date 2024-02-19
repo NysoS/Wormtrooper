@@ -31,6 +31,7 @@ namespace JPhysics
 
 				JMaths::Vector2D<Type> currentEdge = nextVerticesA - currentVerticesA;
 				JMaths::Vector2D<Type> axis = currentEdge.GetLeftNormal();
+				axis.normalilze();
 
 				Type minA;
 				Type maxA;
@@ -60,6 +61,7 @@ namespace JPhysics
 
 				JMaths::Vector2D<Type> currentEdge = nextVerticesB - currentVerticesB;
 				JMaths::Vector2D<Type> axis = currentEdge.GetLeftNormal();
+				axis.normalilze();
 
 				Type minA;
 				Type maxA;
@@ -81,9 +83,6 @@ namespace JPhysics
 					_normal = axis;
 				}
 			}
-
-			_depth /= _normal.getLength();
-			_normal.normalilze();
 
 			JMaths::Vector2D<Type> centerA = FindArithmeticMean(_verticesA);
 			JMaths::Vector2D<Type> centerB = FindArithmeticMean(_verticesB);
@@ -114,7 +113,7 @@ namespace JPhysics
 			}
 
 			_normal = _centerB - _centerA;
-			_normal.getNormarlized();
+			_normal.normalilze();
 
 			_depth = radius - distance;
 
@@ -150,6 +149,7 @@ namespace JPhysics
 
 			JMaths::Vector2D<Type> currentEdge = nextVerticesA - currentVerticesA;
 			axis = currentEdge.GetLeftNormal();
+			axis.normalilze();
 
 			ProjectVertices(_vertices, axis, minA, maxA);
 			ProjectCircle(_circlCenter, _circleRadius, axis, minB, maxB);
@@ -175,6 +175,7 @@ namespace JPhysics
 
 		JMaths::Vector2D<Type> cp = _vertices[cpIndex];
 		axis = cp - _circlCenter;
+		axis.normalilze();
 
 		ProjectVertices(_vertices, axis, minA, maxA);
 		ProjectCircle(_circlCenter, _circleRadius, axis, minB, maxB);
@@ -190,9 +191,6 @@ namespace JPhysics
 			_depth = axisDepth;
 			_normal = axis;
 		}
-
-		_depth /= _normal.getLength();
-		_normal.normalilze();
 
 		JMaths::Vector2D<Type> polygonCenter = FindArithmeticMean(_vertices);
 

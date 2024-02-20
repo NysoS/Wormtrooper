@@ -46,7 +46,7 @@ namespace JPhysics
 		static std::vector<Type> CreateBoxTriangles();
 		std::vector<JMaths::Vector2D<Type>> GetTransformVertices();
 
-		void Step(Type _time);
+		void Step(Type _time, const JMaths::Vector2D<Type>& _gravity);
 		void Move(JMaths::Vector2D<Type> _amount);
 		void MoveTo(JMaths::Vector2D<Type> _position);
 		void Rotate(Type _amount);
@@ -109,10 +109,10 @@ namespace JPhysics
 		bool _isStatic, Type _resitution)
 	{
 		Type area = _radius * _radius * M_PI;
-		if(area < MinBodySize || area > MaxBodySize)
+		/*if(area < MinBodySize || area > MaxBodySize)
 		{
 			return nullptr;
-		}
+		}*/
 
 		if(_density < MinDensity || _density > MaxDensity)
 		{
@@ -121,7 +121,7 @@ namespace JPhysics
 
 		_resitution = JMaths::JMath<Type>::Clamp(_resitution, .0f, 1.f);
 
-		Type mass = area * 1.f * _density;
+		Type mass = area * _density;
 
 		return new RigidBody(_position, _density, mass, _resitution, area, _isStatic, _radius, 0.f, 0.f, ShapeType::Circle);
 	}
@@ -131,10 +131,10 @@ namespace JPhysics
 		Type _density, bool _isStatic, Type _resitution)
 	{
 		Type area = _width * _height;
-		if (area < MinBodySize || area > MaxBodySize)
+		/*if (area < MinBodySize || area > MaxBodySize)
 		{
 			return nullptr;
-		}
+		}*/
 
 		if (_density < MinDensity || _density > MaxDensity)
 		{
@@ -202,13 +202,20 @@ namespace JPhysics
 	}
 
 	template <typename Type>
-	void RigidBody<Type>::Step(Type _time)
+	void RigidBody<Type>::Step(Type _time, const JMaths::Vector2D<Type>& _gravity)
 	{
+		if(isStatic)
+		{
+			return;
+		}
+
 		//force = mass * acc
 		//acc = force / mass
 
-		JMaths::Vector2D<Type> acceleration = m_force / mass;
-		m_linearVelocity += acceleration * _time;
+		//JMaths::Vector2D<Type> acceleration = m_force / mass;
+		//m_linearVelocity += acceleration * _time;
+
+		m_linearVelocity += _gravity * _time;
 
 		m_position += m_linearVelocity * _time;
 		m_rotation += m_rotationVelocity * _time;

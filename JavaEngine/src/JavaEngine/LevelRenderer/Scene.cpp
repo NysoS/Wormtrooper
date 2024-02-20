@@ -4,6 +4,7 @@
 #include <SFML/Graphics/CircleShape.hpp>
 #include <SFML/Graphics/ConvexShape.hpp>
 #include <SFML/Window/Keyboard.hpp>
+#include <SFML/Window/Mouse.hpp>
 
 #include "JavaEngine/Core/Application.h"
 #include "JavaEngine/Core/Log.h"
@@ -42,14 +43,15 @@ namespace JavaEngine
 			if(i > 0)
 				isStatic = bo(gen)==0?false:true;
 
-			if(i%2==0)
-			{
-				m_World->AddRigidbody(JPhysics::RigidBodyf::CreateCircleBody(10.f, JMaths::Vector2Df(x, y), 2.f, isStatic, 0.5f));
-			}else
-			{
-				m_World->AddRigidbody(JPhysics::RigidBodyf::CreateBoxBody(20.f, 20.f , JMaths::Vector2Df(x, y), 2.f, isStatic, 0.5f));
-			}
+		
+m_World->AddRigidbody(JPhysics::RigidBodyf::CreateCircleBody(10.f, JMaths::Vector2Df(x, y), 2.f, isStatic, 0.5f));
 		}
+
+		float maxWidth = Application::Get().GetWindow().GetWidth();
+		float maxHeight = Application::Get().GetWindow().GetHeight();
+
+		m_World->AddRigidbody(JPhysics::RigidBodyf::CreateBoxBody(1000.f, 20.f,
+			JMaths::Vector2Df(640.f, 500.f), 2.f, true, 0.5f));
 	}
 
 	Scene::~Scene()
@@ -79,7 +81,7 @@ namespace JavaEngine
 		}*/
 
 
-		float dx = 0.f;
+		/*float dx = 0.f;
 		float dy = 0.f;
 		float forceMagnitude = 25.f;
 		if(sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
@@ -112,9 +114,38 @@ namespace JavaEngine
 			{
 				body->AddForce(force);
 			}
+		}*/
+
+		if(sf::Mouse::isButtonPressed(sf::Mouse::Left))
+		{
+			std::random_device rd;
+			std::mt19937 gen(rd());
+			std::uniform_real_distribution<> dist(10.f, 50.f);
+
+			float width = dist(gen);
+			float height = dist(gen);
+
+			JMaths::Vector2Df mouseP(sf::Mouse::getPosition().x - 320.f, sf::Mouse::getPosition().y - 250.f);
+
+			m_World->AddRigidbody(JPhysics::RigidBodyf::CreateBoxBody(width, height, mouseP, 2.f, false, .6f));
 		}
 
-		m_World->Step(0.5f);
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
+		{
+			std::random_device rd;
+			std::mt19937 gen(rd());
+			std::uniform_real_distribution<> dist(10.f, 50.f);
+
+			float radius = dist(gen);
+
+			JMaths::Vector2Df mouseP(sf::Mouse::getPosition().x - 320.f, sf::Mouse::getPosition().y - 250.f);
+
+
+			m_World->AddRigidbody(JPhysics::RigidBodyf::CreateCircleBody(10.f, mouseP, 2.f, false, .6f));
+
+		}
+
+		m_World->Step(0.1f);
 	}
 
 	void Scene::OnRenderer(Window& window)

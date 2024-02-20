@@ -51,7 +51,7 @@ namespace JPhysics
 		//Movement step
 		for (int i = 0; i < m_rigidbodyList.size(); ++i)
 		{
-			m_rigidbodyList[i]->Step(_time);
+			m_rigidbodyList[i]->Step(_time, m_gravity);
 		}
 
 		//Collision step
@@ -62,7 +62,12 @@ namespace JPhysics
 			{
 				RigidBodyf* bodyB = m_rigidbodyList[j];
 
-				if(bodyA == bodyB || bodyA->isStatic && bodyB->isStatic)
+				if(bodyA->isStatic && bodyB->isStatic)
+				{
+					continue;
+				}
+
+				if(bodyA == bodyB)
 				{
 					continue;
 				}
@@ -142,11 +147,11 @@ namespace JPhysics
 		{
 			if(shapeTypeB == ShapeType::Box)
 			{
-				return JPhysics::Collisions<float>::IntersectPolygons(bodyA.GetTransformVertices(), bodyB.GetTransformVertices(), _normal, _depth);
+				return JPhysics::Collisions<float>::IntersectPolygons(bodyA.GetPosition(), bodyA.GetTransformVertices(), bodyB.GetPosition(), bodyB.GetTransformVertices(), _normal, _depth);
 			}
 			else if(shapeTypeB == ShapeType::Circle)
 			{
-				const bool result = JPhysics::Collisions<float>::IntersectCirclePolygons(bodyA.GetPosition(), bodyA.radius, bodyB.GetTransformVertices(), _normal, _depth);
+				const bool result = JPhysics::Collisions<float>::IntersectCirclePolygons(bodyB.GetPosition(), bodyB.radius, bodyA.GetPosition(), bodyA.GetTransformVertices(), _normal, _depth);
 
 				_normal = JMaths::Vector2Df{ -_normal.x, -_normal.y };
 				return result;
@@ -156,7 +161,7 @@ namespace JPhysics
 		{
 			if (shapeTypeB == ShapeType::Box)
 			{
-				return JPhysics::Collisions<float>::IntersectCirclePolygons(bodyA.GetPosition(), bodyA.radius, bodyB.GetTransformVertices(), _normal, _depth);
+				return JPhysics::Collisions<float>::IntersectCirclePolygons(bodyA.GetPosition(), bodyA.radius, bodyB.GetPosition(), bodyB.GetTransformVertices(), _normal, _depth);
 			}
 			else if (shapeTypeB == ShapeType::Circle)
 			{

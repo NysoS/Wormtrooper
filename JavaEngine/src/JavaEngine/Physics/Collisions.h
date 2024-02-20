@@ -12,7 +12,18 @@ namespace JPhysics
 	{
 	public:
 		static bool IntersectCirclePolygons(
+			const JMaths::Vector2D<Type>& _circlCenter, Type _circleRadius, const JMaths::Vector2D<Type>& _polygonCenter, const std::vector<JMaths::Vector2D<Type>>& _vertices,
+			JMaths::Vector2D<Type>& _normal, Type& _depth
+		);
+
+		static bool IntersectCirclePolygons(
 			const JMaths::Vector2D<Type>& _circlCenter, Type _circleRadius, const std::vector<JMaths::Vector2D<Type>>& _vertices,
+			JMaths::Vector2D<Type>& _normal, Type& _depth
+		);
+
+		static bool IntersectPolygons(
+			const JMaths::Vector2D<Type>& _centerA, const std::vector<JMaths::Vector2D<Type>>& _verticesA, 
+			const JMaths::Vector2D<Type>& _centerB, const std::vector<JMaths::Vector2D<Type>>& _verticesB,
 			JMaths::Vector2D<Type>& _normal, Type& _depth
 		);
 
@@ -129,6 +140,81 @@ namespace JPhysics
 
 	template <typename Type>
 	bool Collisions<Type>::IntersectCirclePolygons(const JMaths::Vector2D<Type>& _circlCenter, Type _circleRadius,
+		const JMaths::Vector2D<Type>& _polygonCenter, const std::vector<JMaths::Vector2D<Type>>& _vertices,
+		JMaths::Vector2D<Type>& _normal, Type& _depth)
+	{
+		_normal = JMaths::Vector2D<Type>::Zero;
+		_depth = std::numeric_limits<Type>::max();
+
+		JMaths::Vector2D<Type> axis = JMaths::Vector2D<Type>::Zero;
+
+		Type minA;
+		Type maxA;
+		Type minB;
+		Type maxB;
+		Type axisDepth = 0.f;
+
+		for (int i = 0; i < _vertices.size(); ++i)
+		{
+			JMaths::Vector2D<Type> currentVerticesA = _vertices[i];
+			JMaths::Vector2D<Type> nextVerticesA = _vertices[(i + 1) % _vertices.size()];
+
+			JMaths::Vector2D<Type> currentEdge = nextVerticesA - currentVerticesA;
+			axis = currentEdge.GetLeftNormal();
+			axis.normalilze();
+
+			ProjectVertices(_vertices, axis, minA, maxA);
+			ProjectCircle(_circlCenter, _circleRadius, axis, minB, maxB);
+
+			if (minA >= maxB || minB >= maxA)
+			{
+				return false;
+			}
+
+			axisDepth = std::min(maxB - minA, maxA - minB);
+			if (axisDepth < _depth)
+			{
+				_depth = axisDepth;
+				_normal = axis;
+			}
+		}
+
+		int cpIndex = FindClosePointOnPolygon(_circlCenter, _vertices);
+		if (cpIndex <= -1.f)
+		{
+			return false;
+		}
+
+		JMaths::Vector2D<Type> cp = _vertices[cpIndex];
+		axis = cp - _circlCenter;
+		axis.normalilze();
+
+		ProjectVertices(_vertices, axis, minA, maxA);
+		ProjectCircle(_circlCenter, _circleRadius, axis, minB, maxB);
+
+		if (minA >= maxB || minB >= maxA)
+		{
+			return false;
+		}
+
+		axisDepth = std::min(maxB - minA, maxA - minB);
+		if (axisDepth < _depth)
+		{
+			_depth = axisDepth;
+			_normal = axis;
+		}
+
+		JMaths::Vector2D<Type> direction = _polygonCenter - _circlCenter;
+		if (direction.dotProduct(_normal) < 0.f)
+		{
+			_normal = JMaths::Vector2D<Type>{ -_normal.x, -_normal.y };
+		}
+
+		return true;
+	}
+
+	template <typename Type>
+	bool Collisions<Type>::IntersectCirclePolygons(const JMaths::Vector2D<Type>& _circlCenter, Type _circleRadius,
 		const std::vector<JMaths::Vector2D<Type>>& _vertices, JMaths::Vector2D<Type>& _normal, Type& _depth)
 	{
 		_normal = JMaths::Vector2D<Type>::Zero;
@@ -195,6 +281,83 @@ namespace JPhysics
 		JMaths::Vector2D<Type> polygonCenter = FindArithmeticMean(_vertices);
 
 		JMaths::Vector2D<Type> direction = polygonCenter - _circlCenter;
+		if (direction.dotProduct(_normal) < 0.f)
+		{
+			_normal = JMaths::Vector2D<Type>{ -_normal.x, -_normal.y };
+		}
+
+		return true;
+	}
+
+	template <typename Type>
+	bool Collisions<Type>::IntersectPolygons(const JMaths::Vector2D<Type>& _centerA,
+		const std::vector<JMaths::Vector2D<Type>>& _verticesA, const JMaths::Vector2D<Type>& _centerB,
+		const std::vector<JMaths::Vector2D<Type>>& _verticesB, JMaths::Vector2D<Type>& _normal, Type& _depth)
+	{
+		_normal = JMaths::Vector2D<Type>::Zero;
+		_depth = std::numeric_limits<Type>::max();
+
+		for (int i = 0; i < _verticesA.size(); ++i)
+		{
+			JMaths::Vector2D<Type> currentVerticesA = _verticesA[i];
+			JMaths::Vector2D<Type> nextVerticesA = _verticesA[(i + 1) % _verticesA.size()];
+
+			JMaths::Vector2D<Type> currentEdge = nextVerticesA - currentVerticesA;
+			JMaths::Vector2D<Type> axis = currentEdge.GetLeftNormal();
+			axis.normalilze();
+
+			Type minA;
+			Type maxA;
+			Type minB;
+			Type maxB;
+
+			ProjectVertices(_verticesA, axis, minA, maxA);
+			ProjectVertices(_verticesB, axis, minB, maxB);
+
+			if (minA >= maxB || minB >= maxA)
+			{
+				return false;
+			}
+
+			Type axisDepth = std::min(maxB - minA, maxA - minB);
+			if (axisDepth < _depth)
+			{
+				_depth = axisDepth;
+				_normal = axis;
+			}
+		}
+
+		for (int i = 0; i < _verticesB.size(); ++i)
+		{
+			JMaths::Vector2D<Type> currentVerticesB = _verticesB[i];
+			JMaths::Vector2D<Type> nextVerticesB = _verticesB[(i + 1) % _verticesB.size()];
+
+			JMaths::Vector2D<Type> currentEdge = nextVerticesB - currentVerticesB;
+			JMaths::Vector2D<Type> axis = currentEdge.GetLeftNormal();
+			axis.normalilze();
+
+			Type minA;
+			Type maxA;
+			Type minB;
+			Type maxB;
+
+			ProjectVertices(_verticesA, axis, minA, maxA);
+			ProjectVertices(_verticesB, axis, minB, maxB);
+
+			if (minA >= maxB || minB >= maxA)
+			{
+				return false;
+			}
+
+			Type axisDepth = std::min(maxB - minA, maxA - minB);
+			if (axisDepth < _depth)
+			{
+				_depth = axisDepth;
+				_normal = axis;
+			}
+		}
+
+		JMaths::Vector2D<Type> direction = _centerB - _centerA;
 		if (direction.dotProduct(_normal) < 0.f)
 		{
 			_normal = JMaths::Vector2D<Type>{ -_normal.x, -_normal.y };

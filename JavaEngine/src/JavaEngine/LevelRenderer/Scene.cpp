@@ -45,7 +45,7 @@ namespace JavaEngine
 				isStatic = bo(gen)==0?false:true;
 
 		
-m_World->AddRigidbody(JPhysics::RigidBodyf::CreateCircleBody(10.f, JMaths::Vector2Df(x, y), 2.f, isStatic, 0.5f));
+			m_World->AddRigidbody(JPhysics::RigidBodyf::CreateCircleBody(10.f, JMaths::Vector2Df(x, y), 2.f, isStatic, 0.5f));
 		}
 
 		float maxWidth = Application::Get().GetWindow().GetWidth();
@@ -53,6 +53,16 @@ m_World->AddRigidbody(JPhysics::RigidBodyf::CreateCircleBody(10.f, JMaths::Vecto
 
 		m_World->AddRigidbody(JPhysics::RigidBodyf::CreateBoxBody(1000.f, 20.f,
 			JMaths::Vector2Df(640.f, 500.f), 2.f, true, 0.5f));
+
+		JPhysics::RigidBodyf* rotatePlateform = JPhysics::RigidBodyf::CreateBoxBody(400, 20.f,
+			JMaths::Vector2Df(240.f, 400.f), 2.f, true, 0.5f);
+		rotatePlateform->Rotate(6.28f / 30.f);
+		m_World->AddRigidbody(rotatePlateform);
+
+		JPhysics::RigidBodyf* rotatePlateform2 = JPhysics::RigidBodyf::CreateBoxBody(400, 20.f,
+			JMaths::Vector2Df(840.f, 200.f), 2.f, true, 0.5f);
+		rotatePlateform2->Rotate(6.28f / -30.f);
+		m_World->AddRigidbody(rotatePlateform2);
 	}
 
 	Scene::~Scene()
@@ -232,11 +242,11 @@ m_World->AddRigidbody(JPhysics::RigidBodyf::CreateCircleBody(10.f, JMaths::Vecto
 
 		for(auto& contactPoints : m_World->m_contactPointsList)
 		{
-			sf::RectangleShape shape{sf::Vector2f{8.f,8.f}};
-			shape.setPosition(contactPoints.x, contactPoints.y);
-			shape.setOutlineThickness(2);
-			shape.setOutlineColor(sf::Color::Magenta);
-			window.Draw(shape);
+			sf::CircleShape debugContactPoint{ 5.f };
+			debugContactPoint.setPosition(contactPoints.x + 5.f, contactPoints.y + 5.f);
+			debugContactPoint.setOutlineThickness(2);
+			debugContactPoint.setOutlineColor(sf::Color::Magenta);
+			window.Draw(debugContactPoint);
 		}
 	}
 

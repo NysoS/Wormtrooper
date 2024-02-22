@@ -56,6 +56,8 @@ namespace JPhysics
 		AABB<Type> GetAABB();
 
 	protected:
+		Type CalculateRotationalInertia();
+
 		JMaths::Vector2D<Type> m_position;
 		Type m_rotation;
 		Type m_rotationVelocity;
@@ -77,6 +79,8 @@ namespace JPhysics
 		Type density;
 		Type restitution;
 		Type area;
+		Type inertia;
+		Type invInertia;
 
 		bool isStatic;
 
@@ -93,7 +97,7 @@ namespace JPhysics
 	RigidBody<Type>::RigidBody(JMaths::Vector2D<Type> _position, Type _density, Type _mass,
 		Type _resistution, Type _area, bool _isStatic, Type _radius, Type _width, Type _height, ShapeType _shapeType)
 			: m_position(_position), m_linearVelocity(JMaths::Vector2D<Type>::Zero), m_rotation(0.f), m_rotationVelocity(0.f), density(_density), mass(_mass), restitution(_resistution), area(_area), isStatic(_isStatic),
-			radius(_radius), width(_width), height(_height), shapeType(_shapeType), m_transformUpdateRequired(true), m_aabbUpdateRequired(true), m_aabb(AABB<Type>(0,0,0,0))
+			radius(_radius), width(_width), height(_height), shapeType(_shapeType), m_transformUpdateRequired(true), m_aabbUpdateRequired(true), m_aabb(AABB<Type>(0,0,0,0)), inertia(CalculateRotationalInertia()), invInertia(0.f)
 	{
 		if(shapeType == ShapeType::Box)
 		{
@@ -106,6 +110,7 @@ namespace JPhysics
 		if(!isStatic)
 		{
 			invMass = 1.f / mass;
+			invInertia = 1.f / inertia;
 		}
 	}
 
@@ -313,6 +318,22 @@ namespace JPhysics
 
 		m_aabbUpdateRequired = false;
 		return m_aabb;
+	}
+
+	template <typename Type>
+	Type RigidBody<Type>::CalculateRotationalInertia()
+	{
+		if(shapeType == ShapeType::Circle)
+		{
+			return (1 / 2) * mass * (radius * radius);
+		}
+
+		if(shapeType == ShapeType::Box)
+		{
+			return (1 / 12) * mass * (height * height + width * width);
+		}
+
+		return 0.f;
 	}
 
 	using RigidBodyf = RigidBody<float>;

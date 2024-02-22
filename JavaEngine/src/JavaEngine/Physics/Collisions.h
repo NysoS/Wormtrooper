@@ -25,6 +25,10 @@ namespace JPhysics
 			const JMaths::Vector2D<Type>& _centerA, const Type& _radiusA,
 			const JMaths::Vector2D<Type>& _centerB, JMaths::Vector2D<Type>& _contactPoint);
 
+		static void FindContactPointsPolygon(
+			const std::vector<JMaths::Vector2D<Type>>& _verticesA, const std::vector<JMaths::Vector2D<Type>>& _verticesB,
+			JMaths::Vector2D<Type>& _contact1, JMaths::Vector2D<Type>& _contact2, Type& _countactCount);
+
 		static void FindContactPointPolygonCircle(const JMaths::Vector2D<Type>& _circleCenter, const Type& _circleRadius,
 			const JMaths::Vector2D<Type>& _polygonCenter, const std::vector<JMaths::Vector2D<Type>>& _polygonVertices,
 			JMaths::Vector2D<Type>& _contactPoint);
@@ -127,6 +131,7 @@ namespace JPhysics
 		{
 			if (shapeTypeB == ShapeType::Box)
 			{
+				FindContactPointsPolygon(bodyA.GetTransformVertices(), bodyB.GetTransformVertices(), _contact1, _contact2, _contactCount);
 			}
 			else if (shapeTypeB == ShapeType::Circle)
 			{
@@ -157,6 +162,78 @@ namespace JPhysics
 		JMaths::Vector2D<Type> ab = _centerB - _centerA;
 		JMaths::Vector2D<Type> direction = ab.getNormarlized();
 		_contactPoint = _centerA + direction * _radiusA;
+	}
+
+	template <typename Type>
+	void Collisions<Type>::FindContactPointsPolygon(const std::vector<JMaths::Vector2D<Type>>& _verticesA,
+		const std::vector<JMaths::Vector2D<Type>>& _verticesB, JMaths::Vector2D<Type>& _contact1,
+		JMaths::Vector2D<Type>& _contact2, Type& _countactCount)
+	{
+		_contact1 = JMaths::Vector2D<Type>::Zero;
+		_contact2 = JMaths::Vector2D<Type>::Zero;
+		_countactCount = 0;
+
+		Type minDistanceSqrt = std::numeric_limits<Type>::max();
+
+		for(int i = 0; i < _verticesA.size(); ++i)
+		{
+			JMaths::Vector2D<Type> p = _verticesA[i];
+
+			for(int j = 0; j < _verticesB.size(); ++j)
+			{
+				JMaths::Vector2D<Type> va = _verticesB[j];
+				JMaths::Vector2D<Type> vb = _verticesB[(j+1) % _verticesB.size()];
+
+				Type distanceSqrt = 0.f;
+				JMaths::Vector2D<Type> contact;
+				PointSegmentDistance(p, va, vb, distanceSqrt, contact);
+
+				if (JMaths::JMath<Type>::NearlyEqual(distanceSqrt, minDistanceSqrt))
+				{
+					if(!JMaths::JMath<Type>::NearlyEqual(contact, _contact1))
+					{
+						_contact2 = contact;
+						_countactCount = 2;
+					}
+				}
+				else if(distanceSqrt < minDistanceSqrt)
+				{
+					minDistanceSqrt = distanceSqrt;
+					_countactCount = 1;
+					_contact1 = contact;
+				}
+			}
+		}
+
+		for (int i = 0; i < _verticesB.size(); ++i)
+		{
+			JMaths::Vector2D<Type> p = _verticesB[i];
+
+			for (int j = 0; i < _verticesA.size(); ++i)
+			{
+				JMaths::Vector2D<Type> va = _verticesA[j];
+				JMaths::Vector2D<Type> vb = _verticesA[(j + 1) % _verticesA.size()];
+
+				Type distanceSqrt = 0.f;
+				JMaths::Vector2D<Type> contact;
+				PointSegmentDistance(p, va, vb, distanceSqrt, contact);
+
+				if (JMaths::JMath<Type>::NearlyEqual(distanceSqrt, minDistanceSqrt))
+				{
+					if (!JMaths::JMath<Type>::NearlyEqual(contact, _contact1))
+					{
+						_contact2 = contact;
+						_countactCount = 2;
+					}
+				}
+				else if (distanceSqrt < minDistanceSqrt)
+				{
+					minDistanceSqrt = distanceSqrt;
+					_countactCount = 1;
+					_contact1 = contact;
+				}
+			}
+		}
 	}
 
 	template <typename Type>

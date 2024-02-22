@@ -46,130 +46,101 @@ namespace JPhysics
 		return m_rigidbodyList.at(_index);
 	}
 
-	void JWorld::Step(float _time)
+	void JWorld::Step(float _time, int _iterations)
 	{
-		//Movement step
-		for (int i = 0; i < m_rigidbodyList.size(); ++i)
-		{
-			m_rigidbodyList[i]->Step(_time, m_gravity);
-		}
+		int iterations = JMaths::JMath<int>::Clamp(_iterations, MinIteration, MaxIteration);
 
-		//Collision step
-		for (int i = 0; i < m_rigidbodyList.size() - 1; ++i)
+		m_contactPointsList.clear();
+
+		for (int it = 0; it < iterations; ++it)
 		{
-			RigidBodyf* bodyA = m_rigidbodyList[i];
-			for (int j = 1; j < m_rigidbodyList.size(); ++j)
+			//Movement step
+			for (int i = 0; i < m_rigidbodyList.size(); ++i)
 			{
-				RigidBodyf* bodyB = m_rigidbodyList[j];
+				m_rigidbodyList[i]->Step(_time, m_gravity, static_cast<float>(iterations));
+			}
 
-				if(bodyA->isStatic && bodyB->isStatic)
+			m_contactList.clear();
+
+			//Collision step
+			for (int i = 0; i < m_rigidbodyList.size() - 1; ++i)
+			{
+				RigidBodyf* bodyA = m_rigidbodyList[i];
+				AABB<float> aabb_bodyA = bodyA->GetAABB();
+
+				for (int j = 1; j < m_rigidbodyList.size(); ++j)
 				{
-					continue;
-				}
+					RigidBodyf* bodyB = m_rigidbodyList[j];
+					AABB<float> aabb_bodyB = bodyB->GetAABB();
 
-				if(bodyA == bodyB)
-				{
-					continue;
-				}
-
-				JMaths::Vector2Df normal{};
-				float depth{ 0 };
-
-				if(Collide(*bodyA, *bodyB, normal, depth))
-				{
-					if(bodyA->isStatic)
+					if (bodyA->isStatic && bodyB->isStatic)
 					{
-						bodyB->Move(normal * depth);
-					}else if(bodyB->isStatic)
-					{
-						bodyA->Move(JMaths::Vector2Df{ -normal.x, -normal.y } *(depth / 2.f));
-					}else
-					{
-						bodyA->Move(JMaths::Vector2Df{ -normal.x, -normal.y } *(depth / 2.f));
-						bodyB->Move(normal * (depth / 2.f));
+						continue;
 					}
 
-					ResolveCollision(*bodyA, *bodyB, normal, depth);
-				}
-
-				/*
-
-				if (bodyA->shapeType == JPhysics::Box && bodyB->shapeType == JPhysics::Circle)
-				{
-					if (JPhysics::Collisions<float>::IntersectCirclePolygons(bodyB->GetPosition(), bodyB->radius, bodyA->GetTransformVertices(), normal, depth))
+					if (bodyA == bodyB)
 					{
-						bodyB->Move(JMaths::Vector2Df(-normal.x, -normal.y) * (depth / 2.f));
-						bodyA->Move(normal * (depth / 2.f));
+						continue;
+					}
+
+					JMaths::Vector2Df normal{};
+					float depth{ 0 };
+
+					if(!Collisions<float>::IntersectAABB(aabb_bodyA, aabb_bodyB))
+					{
+						continue;
+					}
+
+					if (Collisions<float>::Collide(*bodyA, *bodyB, normal, depth))
+					{
+						if (bodyA->isStatic)
+						{
+							bodyB->Move(normal * depth);
+						}
+						else if (bodyB->isStatic)
+						{
+							bodyA->Move(JMaths::Vector2Df{ -normal.x, -normal.y } *(depth / 2.f));
+						}
+						else
+						{
+							bodyA->Move(JMaths::Vector2Df{ -normal.x, -normal.y } *(depth / 2.f));
+							bodyB->Move(normal * (depth / 2.f));
+						}
+
+
+						JMaths::Vector2Df contact1;
+						JMaths::Vector2Df contact2;
+						float contactCount;
+
+						Collisions<float>::FindContactPoints(*bodyA, *bodyB, contact1, contact2, contactCount);
+						Manifold<float>* c = new Manifold<float>{ *bodyA, *bodyB, normal, depth, contact1, contact2, contactCount };
+						m_contactList.push_back(c);
 					}
 				}
-				else if (bodyB->shapeType == JPhysics::Box && bodyA->shapeType == JPhysics::Circle)
+			}
+
+			for(int i = 0; i < m_contactList.size(); ++i)
+			{
+				Manifold<float> contact = *m_contactList[i];
+				ResolveCollision(contact);
+
+				if(contact.contactCount > 0)
 				{
-					if (JPhysics::Collisions<float>::IntersectCirclePolygons(bodyA->GetPosition(), bodyA->radius, bodyB->GetTransformVertices(), normal, depth))
+					if(std::find(m_contactPointsList.begin(), m_contactPointsList.end(), contact.contact1) == m_contactPointsList.end())
 					{
-						bodyA->Move(JMaths::Vector2Df(-normal.x, -normal.y) * (depth / 2.f));
-						bodyB->Move(normal * (depth / 2.f));
+						m_contactPointsList.push_back(contact.contact1);
 					}
-				}*/
 
-
-				/*if (JPhysics::Collisions<float>::IntersectPolygons(bodyA->GetTransformVertices(), bodyB->GetTransformVertices(), normal, depth))
-				{
-					JE_INFO("depth {0}", depth);
-					bodyA->Move(JMaths::Vector2Df(-normal.x, -normal.y) * (depth / 2.f));
-					bodyB->Move(normal * (depth / 2.f));
-				}*/
-
-				//if(JPhysics::Collisions<float>::IntersectCircles(
-				//	bodyA->GetPosition(), bodyA->radius,
-				//	bodyB->GetPosition(), bodyB->radius,
-				//	normal, depth))
-				//{
-				//	JE_INFO("depth {0} {1}", normal.x, normal.y);
-				//	bodyA->Move(JMaths::Vector2Df(-normal.x, -normal.y) * (depth / 2.f));
-				//	bodyB->Move(normal * (depth / 2.f));
-				//}
+					if (contact.contactCount > 1)
+					{
+						if (std::find(m_contactPointsList.begin(), m_contactPointsList.end(), contact.contact2) == m_contactPointsList.end())
+						{
+							m_contactPointsList.push_back(contact.contact2);
+						}
+					}
+				}
 			}
 		}
-	}
-
-	bool JWorld::Collide(const RigidBodyf& _bodyA, const RigidBodyf& _bodyB, JMaths::Vector2Df& _normal, float& _depth)
-	{
-		_normal = JMaths::Vector2Df::Zero;
-		_depth = 0.f;
-
-		ShapeType shapeTypeA = _bodyA.shapeType;
-		ShapeType shapeTypeB = _bodyB.shapeType;
-
-		RigidBodyf bodyA = _bodyA;
-		RigidBodyf bodyB = _bodyB;
-
-		if(shapeTypeA == ShapeType::Box)
-		{
-			if(shapeTypeB == ShapeType::Box)
-			{
-				return JPhysics::Collisions<float>::IntersectPolygons(bodyA.GetPosition(), bodyA.GetTransformVertices(), bodyB.GetPosition(), bodyB.GetTransformVertices(), _normal, _depth);
-			}
-			else if(shapeTypeB == ShapeType::Circle)
-			{
-				const bool result = JPhysics::Collisions<float>::IntersectCirclePolygons(bodyB.GetPosition(), bodyB.radius, bodyA.GetPosition(), bodyA.GetTransformVertices(), _normal, _depth);
-
-				_normal = JMaths::Vector2Df{ -_normal.x, -_normal.y };
-				return result;
-			}
-		}
-		else if(shapeTypeA == ShapeType::Circle)
-		{
-			if (shapeTypeB == ShapeType::Box)
-			{
-				return JPhysics::Collisions<float>::IntersectCirclePolygons(bodyA.GetPosition(), bodyA.radius, bodyB.GetPosition(), bodyB.GetTransformVertices(), _normal, _depth);
-			}
-			else if (shapeTypeB == ShapeType::Circle)
-			{
-				return JPhysics::Collisions<float>::IntersectCircles(bodyA.GetPosition(), bodyA.radius, bodyB.GetPosition(), bodyB.radius, _normal, _depth);
-			}
-		}
-
-		return false;
 	}
 
 	size_t JWorld::RigidbodyCount() const
@@ -177,25 +148,24 @@ namespace JPhysics
 		return m_rigidbodyList.size();
 	}
 
-	void JWorld::ResolveCollision(RigidBodyf& _bodyA, RigidBodyf& _bodyB, JMaths::Vector2Df& _normal,
-		float& depth)
+	void JWorld::ResolveCollision(Manifold<float>& _contact)
 	{
-		JMaths::Vector2Df relativeVelocity = _bodyB.m_linearVelocity - _bodyA.m_linearVelocity;
+		JMaths::Vector2Df relativeVelocity = _contact.bodyB.m_linearVelocity - _contact.bodyA.m_linearVelocity;
 
-		if(relativeVelocity.dotProduct(_normal) > 0.f)
+		if(relativeVelocity.dotProduct(_contact.normal) > 0.f)
 		{
 			return;
 		}
 
-		const float e = std::min(_bodyA.restitution, _bodyB.restitution);
+		const float e = std::min(_contact.bodyA.restitution, _contact.bodyB.restitution);
 
-		float j = -(1.f + e) * relativeVelocity.dotProduct(_normal);
-		j /= _bodyA.invMass + _bodyB.invMass;
+		float j = -(1.f + e) * relativeVelocity.dotProduct(_contact.normal);
+		j /= _contact.bodyA.invMass + _contact.bodyB.invMass;
 
-		const JMaths::Vector2Df impluse = j * _normal;
+		const JMaths::Vector2Df impluse = j * _contact.normal;
 
-		_bodyA.m_linearVelocity -= impluse * _bodyA.invMass;
-		_bodyB.m_linearVelocity += impluse * _bodyB.invMass;
+		_contact.bodyA.m_linearVelocity -= impluse * _contact.bodyA.invMass;
+		_contact.bodyB.m_linearVelocity += impluse * _contact.bodyB.invMass;
 
 	}
 }

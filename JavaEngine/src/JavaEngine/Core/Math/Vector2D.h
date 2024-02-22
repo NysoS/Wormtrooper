@@ -22,6 +22,7 @@ namespace JMaths
 		Type x, y;
 
 		static Type Distance(const Vector2D& one, const Vector2D& two);
+		static Type DistanceSquare(const Vector2D& a, const Vector2D& b);
 
 		static const Vector2D Zero;
 		static const Vector2D Up;
@@ -89,9 +90,15 @@ namespace JMaths
 	template <typename Type>
 	Type Vector2D<Type>::Distance(const Vector2D& one, const Vector2D& two)
 	{
-		Type dx = one.x - two.x;
-		Type dy = one.y - two.y;
-		return std::sqrt(dx * dx + dy * dy);
+		return std::sqrt(DistanceSquare(one, two));
+	}
+
+	template <typename Type>
+	Type Vector2D<Type>::DistanceSquare(const Vector2D& a, const Vector2D& b)
+	{
+		Type dx = a.x - b.x;
+		Type dy = a.y - b.y;
+		return dx * dx + dy * dy;
 	}
 
 	template <typename Type>
@@ -185,6 +192,12 @@ namespace JMaths
 	Vector2D<Type> operator/(const Type& lhs, const Vector2D<Type>& rhs)
 	{
 		return Vector2D<Type>(lhs / rhs.x, lhs / rhs.y);
+	}
+
+	template <typename Type>
+	bool operator==(const Vector2D<Type>& lhs, const Vector2D<Type>& rhs)
+	{
+		return lhs.x == rhs.x && lhs.y == rhs.y;
 	}
 
 	template <typename Type> const Vector2D<Type> Vector2D<Type>::Zero(0, 0);

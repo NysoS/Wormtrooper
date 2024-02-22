@@ -1,5 +1,6 @@
 #pragma once
 
+#include "AABB.h"
 #include "jepch.h"
 #include "JavaEngine/Core/Core.h"
 #include "JavaEngine/Core/Math/Math.h"
@@ -46,11 +47,13 @@ namespace JPhysics
 		static std::vector<Type> CreateBoxTriangles();
 		std::vector<JMaths::Vector2D<Type>> GetTransformVertices();
 
-		void Step(Type _time, const JMaths::Vector2D<Type>& _gravity);
+		void Step(Type _time, const JMaths::Vector2D<Type>& _gravity, const Type& _iteratoons);
 		void Move(JMaths::Vector2D<Type> _amount);
 		void MoveTo(JMaths::Vector2D<Type> _position);
 		void Rotate(Type _amount);
 		void AddForce(JMaths::Vector2D<Type> _amount);
+
+		AABB<Type> GetAABB();
 
 	protected:
 		JMaths::Vector2D<Type> m_position;
@@ -64,6 +67,9 @@ namespace JPhysics
 		std::vector<JMaths::Vector2D<Type>> m_transformVertices;
 
 		bool m_transformUpdateRequired = false;
+
+		AABB<Type> m_aabb;
+		bool m_aabbUpdateRequired = false;
 
 	public:
 		Type mass;
@@ -87,7 +93,7 @@ namespace JPhysics
 	RigidBody<Type>::RigidBody(JMaths::Vector2D<Type> _position, Type _density, Type _mass,
 		Type _resistution, Type _area, bool _isStatic, Type _radius, Type _width, Type _height, ShapeType _shapeType)
 			: m_position(_position), m_linearVelocity(JMaths::Vector2D<Type>::Zero), m_rotation(0.f), m_rotationVelocity(0.f), density(_density), mass(_mass), restitution(_resistution), area(_area), isStatic(_isStatic),
-			radius(_radius), width(_width), height(_height), shapeType(_shapeType)
+			radius(_radius), width(_width), height(_height), shapeType(_shapeType), m_transformUpdateRequired(true), m_aabbUpdateRequired(true), m_aabb(AABB<Type>(0,0,0,0))
 	{
 		if(shapeType == ShapeType::Box)
 		{
@@ -95,7 +101,6 @@ namespace JPhysics
 			m_transformVertices.resize(m_vertices.size());
 		}
 
-		m_transformUpdateRequired = true;
 		m_force = JMaths::Vector2D<Type>::Zero;
 
 		if(!isStatic)
@@ -202,12 +207,14 @@ namespace JPhysics
 	}
 
 	template <typename Type>
-	void RigidBody<Type>::Step(Type _time, const JMaths::Vector2D<Type>& _gravity)
+	void RigidBody<Type>::Step(Type _time, const JMaths::Vector2D<Type>& _gravity, const Type& _iterations)
 	{
 		if(isStatic)
 		{
 			return;
 		}
+
+		Type time = _time / _iterations;
 
 		//force = mass * acc
 		//acc = force / mass
@@ -215,13 +222,14 @@ namespace JPhysics
 		//JMaths::Vector2D<Type> acceleration = m_force / mass;
 		//m_linearVelocity += acceleration * _time;
 
-		m_linearVelocity += _gravity * _time;
+		m_linearVelocity += _gravity * time;
 
-		m_position += m_linearVelocity * _time;
-		m_rotation += m_rotationVelocity * _time;
+		m_position += m_linearVelocity * time;
+		m_rotation += m_rotationVelocity * time;
 
 		m_force = JMaths::Vector2D<Type>::Zero;
 		m_transformUpdateRequired = true;
+		m_aabbUpdateRequired = true;
 	}
 
 	template <typename Type>
@@ -230,6 +238,7 @@ namespace JPhysics
 		m_position.x += _amount.x;
 		m_position.y += _amount.y;
 		m_transformUpdateRequired = true;
+		m_aabbUpdateRequired = true;
 	}
 
 	template <typename Type>
@@ -237,6 +246,7 @@ namespace JPhysics
 	{
 		m_position = _position;
 		m_transformUpdateRequired = true;
+		m_aabbUpdateRequired = true;
 	}
 
 	template <typename Type>
@@ -244,12 +254,65 @@ namespace JPhysics
 	{
 		m_rotation += _amount;
 		m_transformUpdateRequired = true;
+		m_aabbUpdateRequired = true;
 	}
 
 	template <typename Type>
 	void RigidBody<Type>::AddForce(JMaths::Vector2D<Type> _amount)
 	{
 		m_force = _amount;
+	}
+
+	template <typename Type>
+	AABB<Type> RigidBody<Type>::GetAABB()
+	{
+		if(m_aabbUpdateRequired)
+		{
+			Type minX = std::numeric_limits<Type>::max();
+			Type minY = std::numeric_limits<Type>::max();
+			Type maxX = std::numeric_limits<Type>::min();
+			Type maxY = std::numeric_limits<Type>::min();
+
+			if (shapeType == ShapeType::Box)
+			{
+				std::vector<JMaths::Vector2D<Type>> vertices = GetTransformVertices();
+				for (int i = 0; i < vertices.size(); ++i)
+				{
+					if (vertices[i].x < minX)
+					{
+						minX = vertices[i].x;
+					}
+
+					if (vertices[i].x > maxX)
+					{
+						maxX = vertices[i].x;
+					}
+
+					if (vertices[i].y < minY)
+					{
+						minY = vertices[i].y;
+					}
+
+					if (vertices[i].y > maxY)
+					{
+						maxY = vertices[i].y;
+					}
+				}
+
+			}
+			else if (shapeType == ShapeType::Circle)
+			{
+				minX = m_position.x - radius;
+				minY = m_position.y - radius;
+				maxX = m_position.x + radius;
+				maxY = m_position.y + radius;
+			}
+
+			m_aabb = AABB<Type>(minX, minY, maxX, maxY);
+		}
+
+		m_aabbUpdateRequired = false;
+		return m_aabb;
 	}
 
 	using RigidBodyf = RigidBody<float>;

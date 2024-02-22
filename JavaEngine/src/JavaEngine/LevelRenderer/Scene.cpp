@@ -3,6 +3,7 @@
 #include <random>
 #include <SFML/Graphics/CircleShape.hpp>
 #include <SFML/Graphics/ConvexShape.hpp>
+#include <SFML/Graphics/RectangleShape.hpp>
 #include <SFML/Window/Keyboard.hpp>
 #include <SFML/Window/Mouse.hpp>
 
@@ -130,13 +131,13 @@ m_World->AddRigidbody(JPhysics::RigidBodyf::CreateCircleBody(10.f, JMaths::Vecto
 			m_World->AddRigidbody(JPhysics::RigidBodyf::CreateBoxBody(width, height, mouseP, 2.f, false, .6f));
 		}
 
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
+		if (sf::Mouse::isButtonPressed(sf::Mouse::Right))
 		{
-			std::random_device rd;
+			/*std::random_device rd;
 			std::mt19937 gen(rd());
-			std::uniform_real_distribution<> dist(10.f, 50.f);
+			std::uniform_real_distribution<> dist(5.f, 20.f);
 
-			float radius = dist(gen);
+			float radius = dist(gen);*/
 
 			JMaths::Vector2Df mouseP(sf::Mouse::getPosition().x - 320.f, sf::Mouse::getPosition().y - 250.f);
 
@@ -145,7 +146,34 @@ m_World->AddRigidbody(JPhysics::RigidBodyf::CreateCircleBody(10.f, JMaths::Vecto
 
 		}
 
-		m_World->Step(0.1f);
+		/*if(clock.s > 1)
+		{
+			totalBodyCount = 0;
+			totalWorldStepTime = 0;
+			totalSampleCount = 0;
+			clock.reset;
+		}*/
+
+		m_World->Step(0.1f, 20);
+		totalWorldStepTime += 0.05f;
+		totalBodyCount += m_World->RigidbodyCount();
+		totalSampleCount++;
+
+		for(int i =0; i < m_World->RigidbodyCount(); ++i)
+		{
+			JPhysics::RigidBodyf* body = m_World->GetRigidbody(i);
+			if(!body)
+			{
+				continue;
+			}
+
+			JPhysics::AABB<float> box = body->GetAABB();
+			if(box.max.y > Application::Get().GetWindow().GetHeight())
+			{
+				JE_INFO("body removed, max body {0}", m_World->RigidbodyCount());
+				m_World->RemoveRigidbody(body);
+			}
+		}
 	}
 
 	void Scene::OnRenderer(Window& window)
@@ -170,7 +198,7 @@ m_World->AddRigidbody(JPhysics::RigidBodyf::CreateCircleBody(10.f, JMaths::Vecto
 			if(body->shapeType == JPhysics::Circle)
 			{
 				sf::CircleShape shape{};
-				shape.setRadius(10.f);
+				shape.setRadius(body->radius);
 				shape.setOutlineThickness(1);
 				shape.setPosition(body->GetPosition().x, body->GetPosition().y);
 				shape.setOutlineColor(sf::Color(250, 150, 100));
@@ -200,6 +228,15 @@ m_World->AddRigidbody(JPhysics::RigidBodyf::CreateCircleBody(10.f, JMaths::Vecto
 				window.Draw(shape);
 			}
 			
+		}
+
+		for(auto& contactPoints : m_World->m_contactPointsList)
+		{
+			sf::RectangleShape shape{sf::Vector2f{8.f,8.f}};
+			shape.setPosition(contactPoints.x, contactPoints.y);
+			shape.setOutlineThickness(2);
+			shape.setOutlineColor(sf::Color::Magenta);
+			window.Draw(shape);
 		}
 	}
 

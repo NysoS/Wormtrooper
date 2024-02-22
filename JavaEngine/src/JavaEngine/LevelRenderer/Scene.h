@@ -63,5 +63,9 @@ namespace JavaEngine
 
 		std::vector<JObject*> m_ObjectList;
 		std::unique_ptr<JPhysics::JWorld> m_World;
+
+		double totalWorldStepTime;
+		size_t totalBodyCount;
+		int totalSampleCount;
 	};
 }

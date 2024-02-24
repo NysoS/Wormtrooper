@@ -44,23 +44,26 @@ namespace JavaEngine
 			if(i > 0)
 				isStatic = bo(gen)==0?false:true;
 
-		
-			m_World->AddRigidbody(JPhysics::RigidBodyf::CreateCircleBody(10.f, JMaths::Vector2Df(x, y), 2.f, isStatic, 0.5f));
+
+			JPhysics::RigidBodyf* simpleBall = JPhysics::RigidBodyf::CreateCircleBody(10.f, 2.f, isStatic, 0.5f);
+			simpleBall->MoveTo(JMaths::Vector2Df(x, y));
+			m_World->AddRigidbody(simpleBall);
 		}
 
 		float maxWidth = Application::Get().GetWindow().GetWidth();
 		float maxHeight = Application::Get().GetWindow().GetHeight();
 
-		m_World->AddRigidbody(JPhysics::RigidBodyf::CreateBoxBody(1000.f, 20.f,
-			JMaths::Vector2Df(640.f, 500.f), 2.f, true, 0.5f));
+		JPhysics::RigidBodyf* flatGround = JPhysics::RigidBodyf::CreateBoxBody(1000.f, 20.f, 2.f, true, 0.5f);
+		flatGround->MoveTo(JMaths::Vector2Df(640.f, 500.f));
+		m_World->AddRigidbody(flatGround);
 
-		JPhysics::RigidBodyf* rotatePlateform = JPhysics::RigidBodyf::CreateBoxBody(400, 20.f,
-			JMaths::Vector2Df(240.f, 400.f), 2.f, true, 0.5f);
+		JPhysics::RigidBodyf* rotatePlateform = JPhysics::RigidBodyf::CreateBoxBody(400, 20.f, 2.f, true, 0.5f);
+		rotatePlateform->MoveTo(JMaths::Vector2Df(240.f, 400.f));
 		rotatePlateform->Rotate(6.28f / 30.f);
 		m_World->AddRigidbody(rotatePlateform);
 
-		JPhysics::RigidBodyf* rotatePlateform2 = JPhysics::RigidBodyf::CreateBoxBody(400, 20.f,
-			JMaths::Vector2Df(840.f, 200.f), 2.f, true, 0.5f);
+		JPhysics::RigidBodyf* rotatePlateform2 = JPhysics::RigidBodyf::CreateBoxBody(400, 20.f, 2.f, true, 0.5f);
+		rotatePlateform2->MoveTo(JMaths::Vector2Df(840.f, 200.f));
 		rotatePlateform2->Rotate(6.28f / -30.f);
 		m_World->AddRigidbody(rotatePlateform2);
 	}
@@ -138,7 +141,9 @@ namespace JavaEngine
 
 			JMaths::Vector2Df mouseP(sf::Mouse::getPosition().x - 320.f, sf::Mouse::getPosition().y - 250.f);
 
-			m_World->AddRigidbody(JPhysics::RigidBodyf::CreateBoxBody(width, height, mouseP, 2.f, false, .6f));
+			JPhysics::RigidBodyf* Box = JPhysics::RigidBodyf::CreateBoxBody(width, height, 2.f, false, .6f);
+			Box->MoveTo(mouseP);
+			m_World->AddRigidbody(Box);
 		}
 
 		if (sf::Mouse::isButtonPressed(sf::Mouse::Right))
@@ -151,8 +156,9 @@ namespace JavaEngine
 
 			JMaths::Vector2Df mouseP(sf::Mouse::getPosition().x - 320.f, sf::Mouse::getPosition().y - 250.f);
 
-
-			m_World->AddRigidbody(JPhysics::RigidBodyf::CreateCircleBody(10.f, mouseP, 2.f, false, .6f));
+			JPhysics::RigidBodyf* Ball = JPhysics::RigidBodyf::CreateCircleBody(10.f, 2.f, false, .6f);
+			Ball->MoveTo(mouseP);
+			m_World->AddRigidbody(Ball);
 
 		}
 
@@ -172,7 +178,7 @@ namespace JavaEngine
 		for(int i =0; i < m_World->RigidbodyCount(); ++i)
 		{
 			JPhysics::RigidBodyf* body = m_World->GetRigidbody(i);
-			if(!body)
+			if(!body || body->isStatic)
 			{
 				continue;
 			}
@@ -240,14 +246,14 @@ namespace JavaEngine
 			
 		}
 
-		for(auto& contactPoints : m_World->m_contactPointsList)
+		/*for(auto& contactPoints : m_World->m_contactPointsList)
 		{
 			sf::CircleShape debugContactPoint{ 5.f };
 			debugContactPoint.setPosition(contactPoints.x + 5.f, contactPoints.y + 5.f);
 			debugContactPoint.setOutlineThickness(2);
 			debugContactPoint.setOutlineColor(sf::Color::Magenta);
 			window.Draw(debugContactPoint);
-		}
+		}*/
 	}
 
 	void Scene::OnEvent(Event& event)

@@ -74,6 +74,6 @@ namespace JMaths
 	template <typename Type>
 	bool JMath<Type>::NearlyEqual(const JMaths::Vector2D<Type>& _a, const JMaths::Vector2D<Type>& _b)
 	{
-		return NearlyEqual(_a.x, _b.x) && NearlyEqual(_a.y, _b.y);
-	}
+		return JMaths::Vector2D<Type>::DistanceSquare(_a, _b) < VerySmallAmount * VerySmallAmount;
+	} 
 }

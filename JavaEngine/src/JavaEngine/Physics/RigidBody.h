@@ -29,15 +29,15 @@ namespace JPhysics
 		RigidBody() = default;
 
 		RigidBody(
-			JMaths::Vector2D<Type> _position, Type _density, Type _mass, Type _resistution, Type area,
-			bool _isStatic, Type _radius, Type _width, Type _height, ShapeType _shapeType
+			Type _density, Type _mass, Type _inertia, Type _resistution, Type area,
+			bool _isStatic, Type _radius, Type _width, Type _height, std::vector<JMaths::Vector2D<Type>> _vertices, ShapeType _shapeType
 		);
 		virtual ~RigidBody() = default;
 
-		static RigidBody* CreateCircleBody(Type _radius, JMaths::Vector2D<Type> _position, Type _density,
+		static RigidBody* CreateCircleBody(Type _radius, Type _density,
 			bool _isStatic, Type _resitution);
 
-		static RigidBody* CreateBoxBody(Type _width, Type _height, JMaths::Vector2D<Type> _position, Type _density,
+		static RigidBody* CreateBoxBody(Type _width, Type _height, Type _density,
 			bool _isStatic, Type _resitution);
 
 		JMaths::Vector2D<Type> GetPosition() const;
@@ -51,16 +51,15 @@ namespace JPhysics
 		void Move(JMaths::Vector2D<Type> _amount);
 		void MoveTo(JMaths::Vector2D<Type> _position);
 		void Rotate(Type _amount);
+		void RotataTo(Type angle);
 		void AddForce(JMaths::Vector2D<Type> _amount);
 
 		AABB<Type> GetAABB();
 
 	protected:
-		Type CalculateRotationalInertia();
-
 		JMaths::Vector2D<Type> m_position;
-		Type m_rotation;
-		Type m_rotationVelocity;
+		Type m_angle;
+		Type m_angleVelocity;
 
 		JMaths::Vector2D<Type> m_force;
 
@@ -94,35 +93,29 @@ namespace JPhysics
 	};
 
 	template <typename Type>
-	RigidBody<Type>::RigidBody(JMaths::Vector2D<Type> _position, Type _density, Type _mass,
-		Type _resistution, Type _area, bool _isStatic, Type _radius, Type _width, Type _height, ShapeType _shapeType)
-			: m_position(_position), m_linearVelocity(JMaths::Vector2D<Type>::Zero), m_rotation(0.f), m_rotationVelocity(0.f), density(_density), mass(_mass), restitution(_resistution), area(_area), isStatic(_isStatic),
-			radius(_radius), width(_width), height(_height), shapeType(_shapeType), m_transformUpdateRequired(true), m_aabbUpdateRequired(true), m_aabb(AABB<Type>(0,0,0,0)), inertia(CalculateRotationalInertia()), invInertia(0.f)
+	RigidBody<Type>::RigidBody(Type _density, Type _mass, Type _inertia,
+		Type _resistution, Type _area, bool _isStatic, Type _radius, 
+		Type _width, Type _height, std::vector<JMaths::Vector2D<Type>> _vertices, ShapeType _shapeType)
+			: m_position(JMaths::Vector2D<Type>::Zero), m_linearVelocity(JMaths::Vector2D<Type>::Zero), m_angle(0.f), m_angleVelocity(0.f), density(_density), mass(_mass), restitution(_resistution), area(_area), isStatic(_isStatic),
+			radius(_radius), width(_width), height(_height), shapeType(_shapeType), m_transformUpdateRequired(true), m_aabbUpdateRequired(true), m_aabb(AABB<Type>(0,0,0,0)), invMass(_mass > 0 ? 1.f / mass : 0.f), inertia(_inertia), invInertia(_inertia > 0 ? 1.f / inertia : 0.f)
 	{
 		if(shapeType == ShapeType::Box)
 		{
-			m_vertices = CreateBoxVertices(width, height);
+			m_vertices = _vertices;
 			m_transformVertices.resize(m_vertices.size());
 		}
 
 		m_force = JMaths::Vector2D<Type>::Zero;
 
-		if(!isStatic)
-		{
-			invMass = 1.f / mass;
-			invInertia = 1.f / inertia;
-		}
+		m_transformUpdateRequired = true;
+		m_aabbUpdateRequired = true;
 	}
 
 	template <typename Type>
-	RigidBody<Type>* RigidBody<Type>::CreateCircleBody(Type _radius, JMaths::Vector2D<Type> _position, Type _density,
+	RigidBody<Type>* RigidBody<Type>::CreateCircleBody(Type _radius, Type _density,
 		bool _isStatic, Type _resitution)
 	{
 		Type area = _radius * _radius * M_PI;
-		/*if(area < MinBodySize || area > MaxBodySize)
-		{
-			return nullptr;
-		}*/
 
 		if(_density < MinDensity || _density > MaxDensity)
 		{
@@ -131,20 +124,23 @@ namespace JPhysics
 
 		_resitution = JMaths::JMath<Type>::Clamp(_resitution, .0f, 1.f);
 
-		Type mass = area * _density;
+		Type mass = 0.f;
+		Type inertia = 0.f;
 
-		return new RigidBody(_position, _density, mass, _resitution, area, _isStatic, _radius, 0.f, 0.f, ShapeType::Circle);
+		if (!_isStatic)
+		{
+			mass = area * _density;
+			inertia = (1.f / 2) * mass * (_radius * _radius);
+		}
+
+		return new RigidBody(_density, mass, inertia, _resitution, area, _isStatic, _radius, 0.f, 0.f, std::vector<JMaths::Vector2D<Type>>{}, ShapeType::Circle);
 	}
 
 	template <typename Type>
-	RigidBody<Type>* RigidBody<Type>::CreateBoxBody(Type _width, Type _height, JMaths::Vector2D<Type> _position,
+	RigidBody<Type>* RigidBody<Type>::CreateBoxBody(Type _width, Type _height,
 		Type _density, bool _isStatic, Type _resitution)
 	{
 		Type area = _width * _height;
-		/*if (area < MinBodySize || area > MaxBodySize)
-		{
-			return nullptr;
-		}*/
 
 		if (_density < MinDensity || _density > MaxDensity)
 		{
@@ -153,9 +149,18 @@ namespace JPhysics
 
 		_resitution = JMaths::JMath<Type>::Clamp(_resitution, .0f, 1.f);
 
-		Type mass = area * _density;
+		Type mass = 0.f;
+		Type inertia = 0.f;
 
-		return new RigidBody(_position, _density, mass, _resitution, area, _isStatic, 0.f, _width, _height, ShapeType::Box);
+		if(!_isStatic)
+		{
+			mass = area * _density;
+			inertia = (1.f / 12) * mass * (_height * _height + _width * _width);
+		}
+
+		std::vector<JMaths::Vector2D<Type>> vertices = CreateBoxVertices(_width, _height);
+
+		return new RigidBody(_density, mass, inertia, _resitution, area, _isStatic, 0.f, _width, _height, vertices, ShapeType::Box);
 	}
 
 	template <typename Type>
@@ -167,7 +172,7 @@ namespace JPhysics
 	template <typename Type>
 	Type RigidBody<Type>::GetRotation() const
 	{
-		return m_rotation;
+		return m_angle;
 	}
 
 	template <typename Type>
@@ -199,7 +204,7 @@ namespace JPhysics
 		{
 			JavaEngine::Transform<Type>* transform = new JavaEngine::Transform<Type>();
 			transform->setPosition(m_position);
-			transform->setRotation(m_rotation);
+			transform->setRotation(m_angle);
 
 			for(int i = 0; i < m_vertices.size(); ++i)
 			{
@@ -230,7 +235,7 @@ namespace JPhysics
 		m_linearVelocity += _gravity * time;
 
 		m_position += m_linearVelocity * time;
-		m_rotation += m_rotationVelocity * time;
+		m_angle += m_angleVelocity * time;
 
 		m_force = JMaths::Vector2D<Type>::Zero;
 		m_transformUpdateRequired = true;
@@ -257,7 +262,15 @@ namespace JPhysics
 	template <typename Type>
 	void RigidBody<Type>::Rotate(Type _amount)
 	{
-		m_rotation += _amount;
+		m_angle += _amount;
+		m_transformUpdateRequired = true;
+		m_aabbUpdateRequired = true;
+	}
+
+	template <typename Type>
+	void RigidBody<Type>::RotataTo(Type angle)
+	{
+		m_angle = angle;
 		m_transformUpdateRequired = true;
 		m_aabbUpdateRequired = true;
 	}
@@ -318,22 +331,6 @@ namespace JPhysics
 
 		m_aabbUpdateRequired = false;
 		return m_aabb;
-	}
-
-	template <typename Type>
-	Type RigidBody<Type>::CalculateRotationalInertia()
-	{
-		if(shapeType == ShapeType::Circle)
-		{
-			return (1 / 2) * mass * (radius * radius);
-		}
-
-		if(shapeType == ShapeType::Box)
-		{
-			return (1 / 12) * mass * (height * height + width * width);
-		}
-
-		return 0.f;
 	}
 
 	using RigidBodyf = RigidBody<float>;

@@ -40,7 +40,7 @@ namespace JavaEngine
 			std::string Title;
 			unsigned int Width, Height;
 			bool VSync;
-
+			
 			EventCallbackFn EventCallack;
 			EventUpdateCallbackFn EventUpdateCallback;
 			EventRenderCallbackFn EventRenderCallback;

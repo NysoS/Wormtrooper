@@ -21,6 +21,7 @@ namespace JPhysics
 			const RigidBody<Type>& _bodyA, const RigidBody<Type>& _bodyB,
 			JMaths::Vector2D<Type>& _contact1, JMaths::Vector2D<Type>& _contact2, Type& _contactCount);
 
+		//Circle//
 		static void FindContactPoint(
 			const JMaths::Vector2D<Type>& _centerA, const Type& _radiusA,
 			const JMaths::Vector2D<Type>& _centerB, JMaths::Vector2D<Type>& _contactPoint);

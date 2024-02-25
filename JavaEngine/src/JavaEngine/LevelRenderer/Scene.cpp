@@ -28,41 +28,41 @@ namespace JavaEngine
 
 
 
-		for(int i = 0; i < 10; ++i)
-		{
-			std::random_device rd;
-			std::mt19937 gen(rd());
-			std::uniform_real_distribution<> dist(10, 600);
+		//for(int i = 0; i < 10; ++i)
+		//{
+		//	std::random_device rd;
+		//	std::mt19937 gen(rd());
+		//	std::uniform_real_distribution<> dist(10, 600);
 
-			std::uniform_int_distribution<> bo(0, 1);
+		//	std::uniform_int_distribution<> bo(0, 1);
 
-			float x = dist(gen);
-			float y = dist(gen);
+		//	float x = dist(gen);
+		//	float y = dist(gen);
 
-			bool isStatic = false;
+		//	bool isStatic = false;
 
-			if(i > 0)
-				isStatic = bo(gen)==0?false:true;
+		//	if(i > 0)
+		//		isStatic = bo(gen)==0?false:true;
 
 
-			JPhysics::RigidBodyf* simpleBall = JPhysics::RigidBodyf::CreateCircleBody(10.f, 2.f, isStatic, 0.5f);
-			simpleBall->MoveTo(JMaths::Vector2Df(x, y));
-			m_World->AddRigidbody(simpleBall);
-		}
+		//	JPhysics::RigidBodyf* simpleBall = JPhysics::RigidBodyf::CreateCircleBody(10.f, 10.f, isStatic, 0.5f);
+		//	simpleBall->MoveTo(JMaths::Vector2Df(x, y));
+		//	m_World->AddRigidbody(simpleBall);
+		//}
 
 		float maxWidth = Application::Get().GetWindow().GetWidth();
 		float maxHeight = Application::Get().GetWindow().GetHeight();
 
-		JPhysics::RigidBodyf* flatGround = JPhysics::RigidBodyf::CreateBoxBody(1000.f, 20.f, 2.f, true, 0.5f);
+		JPhysics::RigidBodyf* flatGround = JPhysics::RigidBodyf::CreateBoxBody(1000.f, 20.f, 10.f, true, 0);
 		flatGround->MoveTo(JMaths::Vector2Df(640.f, 500.f));
 		m_World->AddRigidbody(flatGround);
 
-		JPhysics::RigidBodyf* rotatePlateform = JPhysics::RigidBodyf::CreateBoxBody(400, 20.f, 2.f, true, 0.5f);
+		JPhysics::RigidBodyf* rotatePlateform = JPhysics::RigidBodyf::CreateBoxBody(400, 20.f, 10.f, true, 0);
 		rotatePlateform->MoveTo(JMaths::Vector2Df(240.f, 400.f));
 		rotatePlateform->Rotate(6.28f / 30.f);
 		m_World->AddRigidbody(rotatePlateform);
 
-		JPhysics::RigidBodyf* rotatePlateform2 = JPhysics::RigidBodyf::CreateBoxBody(400, 20.f, 2.f, true, 0.5f);
+		JPhysics::RigidBodyf* rotatePlateform2 = JPhysics::RigidBodyf::CreateBoxBody(400, 20.f, 10.f, true, 0);
 		rotatePlateform2->MoveTo(JMaths::Vector2Df(840.f, 200.f));
 		rotatePlateform2->Rotate(6.28f / -30.f);
 		m_World->AddRigidbody(rotatePlateform2);
@@ -170,8 +170,8 @@ namespace JavaEngine
 			clock.reset;
 		}*/
 
-		m_World->Step(0.1f, 20);
-		totalWorldStepTime += 0.05f;
+		m_World->Step(0.08f, 20);
+		totalWorldStepTime += 0.08f;
 		totalBodyCount += m_World->RigidbodyCount();
 		totalSampleCount++;
 
@@ -189,6 +189,7 @@ namespace JavaEngine
 				JE_INFO("body removed, max body {0}", m_World->RigidbodyCount());
 				m_World->RemoveRigidbody(body);
 			}
+			JE_CORE_INFO("body angularVelocity {0}", body->angularVelocity);
 		}
 	}
 

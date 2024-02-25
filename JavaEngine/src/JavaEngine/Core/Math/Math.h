@@ -9,7 +9,7 @@ namespace JMaths
 	template<typename Type>
 	class JE_API JMath
 	{
-		static constexpr Type VerySmallAmount = 0.0005f;
+		static constexpr Type VerySmallAmount = 0.005f;
 		static constexpr Type TwoPi = 6.28f;
 
 	public:

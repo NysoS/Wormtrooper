@@ -35,13 +35,22 @@ namespace JPhysics
 	protected:
 		void BroadPhase();
 		void NarrowPhase();
-		void ResolveCollision(Manifold<float>& _contact);
 		void SeparateBodies(RigidBodyf& _bodyA, RigidBodyf& _bodyB, const JMaths::Vector2Df& _normal, float& _depth);
+		void ResolveCollisionBasic(Manifold<float>& _contact);
+		void ResolveCollisionWithRotation(Manifold<float>& _contact);
+		void ResolveCollisionWithRotationAndFriction(Manifold<float>& _contact);
 
 	private:
 		std::vector<RigidBody<float>*> m_rigidbodyList;
 		JMaths::Vector2Df m_gravity;
 		//std::vector<Manifold<float>*> m_contactList;
 		std::vector<ContactPair> m_contactPair;
+
+		JMaths::Vector2Df contactList[2];
+		JMaths::Vector2Df impulseList[2];
+		JMaths::Vector2Df impulseFrictionList[2];
+		JMaths::Vector2Df raList[2];
+		JMaths::Vector2Df rbList[2];
+		float jList[2];
 	};
 }

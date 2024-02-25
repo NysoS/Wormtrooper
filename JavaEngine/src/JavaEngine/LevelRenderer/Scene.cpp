@@ -75,12 +75,6 @@ namespace JavaEngine
 			delete object;
 		}
 		m_ObjectList.clear();
-
-		/*for (auto body : rigidBodyList)
-		{
-			delete body;
-		}
-		rigidBodyList.clear();*/
 	}
 
 	void Scene::OnUpate(const float& deltaTime)
@@ -91,42 +85,6 @@ namespace JavaEngine
 			if(object->IsTickableObject())
 			{
 				object->Update();
-			}
-		}*/
-
-
-		/*float dx = 0.f;
-		float dy = 0.f;
-		float forceMagnitude = 25.f;
-		if(sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
-		{
-			dx--;
-		}
-
-		if(sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
-		{
-			dx++;
-		}
-
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
-		{
-			dy--;
-		}
-
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
-		{
-			dy++;
-		}
-
-		if (dx != .0f || dy != .0f)
-		{
-			JMaths::Vector2Df forceDirection = JMaths::Vector2Df(dx, dy).normalilze();
-			JMaths::Vector2Df force = forceDirection * forceMagnitude;
-
-			auto* body = m_World->GetRigidbody(0);
-			if(body != nullptr)
-			{
-				body->AddForce(force);
 			}
 		}*/
 
@@ -148,34 +106,20 @@ namespace JavaEngine
 
 		if (sf::Mouse::isButtonPressed(sf::Mouse::Right))
 		{
-			/*std::random_device rd;
-			std::mt19937 gen(rd());
-			std::uniform_real_distribution<> dist(5.f, 20.f);
-
-			float radius = dist(gen);*/
-
 			JMaths::Vector2Df mouseP(sf::Mouse::getPosition().x - 320.f, sf::Mouse::getPosition().y - 250.f);
 
-			JPhysics::RigidBodyf* Ball = JPhysics::RigidBodyf::CreateCircleBody(10.f, 15.f, false, .6f);
+			JPhysics::RigidBodyf* Ball = JPhysics::RigidBodyf::CreateCircleBody(10.f, 2.f, false, .6f);
 			Ball->MoveTo(mouseP);
 			m_World->AddRigidbody(Ball);
 
 		}
 
-		/*if(clock.s > 1)
-		{
-			totalBodyCount = 0;
-			totalWorldStepTime = 0;
-			totalSampleCount = 0;
-			clock.reset;
-		}*/
-
-		m_World->Step(deltaTime, 2);
+		m_World->Step(deltaTime, 20);
 		totalWorldStepTime += deltaTime;
 		totalBodyCount += m_World->RigidbodyCount();
 		totalSampleCount++;
 
-		for(int i =0; i < m_World->RigidbodyCount(); ++i)
+		for(int i = 0; i < m_World->RigidbodyCount(); ++i)
 		{
 			JPhysics::RigidBodyf* body = m_World->GetRigidbody(i);
 			if(!body || body->isStatic)
@@ -189,7 +133,6 @@ namespace JavaEngine
 				JE_INFO("body removed, max body {0}", m_World->RigidbodyCount());
 				m_World->RemoveRigidbody(body);
 			}
-			JE_CORE_INFO("body angularVelocity {0}", body->angularVelocity);
 		}
 	}
 
@@ -246,15 +189,6 @@ namespace JavaEngine
 			}
 			
 		}
-
-		/*for(auto& contactPoints : m_World->m_contactPointsList)
-		{
-			sf::CircleShape debugContactPoint{ 5.f };
-			debugContactPoint.setPosition(contactPoints.x + 5.f, contactPoints.y + 5.f);
-			debugContactPoint.setOutlineThickness(2);
-			debugContactPoint.setOutlineColor(sf::Color::Magenta);
-			window.Draw(debugContactPoint);
-		}*/
 	}
 
 	void Scene::OnEvent(Event& event)

@@ -135,7 +135,7 @@ namespace JPhysics
 
 				Collisions<float>::FindContactPoints(*bodyA,*bodyB, contact1, contact2, contactCount);
 				auto contact = Manifold<float>{ *bodyA, *bodyB, normal, depth, contact1, contact2, contactCount };
-				ResolveCollisionBasic(contact);
+				ResolveCollisionWithRotation(contact);
 			}
 		}
 	}
@@ -169,8 +169,6 @@ namespace JPhysics
 		JMaths::Vector2Df raList[2] = { JMaths::Vector2Df{}, JMaths::Vector2Df{} };
 		JMaths::Vector2Df rbList[2] = { JMaths::Vector2Df{}, JMaths::Vector2Df{} };
 
-		JE_CORE_INFO("contactCount {0}", _contact.contactCount);
-
 		const int contactCount = static_cast<int>(_contact.contactCount);
 
 		for(int i = 0; i < contactCount; ++i)
@@ -190,7 +188,6 @@ namespace JPhysics
 			JMaths::Vector2Df relativeVelocity = (_contact.bodyB.m_linearVelocity + angularLinearVelocityBodyB) - (_contact.bodyA.m_linearVelocity + angularLinearVelocityBodyA);
 
 			float contactVelocityMag = relativeVelocity.dotProduct(_contact.normal);
-			JE_CORE_INFO("contactVelocityMag : {0}", contactVelocityMag);
 
 			if (relativeVelocity.dotProduct(_contact.normal) > 0.f)
 			{
@@ -344,8 +341,6 @@ namespace JPhysics
 			
 			impulseFrictionList[i] = impulseFriction;
 		}
-
-		//JE_CORE_INFO("impulseFriction : {0} {1}", impulseFrictionList[0].x, impulseFrictionList[0].y);
 
 		for (int i = 0; i < contactCount; ++i)
 		{

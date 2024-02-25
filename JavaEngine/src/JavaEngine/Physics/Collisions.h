@@ -210,7 +210,7 @@ namespace JPhysics
 		{
 			JMaths::Vector2D<Type> p = _verticesB[i];
 
-			for (int j = 0; i < _verticesA.size(); ++i)
+			for (int j = 0; j < _verticesA.size(); ++j)
 			{
 				JMaths::Vector2D<Type> va = _verticesA[j];
 				JMaths::Vector2D<Type> vb = _verticesA[(j + 1) % _verticesA.size()];
@@ -344,8 +344,8 @@ namespace JPhysics
 			}
 		}
 
-		int cpIndex = FindClosePointOnPolygon(_circlCenter, _vertices);
-		if (cpIndex <= -1.f)
+		auto cpIndex = static_cast<int>(FindClosePointOnPolygon(_circlCenter, _vertices));
+		if (cpIndex <= -1)
 		{
 			return false;
 		}

@@ -11,6 +11,7 @@ namespace JMaths
 		explicit Vector2D(const Type& _x = 0.f, const Type& _y = 0.f);
 
 		Type dotProduct(const Vector2D& vector);
+		Type crossProduct(const Vector2D& vector);
 		Vector2D getNormarlized() const;
 		Vector2D& normalilze();
 		Type squareLength() const;
@@ -23,6 +24,7 @@ namespace JMaths
 
 		static Type Distance(const Vector2D& one, const Vector2D& two);
 		static Type DistanceSquare(const Vector2D& a, const Vector2D& b);
+		static Type Cross(const Vector2D& a, const Vector2D& b);
 
 		static const Vector2D Zero;
 		static const Vector2D Up;
@@ -44,6 +46,12 @@ namespace JMaths
 	Type Vector2D<Type>::dotProduct(const Vector2D& otherVector)
 	{
 		return x * otherVector.x + y * otherVector.y;
+	}
+
+	template <typename Type>
+	Type Vector2D<Type>::crossProduct(const Vector2D& vector)
+	{
+		return x * vector.y - y * vector.x;
 	}
 
 	template <typename Type>
@@ -102,6 +110,12 @@ namespace JMaths
 	}
 
 	template <typename Type>
+	Type Vector2D<Type>::Cross(const Vector2D& a, const Vector2D& b)
+	{
+		return a.x * b.y - a.y + b.x;
+	}
+
+	template <typename Type>
 	Vector2D<Type> operator+(const Vector2D<Type>& lhs, const Vector2D<Type>& rhs)
 	{
 		return Vector2D<Type>{lhs.x + rhs.x, lhs.y + rhs.y};
@@ -123,6 +137,12 @@ namespace JMaths
 	Vector2D<Type> operator*(const Vector2D<Type>& lhs, const Type& rhs)
 	{
 		return Vector2D<Type>{lhs.x * rhs, lhs.y * rhs};
+	}
+
+	template <typename Type>
+	Vector2D<Type> operator*(const Vector2D<Type>& lhs, const Vector2D<Type>& rhs)
+	{
+		return Vector2D<Type>{lhs.x * rhs.x, lhs.y * rhs.y};
 	}
 
 	template <typename Type>

@@ -1,6 +1,7 @@
 #include "JavaEngine/Physics/JWorld.h"
 
 #include "Collisions.h"
+#include "JavaEngine/Core/Log.h"
 
 namespace JPhysics
 {
@@ -133,7 +134,7 @@ namespace JPhysics
 
 				Collisions<float>::FindContactPoints(*bodyA,*bodyB, contact1, contact2, contactCount);
 				auto contact = Manifold<float>{ *bodyA, *bodyB, normal, depth, contact1, contact2, contactCount };
-				ResolveCollision(contact);
+				ResolveCollisionBasic(contact);
 			}
 
 			//Manifold<float> contact = *m_contactList[i];
@@ -157,7 +158,7 @@ namespace JPhysics
 		}
 	}
 
-	void JWorld::ResolveCollision(Manifold<float>& _contact)
+	void JWorld::ResolveCollisionBasic(Manifold<float>& _contact)
 	{
 		JMaths::Vector2Df relativeVelocity = _contact.bodyB.m_linearVelocity - _contact.bodyA.m_linearVelocity;
 
@@ -176,6 +177,205 @@ namespace JPhysics
 		_contact.bodyA.m_linearVelocity -= impluse * _contact.bodyA.invMass;
 		_contact.bodyB.m_linearVelocity += impluse * _contact.bodyB.invMass;
 
+	}
+
+	void JWorld::ResolveCollisionWithRotation(Manifold<float>& _contact)
+	{
+		const float e = std::min(_contact.bodyA.restitution, _contact.bodyB.restitution);
+		JMaths::Vector2Df contactList[2] = { _contact.contact1, _contact.contact2 };
+		JMaths::Vector2Df impulseList[2] = {JMaths::Vector2Df{}, JMaths::Vector2Df{} };
+		JMaths::Vector2Df raList[2] = { JMaths::Vector2Df{}, JMaths::Vector2Df{} };
+		JMaths::Vector2Df rbList[2] = { JMaths::Vector2Df{}, JMaths::Vector2Df{} };
+
+		JE_CORE_INFO("contactCount {0}", _contact.contactCount);
+
+		const int contactCount = static_cast<int>(_contact.contactCount);
+
+		for(int i = 0; i < contactCount; ++i)
+		{
+			JMaths::Vector2Df ra = contactList[i] - _contact.bodyA.GetPosition();
+			JMaths::Vector2Df rb = contactList[i] - _contact.bodyB.GetPosition();
+
+			raList[i] = ra;
+			rbList[i] = rb;
+
+			JMaths::Vector2Df raPerp = ra.GetLeftNormal();
+			JMaths::Vector2Df rbPerp = rb.GetLeftNormal();
+
+			JMaths::Vector2Df angularLinearVelocityBodyA = raPerp * _contact.bodyA.angularVelocity;
+			JMaths::Vector2Df angularLinearVelocityBodyB = rbPerp * _contact.bodyB.angularVelocity;
+			 
+			JMaths::Vector2Df relativeVelocity = (_contact.bodyB.m_linearVelocity + angularLinearVelocityBodyB) - (_contact.bodyA.m_linearVelocity + angularLinearVelocityBodyA);
+
+			float contactVelocityMag = relativeVelocity.dotProduct(_contact.normal);
+			JE_CORE_INFO("contactVelocityMag : {0}", contactVelocityMag);
+
+			if (relativeVelocity.dotProduct(_contact.normal) > 0.f)
+			{
+				continue;
+			}
+
+			float raPerpDotN = raPerp.dotProduct(_contact.normal);
+			float rbPerpDotN = rbPerp.dotProduct(_contact.normal);
+
+			float denom = _contact.bodyA.invMass + _contact.bodyB.invMass + 
+				(raPerpDotN * raPerpDotN) * _contact.bodyA.invInertia + 
+				(rbPerpDotN * rbPerpDotN) * _contact.bodyB.invInertia;
+
+			float j = -(1.f + e) * contactVelocityMag;
+			j /= denom;
+			j /= _contact.contactCount;
+
+			const JMaths::Vector2Df impluse = j * _contact.normal;
+			impulseList[i] = impluse;
+		}
+
+		for(int i = 0; i < contactCount; ++i)
+		{
+			JMaths::Vector2Df impulse = impulseList[i];
+			JMaths::Vector2Df ra = raList[i];
+			JMaths::Vector2Df rb = rbList[i];
+
+			_contact.bodyA.m_linearVelocity -= impulse * _contact.bodyA.invMass;
+			_contact.bodyA.angularVelocity += -JMaths::Vector2Df::Cross(ra, impulse) * _contact.bodyA.invInertia;
+			_contact.bodyB.m_linearVelocity += impulse * _contact.bodyB.invMass;
+			_contact.bodyB.angularVelocity += JMaths::Vector2Df::Cross(rb, impulse) * _contact.bodyB.invInertia;
+		}
+	}
+
+	void JWorld::ResolveCollisionWithRotationAndFriction(Manifold<float>& _contact)
+	{
+		const float e = std::min(_contact.bodyA.restitution, _contact.bodyB.restitution);
+		contactList[0] = _contact.contact1;
+		contactList[1] = _contact.contact2;
+
+		float sf = (_contact.bodyA.staticFriction +_contact.bodyB.staticFriction) * 0.5f;
+		float df = (_contact.bodyA.dynamicFriction + _contact.bodyB.dynamicFriction) * 0.5f;
+
+		const int contactCount = static_cast<int>(_contact.contactCount);
+
+		for(int i = 0; i < contactCount; ++i)
+		{
+			impulseList[i] = JMaths::Vector2Df::Zero;
+			raList[i] = JMaths::Vector2Df::Zero;
+			rbList[i] = JMaths::Vector2Df::Zero;
+			impulseFrictionList[i] = JMaths::Vector2Df::Zero;
+			jList[i] = 0.f;
+		}
+
+		for (int i = 0; i < contactCount; ++i)
+		{
+			JMaths::Vector2Df ra = contactList[i] - _contact.bodyA.GetPosition();
+			JMaths::Vector2Df rb = contactList[i] - _contact.bodyB.GetPosition();
+
+			raList[i] = ra;
+			rbList[i] = rb;
+
+			JMaths::Vector2Df raPerp = ra.GetLeftNormal();
+			JMaths::Vector2Df rbPerp = rb.GetLeftNormal();
+
+			JMaths::Vector2Df angularLinearVelocityBodyA = raPerp * _contact.bodyA.angularVelocity;
+			JMaths::Vector2Df angularLinearVelocityBodyB = rbPerp * _contact.bodyB.angularVelocity;
+
+			JMaths::Vector2Df relativeVelocity = (_contact.bodyB.m_linearVelocity + angularLinearVelocityBodyB) - (_contact.bodyA.m_linearVelocity + angularLinearVelocityBodyA);
+
+			float contactVelocityMag = relativeVelocity.dotProduct(_contact.normal);
+
+			if (relativeVelocity.dotProduct(_contact.normal) > 0.8f)
+			{
+				continue;
+			}
+
+			float raPerpDotN = raPerp.dotProduct(_contact.normal);
+			float rbPerpDotN = rbPerp.dotProduct(_contact.normal);
+
+			float denom = _contact.bodyA.invMass + _contact.bodyB.invMass +
+				(raPerpDotN * raPerpDotN) * _contact.bodyA.invInertia +
+				(rbPerpDotN * rbPerpDotN) * _contact.bodyB.invInertia;
+
+			float j = -(1.f + e) * contactVelocityMag;
+			j /= denom;
+			j /= _contact.contactCount;
+
+			jList[i] = j;
+
+			const JMaths::Vector2Df impluse = j * _contact.normal;
+			impulseList[i] = impluse;
+		}
+
+		for (int i = 0; i < contactCount; ++i)
+		{
+			JMaths::Vector2Df impulse = impulseList[i];
+			JMaths::Vector2Df ra = raList[i];
+			JMaths::Vector2Df rb = rbList[i];
+
+			_contact.bodyA.m_linearVelocity += JMaths::Vector2Df(-impulse.x, -impulse.y) * _contact.bodyA.invMass;
+			_contact.bodyA.angularVelocity += -JMaths::Vector2Df::Cross(ra, impulse) * _contact.bodyA.invInertia;
+			_contact.bodyB.m_linearVelocity += impulse * _contact.bodyB.invMass;
+			_contact.bodyB.angularVelocity += JMaths::Vector2Df::Cross(rb, impulse) * _contact.bodyB.invInertia;
+		}
+
+		//Friction
+		for (int i = 0; i < contactCount; ++i)
+		{
+			JMaths::Vector2Df ra = contactList[i] - _contact.bodyA.GetPosition();
+			JMaths::Vector2Df rb = contactList[i] - _contact.bodyB.GetPosition();
+
+			raList[i] = ra;
+			rbList[i] = rb;
+
+			JMaths::Vector2Df raPerp = ra.GetLeftNormal();
+			JMaths::Vector2Df rbPerp = rb.GetLeftNormal();
+
+			JMaths::Vector2Df angularLinearVelocityBodyA = raPerp * std::round(_contact.bodyA.angularVelocity);
+			JMaths::Vector2Df angularLinearVelocityBodyB = rbPerp * std::round(_contact.bodyB.angularVelocity);
+
+			JMaths::Vector2Df relativeVelocity = (_contact.bodyB.m_linearVelocity + angularLinearVelocityBodyB) - (_contact.bodyA.m_linearVelocity + angularLinearVelocityBodyA);
+
+			JMaths::Vector2Df tangent = relativeVelocity - relativeVelocity.dotProduct(_contact.normal) * _contact.normal;
+
+			if (JMaths::JMath<float>::NearlyEqual(tangent, JMaths::Vector2Df::Zero))
+			{
+				continue;
+			}
+			tangent.normalilze();
+
+			float raPerpDotT = raPerp.dotProduct(tangent);
+			float rbPerpDotT = rbPerp.dotProduct(tangent);
+
+			float denom = _contact.bodyA.invMass + _contact.bodyB.invMass +
+				(raPerpDotT * raPerpDotT) * _contact.bodyA.invInertia +
+				(rbPerpDotT * rbPerpDotT) * _contact.bodyB.invInertia;
+
+			float jt = -relativeVelocity.dotProduct(tangent);
+			jt /= denom;
+			jt /= contactCount;
+
+			JMaths::Vector2Df impulseFriction;
+			if(std::abs(jt) <= jList[i] * sf)
+			{
+				impulseFriction = jt * tangent;
+			}else
+			{
+				impulseFriction = -jList[i] * tangent * df;
+			}
+			
+			impulseFrictionList[i] = impulseFriction;
+		}
+
+		//JE_CORE_INFO("impulseFriction : {0} {1}", impulseFrictionList[0].x, impulseFrictionList[0].y);
+
+		for (int i = 0; i < contactCount; ++i)
+		{
+			JMaths::Vector2Df impulseFriction = impulseFrictionList[i];
+			JMaths::Vector2Df ra = raList[i];
+			JMaths::Vector2Df rb = rbList[i];
+
+			_contact.bodyA.m_linearVelocity -= impulseFriction * _contact.bodyA.invMass;
+			_contact.bodyA.angularVelocity += -JMaths::Vector2Df::Cross(ra, impulseFriction) * _contact.bodyA.invInertia;
+			_contact.bodyB.m_linearVelocity += impulseFriction * _contact.bodyB.invMass;
+			_contact.bodyB.angularVelocity += JMaths::Vector2Df::Cross(rb, impulseFriction) * _contact.bodyB.invInertia;
+		}
 	}
 
 	void JWorld::SeparateBodies(RigidBodyf& _bodyA, RigidBodyf& _bodyB, const JMaths::Vector2Df& _normal, float& _depth)

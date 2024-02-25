@@ -59,7 +59,6 @@ namespace JPhysics
 	protected:
 		JMaths::Vector2D<Type> m_position;
 		Type m_angle;
-		Type m_angleVelocity;
 
 		JMaths::Vector2D<Type> m_force;
 
@@ -79,7 +78,7 @@ namespace JPhysics
 		Type restitution;
 		Type area;
 		Type inertia;
-		Type invInertia;
+		Type invInertia = 0.f;
 
 		bool isStatic;
 
@@ -90,14 +89,19 @@ namespace JPhysics
 		ShapeType shapeType;
 
 		JMaths::Vector2D<Type> m_linearVelocity;
+		Type angularVelocity;
+
+		Type staticFriction;
+		Type dynamicFriction;
 	};
 
 	template <typename Type>
 	RigidBody<Type>::RigidBody(Type _density, Type _mass, Type _inertia,
 		Type _resistution, Type _area, bool _isStatic, Type _radius, 
 		Type _width, Type _height, std::vector<JMaths::Vector2D<Type>> _vertices, ShapeType _shapeType)
-			: m_position(JMaths::Vector2D<Type>::Zero), m_linearVelocity(JMaths::Vector2D<Type>::Zero), m_angle(0.f), m_angleVelocity(0.f), density(_density), mass(_mass), restitution(_resistution), area(_area), isStatic(_isStatic),
-			radius(_radius), width(_width), height(_height), shapeType(_shapeType), m_transformUpdateRequired(true), m_aabbUpdateRequired(true), m_aabb(AABB<Type>(0,0,0,0)), invMass(_mass > 0 ? 1.f / mass : 0.f), inertia(_inertia), invInertia(_inertia > 0 ? 1.f / inertia : 0.f)
+			: m_position(JMaths::Vector2D<Type>::Zero), m_linearVelocity(JMaths::Vector2D<Type>::Zero), m_angle(0.f), angularVelocity(0.f), density(_density), mass(_mass), restitution(_resistution), area(_area), isStatic(_isStatic),
+			radius(_radius), width(_width), height(_height), shapeType(_shapeType), m_transformUpdateRequired(true), m_aabbUpdateRequired(true), m_aabb(AABB<Type>(0,0,0,0)), invMass(_mass > 0 ? 1.f / mass : 0.f), inertia(_inertia), invInertia(0.f),
+			staticFriction(1.6f), dynamicFriction(1.4f)
 	{
 		if(shapeType == ShapeType::Box)
 		{
@@ -106,6 +110,11 @@ namespace JPhysics
 		}
 
 		m_force = JMaths::Vector2D<Type>::Zero;
+
+		if(!_isStatic)
+		{
+			invInertia = 1.f/inertia;
+		}
 
 		m_transformUpdateRequired = true;
 		m_aabbUpdateRequired = true;
@@ -150,12 +159,15 @@ namespace JPhysics
 		_resitution = JMaths::JMath<Type>::Clamp(_resitution, .0f, 1.f);
 
 		Type mass = 0.f;
+		Type invMass = 0.f;
 		Type inertia = 0.f;
+		Type invInertia = 0.f;
 
 		if(!_isStatic)
 		{
 			mass = area * _density;
 			inertia = (1.f / 12) * mass * (_height * _height + _width * _width);
+			invMass = 1.f/mass;
 		}
 
 		std::vector<JMaths::Vector2D<Type>> vertices = CreateBoxVertices(_width, _height);
@@ -235,7 +247,7 @@ namespace JPhysics
 		m_linearVelocity += _gravity * time;
 
 		m_position += m_linearVelocity * time;
-		m_angle += m_angleVelocity * time;
+		m_angle += angularVelocity * time;
 
 		m_force = JMaths::Vector2D<Type>::Zero;
 		m_transformUpdateRequired = true;

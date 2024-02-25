@@ -11,7 +11,7 @@ namespace JavaEngine
 		SFMLWindow(const WindowProps& props);
 		virtual ~SFMLWindow();
 
-		void OnUpdate() override;
+		void OnUpdate(const float& deltaTime) override;
 		void OnRenderer() override;
 		void HandleEvent() override;
 
@@ -24,6 +24,8 @@ namespace JavaEngine
 
 		void SetVSync(bool enable) override;
 		bool IsVSync() const override;
+
+		float getElapsedTime() override;
 
 		void Draw(const sf::Drawable&) override;
 

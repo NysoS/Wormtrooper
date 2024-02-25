@@ -42,7 +42,7 @@ namespace JavaEngine
 
 		SetVSync(true);
 
-		ImGui::SFML::Init(*m_Window);
+		//ImGui::SFML::Init(*m_Window);
 		m_DeltaClock = sf::Clock();
 	}
 
@@ -51,11 +51,11 @@ namespace JavaEngine
 		m_Window->close();
 	}
 
-	void SFMLWindow::OnUpdate()
+	void SFMLWindow::OnUpdate(const float& deltaTime)
 	{
-		m_Data.EventUpdateCallback();
-
-		ImGui::SFML::Update(*m_Window, m_DeltaClock.restart());
+		m_Data.EventUpdateCallback(deltaTime);
+		//ImGui::ShowDemoWindow();
+		//ImGui::SFML::Update(*m_Window, m_DeltaClock.getElapsedTime());
 	}
 
 	void SFMLWindow::OnRenderer()
@@ -63,8 +63,6 @@ namespace JavaEngine
 		m_Window->clear();
 
 		m_Data.EventRenderCallback();
-
-		ImGui::SFML::Render(*m_Window);
 
 		m_Window->display();
 	}
@@ -74,7 +72,7 @@ namespace JavaEngine
 		sf::Event sfEvent;
 		while (m_Window->pollEvent(sfEvent))
 		{
-			ImGui::SFML::ProcessEvent(*m_Window, sfEvent);
+			//ImGui::SFML::ProcessEvent(*m_Window, sfEvent);
 
 			if(sfEvent.type == sf::Event::Resized)
 			{
@@ -146,6 +144,11 @@ namespace JavaEngine
 	bool SFMLWindow::IsVSync() const
 	{
 		return m_Data.VSync;
+	}
+
+	float SFMLWindow::getElapsedTime()
+	{
+		return m_DeltaClock.restart().asSeconds();
 	}
 
 	void SFMLWindow::Draw(const sf::Drawable& drawable)

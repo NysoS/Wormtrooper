@@ -25,7 +25,7 @@ namespace JavaEngine
 		inline Window& GetWindow() { return *m_Window; }
 
 	private:
-		void OnUpdate();
+		void OnUpdate(const float& deltaTime);
 		void OnRenderer();
 		bool OnCloseWindow(WindowCloseEvent& event);
 
@@ -36,6 +36,7 @@ namespace JavaEngine
 		std::unique_ptr<class Scene> m_BasicScene;
 
 		static Application* s_Instance;
+		static constexpr float MaxFPS = 1.f / 160.f;
 	};
 
 	Application* CreateApplication();

@@ -34,6 +34,7 @@ namespace JPhysics
 		}
 
 		m_rigidbodyList.erase(it);
+		delete _rigidbody;
 		return true;
 	}
 
@@ -136,25 +137,6 @@ namespace JPhysics
 				auto contact = Manifold<float>{ *bodyA, *bodyB, normal, depth, contact1, contact2, contactCount };
 				ResolveCollisionBasic(contact);
 			}
-
-			//Manifold<float> contact = *m_contactList[i];
-			
-
-			/*if(contact.contactCount > 0)
-			{
-				if(std::find(m_contactPointsList.begin(), m_contactPointsList.end(), contact.contact1) == m_contactPointsList.end())
-				{
-					m_contactPointsList.push_back(contact.contact1);
-				}
-
-				if (contact.contactCount > 1)
-				{
-					if (std::find(m_contactPointsList.begin(), m_contactPointsList.end(), contact.contact2) == m_contactPointsList.end())
-					{
-						m_contactPointsList.push_back(contact.contact2);
-					}
-				}
-			}*/
 		}
 	}
 

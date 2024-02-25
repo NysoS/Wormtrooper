@@ -40,7 +40,7 @@ namespace JavaEngine
 
 	void ImGuiLayer::OnRederer()
 	{
-		ImGui::ShowDemoWindow();
+		
 	}
 
 	void ImGuiLayer::OnEvent(Event& event)

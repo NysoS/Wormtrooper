@@ -238,13 +238,13 @@ namespace JPhysics
 		//force = mass * acc
 		//acc = force / mass
 
-		JMaths::Vector2D<Type> acceleration = m_force / mass;
+		//JMaths::Vector2D<Type> acceleration = m_force / mass;
 		//m_linearVelocity += acceleration * _time;
 
 		m_linearVelocity += _gravity * _time;
 
-		m_position += m_linearVelocity * _time;
-		m_angle += angularVelocity * _time;
+		m_position += m_linearVelocity * time;
+		m_angle += angularVelocity * time;
 
 		m_force = JMaths::Vector2D<Type>::Zero;
 		m_transformUpdateRequired = true;

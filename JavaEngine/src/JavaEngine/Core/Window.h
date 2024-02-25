@@ -24,12 +24,12 @@ namespace JavaEngine
 	{
 	public:
 		using EventCallbackFn = std::function<void(Event&)>;
-		using EventUpdateCallbackFn = std::function<void()>;
+		using EventUpdateCallbackFn = std::function<void(const float&)>;
 		using EventRenderCallbackFn = std::function<void()>;
 
 		virtual ~Window() {}
 
-		virtual void OnUpdate() = 0;
+		virtual void OnUpdate(const float& deltaTime) = 0;
 		virtual void OnRenderer() = 0;
 		virtual void HandleEvent() = 0;
 
@@ -41,6 +41,8 @@ namespace JavaEngine
 		virtual void SetEventRenderCallback(const EventRenderCallbackFn& callback) = 0;
 		virtual void SetVSync(bool enable) = 0;
 		virtual bool IsVSync() const = 0;
+
+		virtual float getElapsedTime() = 0;
 
 		//TODO:for test physics
 		virtual void Draw(const sf::Drawable&) = 0;

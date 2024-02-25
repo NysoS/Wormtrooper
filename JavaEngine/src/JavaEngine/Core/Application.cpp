@@ -16,7 +16,7 @@ namespace JavaEngine
 		m_Window = std::unique_ptr<Window>(Window::Create());
 		m_Window->SetEventCallback(BIND_CALLBACK_ONE_PARAM(Application::OnEvent));
 		m_Window->SetEventRenderCallback(BIND_CALLBACK(Application::OnRenderer));
-		m_Window->SetUpdateCallback(BIND_CALLBACK(Application::OnUpdate));
+		m_Window->SetUpdateCallback(BIND_CALLBACK_ONE_PARAM(Application::OnUpdate));
 
 		m_BasicScene = std::make_unique<Scene>();
 	}
@@ -28,10 +28,21 @@ namespace JavaEngine
 
 	void Application::Run()
 	{
+		auto previousTime = m_Window->getElapsedTime();
+		auto lag = 0.f;
+
 		while (m_isRunning)
 		{
+			const auto elapsedTime = m_Window->getElapsedTime();
+			lag += elapsedTime;
+
 			m_Window->HandleEvent();
-			m_Window->OnUpdate();
+			while (lag >= MaxFPS)
+			{
+				m_Window->OnUpdate(elapsedTime);
+				lag -= MaxFPS;
+			}
+			
 			m_Window->OnRenderer();
 		}
 	}
@@ -54,10 +65,10 @@ namespace JavaEngine
 	}
 
 
-	void Application::OnUpdate()
+	void Application::OnUpdate(const float& deltaTime)
 	{
 		//JE_CORE_INFO("Application Update");
-		m_BasicScene->OnUpate();
+		m_BasicScene->OnUpate(deltaTime);
 
 		for (auto it = m_LayerStack.end(); it != m_LayerStack.begin(); )
 		{

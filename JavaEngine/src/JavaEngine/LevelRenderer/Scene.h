@@ -23,7 +23,7 @@ namespace JavaEngine
 		Scene();
 		virtual ~Scene();
 
-		virtual void OnUpate();
+		virtual void OnUpate(const float& deltaTime);
 		virtual void OnRenderer(Window& window);
 		virtual void OnEvent(Event& event);
 

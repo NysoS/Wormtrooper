@@ -83,7 +83,7 @@ namespace JavaEngine
 		rigidBodyList.clear();*/
 	}
 
-	void Scene::OnUpate()
+	void Scene::OnUpate(const float& deltaTime)
 	{
 		//JE_INFO("Scene Update");
 		/*for(const auto& object : m_ObjectList)
@@ -156,7 +156,7 @@ namespace JavaEngine
 
 			JMaths::Vector2Df mouseP(sf::Mouse::getPosition().x - 320.f, sf::Mouse::getPosition().y - 250.f);
 
-			JPhysics::RigidBodyf* Ball = JPhysics::RigidBodyf::CreateCircleBody(10.f, 2.f, false, .6f);
+			JPhysics::RigidBodyf* Ball = JPhysics::RigidBodyf::CreateCircleBody(10.f, 15.f, false, .6f);
 			Ball->MoveTo(mouseP);
 			m_World->AddRigidbody(Ball);
 
@@ -170,8 +170,8 @@ namespace JavaEngine
 			clock.reset;
 		}*/
 
-		m_World->Step(0.08f, 20);
-		totalWorldStepTime += 0.08f;
+		m_World->Step(deltaTime, 2);
+		totalWorldStepTime += deltaTime;
 		totalBodyCount += m_World->RigidbodyCount();
 		totalSampleCount++;
 

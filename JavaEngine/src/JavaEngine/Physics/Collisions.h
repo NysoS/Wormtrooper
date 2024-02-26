@@ -1,6 +1,8 @@
 #pragma once
 
+#include "CircleCollider.h"
 #include "jepch.h"
+#include "ShapeIntersect.h"
 #include "JavaEngine/Core/Core.h"
 #include "JavaEngine/Core/Math/Math.h"
 #include "JavaEngine/Core/Math/Vector2D.h"
@@ -296,7 +298,10 @@ namespace JPhysics
 			}
 			else if (shapeTypeB == ShapeType::Circle)
 			{
-				return JPhysics::Collisions<float>::IntersectCircles(bodyA.GetPosition(), bodyA.radius, bodyB.GetPosition(), bodyB.radius, _normal, _depth);
+				IntersectInfo<Type> info = JPhysics::ShapeIntersect<Type, JavaEngine::CircleCollider>().intersect(bodyA.GetPosition(), bodyA.radius, bodyB.GetPosition(), bodyB.radius);
+				_normal = info.normal;
+				_depth = info.depth;
+				return info.isIntersect;
 			}
 		}
 

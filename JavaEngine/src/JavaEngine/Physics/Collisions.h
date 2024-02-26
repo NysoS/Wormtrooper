@@ -2,7 +2,7 @@
 
 #include "CircleCollider.h"
 #include "jepch.h"
-#include "ShapeIntersect.h"
+#include "ColliderIntersect.h"
 #include "JavaEngine/Core/Core.h"
 #include "JavaEngine/Core/Math/Math.h"
 #include "JavaEngine/Core/Math/Vector2D.h"
@@ -49,7 +49,7 @@ namespace JPhysics
 			JMaths::Vector2D<Type>& _normal, Type& _depth
 		);
 
-		static bool IntersectCircles(
+		/*static bool IntersectCircles(
 			const JMaths::Vector2D<Type>& _centerA, const Type& _radiusA,
 			const JMaths::Vector2D<Type>& _centerB, const Type& _radiusB,
 			JMaths::Vector2D<Type>& _normal, Type& _depth)
@@ -71,9 +71,8 @@ namespace JPhysics
 			_depth = radius - distance;
 
 			return true;
-		}
+		}*/
 
-	private:
 		static void ProjectVertices(const std::vector<JMaths::Vector2D<Type>>& _vertices, const JMaths::Vector2D<Type>& _axis, Type& _min, Type& _max);
 		static void ProjectCircle(const JMaths::Vector2D<Type>& _center, const Type& _radius, const JMaths::Vector2D<Type>& _axis, Type& _min, Type& _max);
 		static JMaths::Vector2D<Type> FindArithmeticMean(const std::vector<JMaths::Vector2D<Type>>& _vertices);
@@ -280,7 +279,10 @@ namespace JPhysics
 		{
 			if (shapeTypeB == ShapeType::Box)
 			{
-				return JPhysics::Collisions<float>::IntersectPolygons(bodyA.GetPosition(), bodyA.GetTransformVertices(), bodyB.GetPosition(), bodyB.GetTransformVertices(), _normal, _depth);
+				IntersectInfo<Type> info = ColliderIntersect<Type, JavaEngine::PolygonCollider>().intersect(bodyA.GetPosition(), bodyA.GetTransformVertices(), bodyB.GetPosition(), bodyB.GetTransformVertices());
+				_normal = info.normal;
+				_depth = info.depth;
+				return info.isIntersect;
 			}
 			else if (shapeTypeB == ShapeType::Circle)
 			{
@@ -298,7 +300,7 @@ namespace JPhysics
 			}
 			else if (shapeTypeB == ShapeType::Circle)
 			{
-				IntersectInfo<Type> info = JPhysics::ShapeIntersect<Type, JavaEngine::CircleCollider>().intersect(bodyA.GetPosition(), bodyA.radius, bodyB.GetPosition(), bodyB.radius);
+				IntersectInfo<Type> info = JPhysics::ColliderIntersect<Type, JavaEngine::CircleCollider>().intersect(bodyA.GetPosition(), bodyA.radius, bodyB.GetPosition(), bodyB.radius);
 				_normal = info.normal;
 				_depth = info.depth;
 				return info.isIntersect;

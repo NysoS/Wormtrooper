@@ -3,6 +3,7 @@
 #include "CircleCollider.h"
 #include "jepch.h"
 #include "ColliderIntersect.h"
+#include "ContactPoints.h"
 #include "JavaEngine/Core/Core.h"
 #include "JavaEngine/Core/Math/Math.h"
 #include "JavaEngine/Core/Math/Vector2D.h"
@@ -23,11 +24,6 @@ namespace JPhysics
 			const RigidBody<Type>& _bodyA, const RigidBody<Type>& _bodyB,
 			JMaths::Vector2D<Type>& _contact1, JMaths::Vector2D<Type>& _contact2, Type& _contactCount);
 
-		//Circle//
-		static void FindContactPoint(
-			const JMaths::Vector2D<Type>& _centerA, const Type& _radiusA,
-			const JMaths::Vector2D<Type>& _centerB, JMaths::Vector2D<Type>& _contactPoint);
-
 		static void FindContactPointsPolygon(
 			const std::vector<JMaths::Vector2D<Type>>& _verticesA, const std::vector<JMaths::Vector2D<Type>>& _verticesB,
 			JMaths::Vector2D<Type>& _contact1, JMaths::Vector2D<Type>& _contact2, Type& _countactCount);
@@ -38,8 +34,6 @@ namespace JPhysics
 
 		static bool Collide(const RigidBody<Type>& _bodyA, const RigidBody<Type>& _bodyB, JMaths::Vector2D<Type>& _normal, Type& _depth);
 
-		static void ProjectVertices(const std::vector<JMaths::Vector2D<Type>>& _vertices, const JMaths::Vector2D<Type>& _axis, Type& _min, Type& _max);
-		static void ProjectCircle(const JMaths::Vector2D<Type>& _center, const Type& _radius, const JMaths::Vector2D<Type>& _axis, Type& _min, Type& _max);
 		static JMaths::Vector2D<Type> FindArithmeticMean(const std::vector<JMaths::Vector2D<Type>>& _vertices);
 		static Type FindClosePointOnPolygon(const JMaths::Vector2D<Type>& _circleCenter, const std::vector<JMaths::Vector2D<Type>>& _vertices);
 	};
@@ -115,20 +109,12 @@ namespace JPhysics
 			}
 			else if (shapeTypeB == ShapeType::Circle)
 			{
-				FindContactPoint(bodyA.GetPosition(), bodyA.radius, bodyB.GetPosition(), _contact1);
-				_contactCount = 1;
+				ContactPointsInfo<Type> contactPointsInfo = ContactPoints<Type, JavaEngine::CircleCollider>().find(bodyA.GetPosition(), bodyA.radius, bodyB.GetPosition());
+				_contactCount = contactPointsInfo.contactCount;
+				_contact1 = contactPointsInfo.contact1;
+				_contact2 = contactPointsInfo.contact2;
 			}
 		}
-	}
-
-	template <typename Type>
-	void Collisions<Type>::FindContactPoint(
-		const JMaths::Vector2D<Type>& _centerA, const Type& _radiusA,
-		const JMaths::Vector2D<Type>& _centerB, JMaths::Vector2D<Type>& _contactPoint)
-	{
-		JMaths::Vector2D<Type> ab = _centerB - _centerA;
-		JMaths::Vector2D<Type> direction = ab.getNormarlized();
-		_contactPoint = _centerA + direction * _radiusA;
 	}
 
 	template <typename Type>
@@ -278,52 +264,6 @@ namespace JPhysics
 		}
 
 		return false;
-	}
-
-	template <typename Type>
-	void Collisions<Type>::ProjectVertices(const std::vector<JMaths::Vector2D<Type>>& _vertices, const JMaths::Vector2D<Type>& _axis,
-		Type& _min, Type& _max)
-	{
-		_min = std::numeric_limits<Type>::max();
-		_max = std::numeric_limits<Type>::min();
-
-		for(int i = 0; i < _vertices.size(); ++i)
-		{
-			JMaths::Vector2D<Type> vertices = _vertices[i];
-			Type projection = vertices.dotProduct(_axis);
-
-			if(projection < _min)
-			{
-				_min = projection;
-			}
-
-			if(projection > _max)
-			{
-				_max = projection;
-			}
-		}
-	}
-
-	template <typename Type>
-	void Collisions<Type>::ProjectCircle(const JMaths::Vector2D<Type>& _center, const Type& _radius, const JMaths::Vector2D<Type>& _axis,
-		Type& _min,Type& _max)
-	{
-		JMaths::Vector2D<Type> axis = _axis;
-		JMaths::Vector2D<Type> direction = _axis.getNormarlized();
-		JMaths::Vector2D<Type> radiusDirection = direction * _radius;
-
-		JMaths::Vector2D<Type> pA = _center - radiusDirection;
-		JMaths::Vector2D<Type> pB = _center + radiusDirection;
-
-		_min = axis.dotProduct(pA);
-		_max = axis.dotProduct(pB);
-
-		if(_min > _max)
-		{
-			Type temp = _min;
-			_min = _max;
-			_max = temp;
-		}
 	}
 
 	template <typename Type>

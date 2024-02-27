@@ -93,6 +93,10 @@ namespace JPhysics
 			if (shapeTypeB == ShapeType::Box)
 			{
 				FindContactPointsPolygon(bodyA.GetTransformVertices(), bodyB.GetTransformVertices(), _contact1, _contact2, _contactCount);
+				/*ContactPointsInfo<Type> contactPointsInfo = ContactPoints<Type, JavaEngine::PolygonCollider>().find(bodyA.GetTransformVertices(), bodyB.GetTransformVertices());
+				_contactCount = contactPointsInfo.contactCount;
+				_contact1 = contactPointsInfo.contact1;
+				_contact2 = contactPointsInfo.contact2;*/
 			}
 			else if (shapeTypeB == ShapeType::Circle)
 			{

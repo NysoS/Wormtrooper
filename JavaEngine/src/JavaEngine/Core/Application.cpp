@@ -37,11 +37,11 @@ namespace JavaEngine
 			lag += elapsedTime;
 
 			m_Window->HandleEvent();
-			while (lag >= MaxFPS)
-			{
-				m_Window->OnUpdate(elapsedTime);
+			//while (lag >= MaxFPS)
+			//{
+				m_Window->OnUpdate(0.05f);
 				lag -= MaxFPS;
-			}
+			//}
 			
 			m_Window->OnRenderer();
 		}

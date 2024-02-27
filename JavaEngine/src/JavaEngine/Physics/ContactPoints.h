@@ -137,4 +137,43 @@ namespace JPhysics
 			return contactPointsInfo;
 		}
 	};
+
+	template <typename Type>
+	struct ContactPoints<Type, JavaEngine::CircleCollider, JavaEngine::PolygonCollider>
+	{
+		ContactPointsInfo<Type> find(const JMaths::Vector2D<Type>& circleCenter, const Type& circleRadius, const JMaths::Vector2D<Type>& polygonCenter, const std::vector<JMaths::Vector2D<Type>>& polygonVertices)
+		{
+			ContactPointsInfo<Type> contactPointsInfo{};
+
+			Type minDistanceSqrt = std::numeric_limits<Type>::max();
+
+			for (int i = 0; i < polygonVertices.size(); ++i)
+			{
+				JMaths::Vector2D<Type> va = polygonVertices[i];
+				JMaths::Vector2D<Type> vb = polygonVertices[(i + 1) % polygonVertices.size()];
+
+				Type distanceSqrt = 0.f;
+				JMaths::Vector2D<Type> contact;
+				PointSegmentDistance(circleCenter, va, vb, distanceSqrt, contact);
+
+				if (distanceSqrt < minDistanceSqrt)
+				{
+					minDistanceSqrt = distanceSqrt;
+					contactPointsInfo.contact1 = contact;
+					contactPointsInfo.contactCount = 1;
+				}
+			}
+
+			return contactPointsInfo;
+		}
+	};
+
+	template <typename Type>
+	struct ContactPoints<Type, JavaEngine::PolygonCollider, JavaEngine::CircleCollider>
+	{
+		ContactPointsInfo<Type> find(const JMaths::Vector2D<Type>& circleCenter, const Type& circleRadius, const JMaths::Vector2D<Type>& polygonCenter, const std::vector<JMaths::Vector2D<Type>>& polygonVertices)
+		{
+			return ContactPoints<Type, JavaEngine::CircleCollider, JavaEngine::PolygonCollider>().find(circleCenter, circleRadius, polygonCenter, polygonVertices);
+		}
+	};
 }

@@ -135,7 +135,7 @@ namespace JPhysics
 
 				Collisions<float>::FindContactPoints(*bodyA,*bodyB, contact1, contact2, contactCount);
 				auto contact = Manifold<float>{ *bodyA, *bodyB, normal, depth, contact1, contact2, contactCount };
-				ResolveCollisionWithRotation(contact);
+				ResolveCollisionBasic(contact);
 			}
 		}
 	}

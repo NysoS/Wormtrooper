@@ -24,14 +24,6 @@ namespace JPhysics
 			const RigidBody<Type>& _bodyA, const RigidBody<Type>& _bodyB,
 			JMaths::Vector2D<Type>& _contact1, JMaths::Vector2D<Type>& _contact2, Type& _contactCount);
 
-		static void FindContactPointsPolygon(
-			const std::vector<JMaths::Vector2D<Type>>& _verticesA, const std::vector<JMaths::Vector2D<Type>>& _verticesB,
-			JMaths::Vector2D<Type>& _contact1, JMaths::Vector2D<Type>& _contact2, Type& _countactCount);
-
-		static void FindContactPointPolygonCircle(const JMaths::Vector2D<Type>& _circleCenter, const Type& _circleRadius,
-			const JMaths::Vector2D<Type>& _polygonCenter, const std::vector<JMaths::Vector2D<Type>>& _polygonVertices,
-			JMaths::Vector2D<Type>& _contactPoint);
-
 		static bool Collide(const RigidBody<Type>& _bodyA, const RigidBody<Type>& _bodyB, JMaths::Vector2D<Type>& _normal, Type& _depth);
 
 		static JMaths::Vector2D<Type> FindArithmeticMean(const std::vector<JMaths::Vector2D<Type>>& _vertices);
@@ -88,134 +80,34 @@ namespace JPhysics
 		RigidBody<Type> bodyA = _bodyA;
 		RigidBody<Type> bodyB = _bodyB;
 
+		ContactPointsInfo<Type> contactPointsInfo{};
+
 		if (shapeTypeA == ShapeType::Box)
 		{
 			if (shapeTypeB == ShapeType::Box)
 			{
-				FindContactPointsPolygon(bodyA.GetTransformVertices(), bodyB.GetTransformVertices(), _contact1, _contact2, _contactCount);
-				/*ContactPointsInfo<Type> contactPointsInfo = ContactPoints<Type, JavaEngine::PolygonCollider>().find(bodyA.GetTransformVertices(), bodyB.GetTransformVertices());
-				_contactCount = contactPointsInfo.contactCount;
-				_contact1 = contactPointsInfo.contact1;
-				_contact2 = contactPointsInfo.contact2;*/
+				contactPointsInfo = ContactPoints<Type, JavaEngine::PolygonCollider>().find(bodyA.GetTransformVertices(), bodyB.GetTransformVertices());
 			}
 			else if (shapeTypeB == ShapeType::Circle)
 			{
-				Collisions::FindContactPointPolygonCircle(bodyB.GetPosition(), bodyB.radius, bodyA.GetPosition(), bodyA.GetTransformVertices(), _contact1);
-				_contactCount = 1;
+				contactPointsInfo = ContactPoints<Type, JavaEngine::PolygonCollider, JavaEngine::CircleCollider>().find(bodyB.GetPosition(), bodyB.radius, bodyA.GetPosition(), bodyA.GetTransformVertices());
 			}
 		}
 		else if (shapeTypeA == ShapeType::Circle)
 		{
 			if (shapeTypeB == ShapeType::Box)
 			{
-				Collisions::FindContactPointPolygonCircle(bodyA.GetPosition(), bodyA.radius, bodyB.GetPosition(), bodyB.GetTransformVertices(), _contact1);
-				_contactCount = 1;
+				contactPointsInfo = ContactPoints<Type, JavaEngine::CircleCollider, JavaEngine::PolygonCollider>().find(bodyB.GetPosition(), bodyB.radius, bodyA.GetPosition(), bodyA.GetTransformVertices());
 			}
 			else if (shapeTypeB == ShapeType::Circle)
 			{
-				ContactPointsInfo<Type> contactPointsInfo = ContactPoints<Type, JavaEngine::CircleCollider>().find(bodyA.GetPosition(), bodyA.radius, bodyB.GetPosition());
-				_contactCount = contactPointsInfo.contactCount;
-				_contact1 = contactPointsInfo.contact1;
-				_contact2 = contactPointsInfo.contact2;
-			}
-		}
-	}
-
-	template <typename Type>
-	void Collisions<Type>::FindContactPointsPolygon(const std::vector<JMaths::Vector2D<Type>>& _verticesA,
-		const std::vector<JMaths::Vector2D<Type>>& _verticesB, JMaths::Vector2D<Type>& _contact1,
-		JMaths::Vector2D<Type>& _contact2, Type& _countactCount)
-	{
-		_contact1 = JMaths::Vector2D<Type>::Zero;
-		_contact2 = JMaths::Vector2D<Type>::Zero;
-		_countactCount = 0;
-
-		Type minDistanceSqrt = std::numeric_limits<Type>::max();
-
-		for(int i = 0; i < _verticesA.size(); ++i)
-		{
-			JMaths::Vector2D<Type> p = _verticesA[i];
-
-			for(int j = 0; j < _verticesB.size(); ++j)
-			{
-				JMaths::Vector2D<Type> va = _verticesB[j];
-				JMaths::Vector2D<Type> vb = _verticesB[(j+1) % _verticesB.size()];
-
-				Type distanceSqrt = 0.f;
-				JMaths::Vector2D<Type> contact;
-				PointSegmentDistance(p, va, vb, distanceSqrt, contact);
-
-				if (JMaths::JMath<Type>::NearlyEqual(distanceSqrt, minDistanceSqrt))
-				{
-					if(!JMaths::JMath<Type>::NearlyEqual(contact, _contact1))
-					{
-						_contact2 = contact;
-						_countactCount = 2;
-					}
-				}
-				else if(distanceSqrt < minDistanceSqrt)
-				{
-					minDistanceSqrt = distanceSqrt;
-					_countactCount = 1;
-					_contact1 = contact;
-				}
+				contactPointsInfo = ContactPoints<Type, JavaEngine::CircleCollider>().find(bodyA.GetPosition(), bodyA.radius, bodyB.GetPosition());
 			}
 		}
 
-		for (int i = 0; i < _verticesB.size(); ++i)
-		{
-			JMaths::Vector2D<Type> p = _verticesB[i];
-
-			for (int j = 0; j < _verticesA.size(); ++j)
-			{
-				JMaths::Vector2D<Type> va = _verticesA[j];
-				JMaths::Vector2D<Type> vb = _verticesA[(j + 1) % _verticesA.size()];
-
-				Type distanceSqrt = 0.f;
-				JMaths::Vector2D<Type> contact;
-				PointSegmentDistance(p, va, vb, distanceSqrt, contact);
-
-				if (JMaths::JMath<Type>::NearlyEqual(distanceSqrt, minDistanceSqrt))
-				{
-					if (!JMaths::JMath<Type>::NearlyEqual(contact, _contact1))
-					{
-						_contact2 = contact;
-						_countactCount = 2;
-					}
-				}
-				else if (distanceSqrt < minDistanceSqrt)
-				{
-					minDistanceSqrt = distanceSqrt;
-					_countactCount = 1;
-					_contact1 = contact;
-				}
-			}
-		}
-	}
-
-	template <typename Type>
-	void Collisions<Type>::FindContactPointPolygonCircle(const JMaths::Vector2D<Type>& _circleCenter,
-		const Type& _circleRadius, const JMaths::Vector2D<Type>& _polygonCenter,
-		const std::vector<JMaths::Vector2D<Type>>& _polygonVertices, JMaths::Vector2D<Type>& _contactPoint)
-	{
-		Type minDistanceSqrt = std::numeric_limits<Type>::max();
-		_contactPoint = JMaths::Vector2D<Type>::Zero;
-
-		for (int i = 0; i < _polygonVertices.size(); ++i)
-		{
-			JMaths::Vector2D<Type> va = _polygonVertices[i];
-			JMaths::Vector2D<Type> vb = _polygonVertices[(i + 1) % _polygonVertices.size()];
-
-			Type distanceSqrt = 0.f;
-			JMaths::Vector2D<Type> contact;
-			PointSegmentDistance(_circleCenter, va, vb, distanceSqrt, contact);
-
-			if (distanceSqrt < minDistanceSqrt)
-			{
-				minDistanceSqrt = distanceSqrt;
-				_contactPoint = contact;
-			}
-		}
+		_contactCount = contactPointsInfo.contactCount;
+		_contact1 = contactPointsInfo.contact1;
+		_contact2 = contactPointsInfo.contact2;
 	}
 
 	template <typename Type>

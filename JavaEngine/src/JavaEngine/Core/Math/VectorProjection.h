@@ -10,14 +10,14 @@ namespace JMaths
 	using Vec2D = Vector2D<Type>;
 
 	template <typename Type>
-	struct VectorProjectionInfo
+	struct JE_API VectorProjectionInfo
 	{
 		Type min = .0f;
 		Type max = .0f;
 	};
 
 	template <typename Type>
-	struct VectorProjection
+	struct JE_API VectorProjection
 	{
 		VectorProjectionInfo<Type> polygonProjection(const std::vector<Vec2D<Type>>& vertices, const Vec2D<Type>& axis)
 		{

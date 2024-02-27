@@ -1,54 +1,9 @@
 #pragma once
 
+#include "JavaEngine/Core/Math/VectorProjection.h"
 #include "JavaEngine/Physics/IntersectInfo.h"
 #include "JavaEngine/Physics/CircleCollider.h"
 #include "JavaEngine/Physics/PolygonCollider.h"
-
-template <typename Type>
-void ProjectVertices(const std::vector<JMaths::Vector2D<Type>>& _vertices, const JMaths::Vector2D<Type>& _axis,
-	Type& _min, Type& _max)
-{
-	_min = std::numeric_limits<Type>::max();
-	_max = std::numeric_limits<Type>::min();
-
-	for (int i = 0; i < _vertices.size(); ++i)
-	{
-		JMaths::Vector2D<Type> vertices = _vertices[i];
-		Type projection = vertices.dotProduct(_axis);
-
-		if (projection < _min)
-		{
-			_min = projection;
-		}
-
-		if (projection > _max)
-		{
-			_max = projection;
-		}
-	}
-}
-
-template <typename TypeProjectCircle>
-void ProjectCircle(const JMaths::Vector2D<TypeProjectCircle>& _center, const TypeProjectCircle& _radius, 
-	const JMaths::Vector2D<TypeProjectCircle>& _axis, TypeProjectCircle& _min, TypeProjectCircle& _max)
-{
-	JMaths::Vector2D<TypeProjectCircle> axis = _axis;
-	JMaths::Vector2D<TypeProjectCircle> direction = _axis.getNormarlized();
-	JMaths::Vector2D<TypeProjectCircle> radiusDirection = direction * _radius;
-
-	JMaths::Vector2D<TypeProjectCircle> pA = _center - radiusDirection;
-	JMaths::Vector2D<TypeProjectCircle> pB = _center + radiusDirection;
-
-	_min = axis.dotProduct(pA);
-	_max = axis.dotProduct(pB);
-
-	if (_min > _max)
-	{
-		TypeProjectCircle temp = _min;
-		_min = _max;
-		_max = temp;
-	}
-}
 
 template <typename Type>
 Type FindClosePointOnPolygon(const JMaths::Vector2D<Type>& _circleCenter,
@@ -77,6 +32,11 @@ namespace JPhysics
 {
 	template <typename Type>
 	using Vec2D = JMaths::Vector2D<Type>;
+
+	template <typename Type>
+	using VecProjectionInfo = JMaths::VectorProjectionInfo<Type>;
+	template <typename Type>
+	using VecProjection = JMaths::VectorProjection<Type>;
 
 	template <typename ValueType, typename ShapeColliderA, typename ShapeColliderB = ShapeColliderA>
 	struct ColliderIntersect
@@ -128,20 +88,15 @@ namespace JPhysics
 				Vec2D<ValueType> edge = nextVertices - currentVertices;
 				Vec2D<ValueType> axis = edge.normalilze();
 
-				ValueType firstMin;
-				ValueType firstMax;
-				ValueType secondMin;
-				ValueType secondMax;
+				VecProjectionInfo<ValueType> firstPolygonProjectionInfo = VecProjection<ValueType>().polygonProjection(firstShapeVertices, axis);
+				VecProjectionInfo<ValueType> secondPolygonProjectionInfo = VecProjection<ValueType>().polygonProjection(secondShapeVertices, axis);
 
-				ProjectVertices(firstShapeVertices, axis, firstMin, firstMax);
-				ProjectVertices(secondShapeVertices, axis, secondMin, secondMax);
-
-				if (firstMin >= secondMax || secondMin >= firstMax)
+				if (firstPolygonProjectionInfo.min >= secondPolygonProjectionInfo.max || secondPolygonProjectionInfo.min >= firstPolygonProjectionInfo.max)
 				{
 					return intersectInfo;
 				}
 
-				ValueType axisDepth = std::min(secondMax - firstMin, firstMax - secondMin);
+				ValueType axisDepth = std::min(secondPolygonProjectionInfo.max - firstPolygonProjectionInfo.min, firstPolygonProjectionInfo.max - secondPolygonProjectionInfo.min);
 				intersectInfo.depth = std::numeric_limits<ValueType>::max();
 				if (axisDepth < intersectInfo.depth)
 				{
@@ -158,20 +113,15 @@ namespace JPhysics
 				Vec2D<ValueType> edge = nextVertices - currentVertices;
 				Vec2D<ValueType> axis = edge.normalilze();
 
-				ValueType firstMin;
-				ValueType firstMax;
-				ValueType secondMin;
-				ValueType secondMax;
+				VecProjectionInfo<ValueType> firstPolygonProjectionInfo = VecProjection<ValueType>().polygonProjection(firstShapeVertices, axis);
+				VecProjectionInfo<ValueType> secondPolygonProjectionInfo = VecProjection<ValueType>().polygonProjection(secondShapeVertices, axis);
 
-				ProjectVertices(firstShapeVertices, axis, firstMin, firstMax);
-				ProjectVertices(secondShapeVertices, axis, secondMin, secondMax);
-
-				if (firstMin >= secondMax || secondMin >= firstMax)
+				if (firstPolygonProjectionInfo.min >= secondPolygonProjectionInfo.max || secondPolygonProjectionInfo.min >= firstPolygonProjectionInfo.max)
 				{
 					return intersectInfo;
 				}
 
-				ValueType axisDepth = std::min(secondMax - firstMin, firstMax - secondMin);
+				ValueType axisDepth = std::min(secondPolygonProjectionInfo.max - firstPolygonProjectionInfo.min, firstPolygonProjectionInfo.max - secondPolygonProjectionInfo.min);
 				
 				if (axisDepth < intersectInfo.depth)
 				{
@@ -201,10 +151,9 @@ namespace JPhysics
 
 			Vec2D<ValueType> axis = Vec2D<ValueType>::Zero;
 
-			ValueType polygonMin;
-			ValueType polygonMax;
-			ValueType circleMin;
-			ValueType circleMax;
+			VecProjectionInfo<ValueType> polygonProjectionInfo{}; //= VecProjection<ValueType>().polygonProjection(polygonVertices, axis);
+			VecProjectionInfo<ValueType> circleProjectionInfo{}; //= VecProjection<ValueType>().circleProjection(circleCenter, circleRadius, axis);
+
 			ValueType axisDepth = 0.f;
 
 			for (int i = 0; i < polygonVertices.size(); ++i)
@@ -216,15 +165,15 @@ namespace JPhysics
 				axis = edge.GetLeftNormal();
 				axis.normalilze();
 
-				ProjectVertices(polygonVertices, axis, polygonMin, polygonMax);
-				ProjectCircle(circleCenter, circleRadius, axis, circleMin, circleMax);
+				polygonProjectionInfo = VecProjection<ValueType>().polygonProjection(polygonVertices, axis);
+				circleProjectionInfo = VecProjection<ValueType>().circleProjection(circleCenter, circleRadius, axis);
 
-				if (polygonMin >= circleMax || circleMin >= polygonMax)
+				if (polygonProjectionInfo.min >= circleProjectionInfo.max || circleProjectionInfo.min >= polygonProjectionInfo.max)
 				{
 					return intersectInfo;
 				}
 
-				axisDepth = std::min(circleMax - polygonMin, polygonMax - circleMin);
+				axisDepth = std::min(circleProjectionInfo.max - polygonProjectionInfo.min, polygonProjectionInfo.max - circleProjectionInfo.min);
 				if (axisDepth < intersectInfo.depth)
 				{
 					intersectInfo.depth = axisDepth;
@@ -242,15 +191,15 @@ namespace JPhysics
 			axis = cp - circleCenter;
 			axis.normalilze();
 
-			ProjectVertices(polygonVertices, axis, polygonMin, polygonMax);
-			ProjectCircle(circleCenter, circleRadius, axis, circleMin, circleMax);
+			polygonProjectionInfo = VecProjection<ValueType>().polygonProjection(polygonVertices, axis);
+			circleProjectionInfo = VecProjection<ValueType>().circleProjection(circleCenter, circleRadius, axis);
 
-			if (polygonMin >= circleMax || circleMin >= polygonMax)
+			if (polygonProjectionInfo.min >= circleProjectionInfo.max || circleProjectionInfo.min >= polygonProjectionInfo.max)
 			{
 				return intersectInfo;
 			}
 
-			axisDepth = std::min(circleMax - polygonMin, polygonMax - circleMin);
+			axisDepth = std::min(circleProjectionInfo.max - polygonProjectionInfo.min, polygonProjectionInfo.max - circleProjectionInfo.max);
 			if (axisDepth < intersectInfo.depth)
 			{
 				intersectInfo.depth = axisDepth;

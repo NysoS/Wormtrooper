@@ -57,7 +57,7 @@ namespace JPhysics
 			ContactPointsInfo<Type> contactPointsInfo{};
 
 			Vect2D<Type> ab = circleCenterB - circleCenterA;
-			Vect2D<Type> direction = ab.GetLeftNormal();
+			Vect2D<Type> direction = ab.getNormarlized();
 			contactPointsInfo.contact1 = circleCenterA + direction * circleRadiusA;
 			contactPointsInfo.contactCount = 1;
 

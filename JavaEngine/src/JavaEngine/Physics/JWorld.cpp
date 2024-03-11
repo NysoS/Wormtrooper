@@ -10,15 +10,15 @@ namespace JPhysics
 	JWorld::JWorld()
 		: m_gravity(JMaths::Vector2Df(0, 9.81f)), m_colliderIntersect(new ColliderIntersect<float>), m_contactPoints(new ContactPoints<float>)
 	{
-		fnDispatcher.add<JavaEngine::CircleCollider, JavaEngine::CircleCollider>(m_colliderIntersect, &ColliderIntersect<float>::OnCircleColliderIntersectCallback);
-		fnDispatcher.add<JavaEngine::PolygonCollider, JavaEngine::PolygonCollider>(m_colliderIntersect, &ColliderIntersect<float>::OnPolygonColliderIntersectCallback);
-		fnDispatcher.add<JavaEngine::CircleCollider, JavaEngine::PolygonCollider>(m_colliderIntersect, &ColliderIntersect<float>::OnCircleToPolygonColliderIntersectCallback);
-		fnDispatcher.add<JavaEngine::PolygonCollider, JavaEngine::CircleCollider>(m_colliderIntersect, &ColliderIntersect<float>::OnPolygonToCircleColliderIntersectCallback);
+		fnDispatcher.add<JavaEngine::CircleCollider, JavaEngine::CircleCollider>(m_colliderIntersect.get(), &ColliderIntersect<float>::OnCircleColliderIntersectCallback);
+		fnDispatcher.add<JavaEngine::PolygonCollider, JavaEngine::PolygonCollider>(m_colliderIntersect.get(), &ColliderIntersect<float>::OnPolygonColliderIntersectCallback);
+		fnDispatcher.add<JavaEngine::CircleCollider, JavaEngine::PolygonCollider>(m_colliderIntersect.get(), &ColliderIntersect<float>::OnCircleToPolygonColliderIntersectCallback);
+		fnDispatcher.add<JavaEngine::PolygonCollider, JavaEngine::CircleCollider>(m_colliderIntersect.get(), &ColliderIntersect<float>::OnPolygonToCircleColliderIntersectCallback);
 
-		contactPointsDispatcher.add<JavaEngine::CircleCollider, JavaEngine::CircleCollider>(m_contactPoints, &ContactPoints<float>::OnCircleContactPointsCallback);
-		contactPointsDispatcher.add<JavaEngine::PolygonCollider, JavaEngine::PolygonCollider>(m_contactPoints, &ContactPoints<float>::OnPolygonContactPointsCallback);
-		contactPointsDispatcher.add<JavaEngine::CircleCollider, JavaEngine::PolygonCollider>(m_contactPoints, &ContactPoints<float>::OnCircleToPolygonContactPointsCallback);
-		contactPointsDispatcher.add<JavaEngine::PolygonCollider, JavaEngine::CircleCollider>(m_contactPoints, &ContactPoints<float>::OnPolygonToCirlceContactPointsCallback);
+		contactPointsDispatcher.add<JavaEngine::CircleCollider, JavaEngine::CircleCollider>(m_contactPoints.get(), &ContactPoints<float>::OnCircleContactPointsCallback);
+		contactPointsDispatcher.add<JavaEngine::PolygonCollider, JavaEngine::PolygonCollider>(m_contactPoints.get(), &ContactPoints<float>::OnPolygonContactPointsCallback);
+		contactPointsDispatcher.add<JavaEngine::CircleCollider, JavaEngine::PolygonCollider>(m_contactPoints.get(), &ContactPoints<float>::OnCircleToPolygonContactPointsCallback);
+		contactPointsDispatcher.add<JavaEngine::PolygonCollider, JavaEngine::CircleCollider>(m_contactPoints.get(), &ContactPoints<float>::OnPolygonToCirlceContactPointsCallback);
 	}
 
 	JWorld::~JWorld()
@@ -27,12 +27,6 @@ namespace JPhysics
 		{
 			delete rbody;
 			rbody = nullptr;
-		}
-
-		if(m_colliderIntersect)
-		{
-			delete m_colliderIntersect;
-			m_colliderIntersect = nullptr;
 		}
 	}
 
@@ -146,7 +140,7 @@ namespace JPhysics
 			JMaths::Vector2Df normal{};
 			float depth{ 0 };
 
-			m_intersectInfo = fnDispatcher(*bodyA->collider, *bodyB->collider);
+			const IntersectInfo<float> m_intersectInfo = fnDispatcher(*bodyA->collider, *bodyB->collider);
 			normal = m_intersectInfo.normal;
 			depth = m_intersectInfo.depth;
 
@@ -154,7 +148,7 @@ namespace JPhysics
 			{
 				SeparateBodies(*bodyA,*bodyB, normal, depth);
 
-				ContactPointsInfo<float> m_contactPointsInfo = contactPointsDispatcher(*bodyA->collider, *bodyB->collider);
+				const ContactPointsInfo<float> m_contactPointsInfo = contactPointsDispatcher(*bodyA->collider, *bodyB->collider);
 				
 				auto contact = Manifold<float>{ *bodyA, *bodyB, normal, depth, m_contactPointsInfo.contact1, m_contactPointsInfo.contact2, m_contactPointsInfo.contactCount };
 				ResolveCollisionWithRotation(contact);

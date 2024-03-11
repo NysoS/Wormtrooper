@@ -1,9 +1,9 @@
 #pragma once
 
+#include "RigidBody.h"
 #include "JavaEngine/Core/Math/VectorProjection.h"
 #include "JavaEngine/Physics/IntersectInfo.h"
 #include "JavaEngine/Physics/CircleCollider.h"
-#include "JavaEngine/Physics/PolygonCollider.h"
 
 template <typename Type>
 Type FindClosePointOnPolygon(const JMaths::Vector2D<Type>& _circleCenter,
@@ -27,7 +27,6 @@ Type FindClosePointOnPolygon(const JMaths::Vector2D<Type>& _circleCenter,
 	return result;
 }
 
-
 namespace JPhysics
 {
 	template <typename Type>
@@ -38,29 +37,31 @@ namespace JPhysics
 	template <typename Type>
 	using VecProjection = JMaths::VectorProjection<Type>;
 
-	template <typename ValueType, typename ShapeColliderA, typename ShapeColliderB = ShapeColliderA>
+	template <typename ValueType>
 	struct ColliderIntersect
 	{
-	};
-
-	template <typename ValueType>
-	struct ColliderIntersect<ValueType, JavaEngine::CircleCollider>
-	{
-		IntersectInfo<ValueType> intersect(
-			const Vec2D<ValueType>& firstShapeCenter, const ValueType& firstShapeRadius,
-			const Vec2D<ValueType>& secondShapeCenter, const ValueType& secondShapeRadius)
+		template <typename Lhs, typename Rhs>
+		IntersectInfo<float> OnColliderIntersectCallback(Lhs&, Rhs&)
 		{
-			IntersectInfo<ValueType> intersectInfo{};
+			return IntersectInfo<float>{};
+		}
 
-			ValueType distance = Vec2D<ValueType>::Distance(firstShapeCenter, secondShapeCenter);
-			ValueType radius = firstShapeRadius + secondShapeRadius;
+		IntersectInfo<ValueType> OnCircleColliderIntersectCallback(JavaEngine::ColliderBase& lhs, JavaEngine::ColliderBase& rhs)
+		{
+			IntersectInfo<float> intersectInfo{};
+
+			JavaEngine::CircleCollider& circleColliderLhs = dynamic_cast<JavaEngine::CircleCollider&>(lhs);
+			JavaEngine::CircleCollider& circleColliderRhs = dynamic_cast<JavaEngine::CircleCollider&>(rhs);
+
+			float distance = Vec2D<float>::Distance(circleColliderLhs.position, circleColliderRhs.position);
+			float radius = circleColliderLhs.radius + circleColliderRhs.radius;
 
 			if (distance >= radius)
 			{
 				return intersectInfo;
 			}
 
-			Vec2D<ValueType> normal = secondShapeCenter - firstShapeCenter;
+			Vec2D<float> normal = circleColliderRhs.position - circleColliderLhs.position;
 			normal.normalilze();
 
 			intersectInfo.normal = normal;
@@ -69,16 +70,16 @@ namespace JPhysics
 
 			return intersectInfo;
 		}
-	};
 
-	template <typename ValueType>
-	struct ColliderIntersect<ValueType, JavaEngine::PolygonCollider>
-	{
-		IntersectInfo<ValueType> intersect(
-			const Vec2D<ValueType>& firstShapeCenter, const std::vector<JMaths::Vector2D<ValueType>>& firstShapeVertices,
-			const Vec2D<ValueType>& secondShapeCenter, const std::vector<JMaths::Vector2D<ValueType>>& secondShapeVertices)
+		IntersectInfo<ValueType> OnPolygonColliderIntersectCallback(JavaEngine::ColliderBase& lhs, JavaEngine::ColliderBase& rhs)
 		{
 			IntersectInfo<ValueType> intersectInfo{};
+
+			JavaEngine::PolygonCollider& lshPolygon = dynamic_cast<JavaEngine::PolygonCollider&>(lhs);
+			JavaEngine::PolygonCollider& rshPolygon = dynamic_cast<JavaEngine::PolygonCollider&>(rhs);
+
+			auto firstShapeVertices = lshPolygon.getTransformVertices();
+			auto secondShapeVertices= rshPolygon.getTransformVertices();
 
 			for (int firstShapeVerticesIndex = 0; firstShapeVerticesIndex < firstShapeVertices.size(); ++firstShapeVerticesIndex)
 			{
@@ -130,7 +131,7 @@ namespace JPhysics
 				}
 			}
 
-			Vec2D<ValueType> direction = secondShapeCenter - firstShapeCenter;
+			Vec2D<ValueType> direction = rshPolygon.position - lshPolygon.position;
 			if (direction.dotProduct(intersectInfo.normal) < 0.f)
 			{
 				intersectInfo.normal = { -intersectInfo.normal.x, -intersectInfo.normal.y };
@@ -139,15 +140,14 @@ namespace JPhysics
 			intersectInfo.isIntersect = true;
 			return intersectInfo;
 		}
-	};
 
-	template <typename ValueType>
-	struct ColliderIntersect<ValueType, JavaEngine::CircleCollider, JavaEngine::PolygonCollider>
-	{
-		IntersectInfo<ValueType> intersect(const Vec2D<ValueType>& circleCenter, const ValueType& circleRadius, const Vec2D<ValueType>& polygonCenter, const std::vector<Vec2D<ValueType>>& polygonVertices)
+		IntersectInfo<ValueType> OnCircleToPolygonColliderIntersectCallback(JavaEngine::ColliderBase& lhs, JavaEngine::ColliderBase& rhs)
 		{
 			IntersectInfo<ValueType> intersectInfo{};
 			intersectInfo.depth = std::numeric_limits<ValueType>::max();
+
+			JavaEngine::CircleCollider lshCircle = dynamic_cast<JavaEngine::CircleCollider&>(lhs);
+			JavaEngine::PolygonCollider rshPolygon = dynamic_cast<JavaEngine::PolygonCollider&>(rhs);
 
 			Vec2D<ValueType> axis = Vec2D<ValueType>::Zero;
 
@@ -155,6 +155,8 @@ namespace JPhysics
 			VecProjectionInfo<ValueType> circleProjectionInfo{}; //= VecProjection<ValueType>().circleProjection(circleCenter, circleRadius, axis);
 
 			ValueType axisDepth = 0.f;
+
+			auto polygonVertices = rshPolygon.getTransformVertices();
 
 			for (int i = 0; i < polygonVertices.size(); ++i)
 			{
@@ -166,7 +168,7 @@ namespace JPhysics
 				axis.normalilze();
 
 				polygonProjectionInfo = VecProjection<ValueType>().polygonProjection(polygonVertices, axis);
-				circleProjectionInfo = VecProjection<ValueType>().circleProjection(circleCenter, circleRadius, axis);
+				circleProjectionInfo = VecProjection<ValueType>().circleProjection(lshCircle.position, lshCircle.radius, axis);
 
 				if (polygonProjectionInfo.min >= circleProjectionInfo.max || circleProjectionInfo.min >= polygonProjectionInfo.max)
 				{
@@ -181,18 +183,18 @@ namespace JPhysics
 				}
 			}
 
-			auto cpIndex = static_cast<int>(FindClosePointOnPolygon(circleCenter, polygonVertices));
+			auto cpIndex = static_cast<int>(FindClosePointOnPolygon(lshCircle.position, polygonVertices));
 			if (cpIndex <= -1)
 			{
 				return intersectInfo;
 			}
 
 			Vec2D<ValueType> cp = polygonVertices[cpIndex];
-			axis = cp - circleCenter;
+			axis = cp - lshCircle.position;
 			axis.normalilze();
 
 			polygonProjectionInfo = VecProjection<ValueType>().polygonProjection(polygonVertices, axis);
-			circleProjectionInfo = VecProjection<ValueType>().circleProjection(circleCenter, circleRadius, axis);
+			circleProjectionInfo = VecProjection<ValueType>().circleProjection(lshCircle.position, lshCircle.radius, axis);
 
 			if (polygonProjectionInfo.min >= circleProjectionInfo.max || circleProjectionInfo.min >= polygonProjectionInfo.max)
 			{
@@ -206,7 +208,7 @@ namespace JPhysics
 				intersectInfo.normal = axis;
 			}
 
-			Vec2D<ValueType> direction = polygonCenter - circleCenter;
+			Vec2D<ValueType> direction = lshCircle.position - rshPolygon.position;
 			if (direction.dotProduct(intersectInfo.normal) < 0.f)
 			{
 				intersectInfo.normal = Vec2D<ValueType>{ -intersectInfo.normal.x, -intersectInfo.normal.y };
@@ -215,14 +217,10 @@ namespace JPhysics
 			intersectInfo.isIntersect = true;
 			return intersectInfo;
 		}
-	};
 
-	template <typename ValueType>
-	struct ColliderIntersect<ValueType, JavaEngine::PolygonCollider, JavaEngine::CircleCollider>
-	{
-		IntersectInfo<ValueType> intersect(const Vec2D<ValueType>& circleCenter, const ValueType& circleRadius, const Vec2D<ValueType>& polygonCenter, const std::vector<Vec2D<ValueType>>& polygonVertices)
+		IntersectInfo<ValueType> OnPolygonToCircleColliderIntersectCallback(JavaEngine::ColliderBase& lhs, JavaEngine::ColliderBase& rhs)
 		{
-			return ColliderIntersect<ValueType, JavaEngine::CircleCollider, JavaEngine::PolygonCollider>().intersect(circleCenter, circleRadius, polygonCenter, polygonVertices);
+			return ColliderIntersect::OnCircleToPolygonColliderIntersectCallback(rhs, lhs);
 		}
 	};
 }

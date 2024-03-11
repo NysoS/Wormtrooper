@@ -86,80 +86,42 @@ namespace JPhysics
 		{
 			if (shapeTypeB == ShapeType::Box)
 			{
-				contactPointsInfo = ContactPoints<Type, JavaEngine::PolygonCollider>().find(bodyA.GetTransformVertices(), bodyB.GetTransformVertices());
+				JavaEngine::PolygonCollider* polygonCollider = dynamic_cast<JavaEngine::PolygonCollider*>(bodyA.collider);
+				JavaEngine::PolygonCollider* polygonColliderRhs = dynamic_cast<JavaEngine::PolygonCollider*>(bodyB.collider);
+				contactPointsInfo = ContactPoints<Type, JavaEngine::PolygonCollider>().find(polygonCollider->getTransformVertices(), polygonColliderRhs->getTransformVertices());
 			}
 			else if (shapeTypeB == ShapeType::Circle)
 			{
-				contactPointsInfo = ContactPoints<Type, JavaEngine::PolygonCollider, JavaEngine::CircleCollider>().find(bodyB.GetPosition(), bodyB.radius, bodyA.GetPosition(), bodyA.GetTransformVertices());
+				JavaEngine::PolygonCollider* polygonCollider = static_cast<JavaEngine::PolygonCollider*>(bodyA.collider);
+				JavaEngine::CircleCollider* circleCollider = dynamic_cast<JavaEngine::CircleCollider*>(bodyB.collider);
+				contactPointsInfo = ContactPoints<Type, JavaEngine::PolygonCollider, JavaEngine::CircleCollider>().find(circleCollider->position, circleCollider->radius, polygonCollider->position, polygonCollider->getTransformVertices());
 			}
 		}
 		else if (shapeTypeA == ShapeType::Circle)
 		{
 			if (shapeTypeB == ShapeType::Box)
 			{
-				contactPointsInfo = ContactPoints<Type, JavaEngine::CircleCollider, JavaEngine::PolygonCollider>().find(bodyB.GetPosition(), bodyB.radius, bodyA.GetPosition(), bodyA.GetTransformVertices());
+				JavaEngine::PolygonCollider* polygonCollider = dynamic_cast<JavaEngine::PolygonCollider*>(bodyA.collider);
+				JavaEngine::CircleCollider* circleCollider = dynamic_cast<JavaEngine::CircleCollider*>(bodyB.collider);
+
+				if(!polygonCollider && !circleCollider)
+				{
+					return;
+				}
+
+				contactPointsInfo = ContactPoints<Type, JavaEngine::CircleCollider, JavaEngine::PolygonCollider>().find(circleCollider->position, circleCollider->radius, polygonCollider->position, polygonCollider->getTransformVertices());
 			}
 			else if (shapeTypeB == ShapeType::Circle)
 			{
-				contactPointsInfo = ContactPoints<Type, JavaEngine::CircleCollider>().find(bodyA.GetPosition(), bodyA.radius, bodyB.GetPosition());
+				JavaEngine::CircleCollider* circleCollider = dynamic_cast<JavaEngine::CircleCollider*>(bodyA.collider);
+				JavaEngine::CircleCollider* circleColliderB = dynamic_cast<JavaEngine::CircleCollider*>(bodyB.collider);
+				contactPointsInfo = ContactPoints<Type, JavaEngine::CircleCollider>().find(circleCollider->position, circleCollider->radius, circleColliderB->position);
 			}
 		}
 
 		_contactCount = contactPointsInfo.contactCount;
 		_contact1 = contactPointsInfo.contact1;
 		_contact2 = contactPointsInfo.contact2;
-	}
-
-	template <typename Type>
-	bool Collisions<Type>::Collide(const RigidBody<Type>& _bodyA, const RigidBody<Type>& _bodyB, JMaths::Vector2D<Type>& _normal, Type& _depth)
-	{
-		_normal = JMaths::Vector2D<Type>::Zero;
-		_depth = 0.f;
-
-		ShapeType shapeTypeA = _bodyA.shapeType;
-		ShapeType shapeTypeB = _bodyB.shapeType;
-
-		RigidBody<Type> bodyA = _bodyA;
-		RigidBody<Type> bodyB = _bodyB;
-
-		if (shapeTypeA == ShapeType::Box)
-		{
-			if (shapeTypeB == ShapeType::Box)
-			{
-				IntersectInfo<Type> info = ColliderIntersect<Type, JavaEngine::PolygonCollider>().intersect(bodyA.GetPosition(), bodyA.GetTransformVertices(), bodyB.GetPosition(), bodyB.GetTransformVertices());
-				_normal = info.normal;
-				_depth = info.depth;
-				return info.isIntersect;
-			}
-			else if (shapeTypeB == ShapeType::Circle)
-			{
-				IntersectInfo<Type> info = ColliderIntersect<Type, JavaEngine::PolygonCollider, JavaEngine::CircleCollider>().intersect(bodyB.GetPosition(), bodyB.radius, bodyA.GetPosition(), bodyA.GetTransformVertices());
-				_normal = info.normal;
-				_normal = JMaths::Vector2Df{ -_normal.x, -_normal.y };
-
-				_depth = info.depth;
-				return info.isIntersect;
-			}
-		}
-		else if (shapeTypeA == ShapeType::Circle)
-		{
-			if (shapeTypeB == ShapeType::Box)
-			{
-				IntersectInfo<Type> info = ColliderIntersect<Type, JavaEngine::CircleCollider, JavaEngine::PolygonCollider>().intersect(bodyA.GetPosition(), bodyA.radius, bodyB.GetPosition(), bodyB.GetTransformVertices());
-				_normal = info.normal;
-				_depth = info.depth;
-				return info.isIntersect;
-			}
-			else if (shapeTypeB == ShapeType::Circle)
-			{
-				IntersectInfo<Type> info = JPhysics::ColliderIntersect<Type, JavaEngine::CircleCollider>().intersect(bodyA.GetPosition(), bodyA.radius, bodyB.GetPosition(), bodyB.radius);
-				_normal = info.normal;
-				_depth = info.depth;
-				return info.isIntersect;
-			}
-		}
-
-		return false;
 	}
 
 	template <typename Type>

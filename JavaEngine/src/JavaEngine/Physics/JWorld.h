@@ -45,7 +45,7 @@ namespace JPhysics
 		void ResolveCollisionWithRotation(Manifold<float>& _contact);
 		void ResolveCollisionWithRotationAndFriction(Manifold<float>& _contact);
 
-		JavaEngine::FnDispatcher<JavaEngine::ColliderBase, JavaEngine::ColliderBase, IntersectInfo<float>> fnDispatcher;
+		JavaEngine::FnDispatcher<JavaEngine::ColliderBase, JavaEngine::ColliderBase, IntersectInfo<float>> collideIntersectionDispatcher;
 		JavaEngine::FnDispatcher<JavaEngine::ColliderBase, JavaEngine::ColliderBase, ContactPointsInfo<float>> contactPointsDispatcher;
 
 	private:

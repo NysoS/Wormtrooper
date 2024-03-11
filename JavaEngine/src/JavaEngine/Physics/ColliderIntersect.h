@@ -1,31 +1,10 @@
 #pragma once
 
+#include "Collisions.h"
 #include "RigidBody.h"
 #include "JavaEngine/Core/Math/VectorProjection.h"
 #include "JavaEngine/Physics/IntersectInfo.h"
 #include "JavaEngine/Physics/CircleCollider.h"
-
-template <typename Type>
-Type FindClosePointOnPolygon(const JMaths::Vector2D<Type>& _circleCenter,
-	const std::vector<JMaths::Vector2D<Type>>& _vertices)
-{
-	Type result = -1.f;
-	Type minDistance = std::numeric_limits<Type>::max();
-
-	for (int i = 0; i < _vertices.size(); i++)
-	{
-		JMaths::Vector2D<Type> vertices = _vertices[i];
-		Type distance = JMaths::Vector2D<Type>::Distance(vertices, _circleCenter);
-
-		if (distance < minDistance)
-		{
-			minDistance = distance;
-			result = i;
-		}
-	}
-
-	return result;
-}
 
 namespace JPhysics
 {
@@ -48,20 +27,20 @@ namespace JPhysics
 
 		IntersectInfo<ValueType> OnCircleColliderIntersectCallback(JavaEngine::ColliderBase& lhs, JavaEngine::ColliderBase& rhs)
 		{
-			IntersectInfo<float> intersectInfo{};
+			IntersectInfo<ValueType> intersectInfo{};
 
 			JavaEngine::CircleCollider circleColliderLhs = dynamic_cast<JavaEngine::CircleCollider&>(lhs);
 			JavaEngine::CircleCollider circleColliderRhs = dynamic_cast<JavaEngine::CircleCollider&>(rhs);
 
-			float distance = Vec2D<float>::Distance(circleColliderLhs.position, circleColliderRhs.position);
-			float radius = circleColliderLhs.radius + circleColliderRhs.radius;
+			ValueType distance = Vec2D<ValueType>::Distance(circleColliderLhs.position, circleColliderRhs.position);
+			ValueType radius = circleColliderLhs.radius + circleColliderRhs.radius;
 
 			if (distance >= radius)
 			{
 				return intersectInfo;
 			}
 
-			Vec2D<float> normal = circleColliderRhs.position - circleColliderLhs.position;
+			Vec2D<ValueType> normal = circleColliderRhs.position - circleColliderLhs.position;
 			normal.normalilze();
 
 			intersectInfo.normal = normal;
@@ -183,7 +162,7 @@ namespace JPhysics
 				}
 			}
 
-			auto cpIndex = static_cast<int>(FindClosePointOnPolygon(lshCircle.position, polygonVertices));
+			auto cpIndex = static_cast<int>(Collisions<ValueType>::FindClosePointOnPolygon(lshCircle.position, polygonVertices));
 			if (cpIndex <= -1)
 			{
 				return intersectInfo;

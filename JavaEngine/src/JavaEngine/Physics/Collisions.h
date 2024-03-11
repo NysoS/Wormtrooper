@@ -1,7 +1,7 @@
 #pragma once
 
+#include "AABB.h"
 #include "jepch.h"
-#include "ColliderIntersect.h"
 #include "JavaEngine/Core/Core.h"
 #include "JavaEngine/Core/Math/Vector2D.h"
 
@@ -15,10 +15,10 @@ namespace JPhysics
 			const JMaths::Vector2D<Type>& _p, const JMaths::Vector2D<Type>& _a, const JMaths::Vector2D<Type>& _b,
 			Type& _distanceSqrt, JMaths::Vector2D<Type>& _contact);
 
-		static bool IntersectAABB(const AABB<Type>& _bodyA, const AABB<Type>& _bodyB);
-
 		static JMaths::Vector2D<Type> FindArithmeticMean(const std::vector<JMaths::Vector2D<Type>>& _vertices);
 		static Type FindClosePointOnPolygon(const JMaths::Vector2D<Type>& _circleCenter, const std::vector<JMaths::Vector2D<Type>>& _vertices);
+
+		static bool IntersectAABB(const AABB<Type>& _bodyA, const AABB<Type>& _bodyB);
 	};
 
 	template <typename Type>

@@ -26,6 +26,9 @@ namespace JMaths
 		static Type DistanceSquare(const Vector2D& a, const Vector2D& b);
 		static Type Cross(const Vector2D& a, const Vector2D& b);
 
+		static void PointSegmentDistance(const JMaths::Vector2D<Type>& _p, const JMaths::Vector2D<Type>& _a,
+			const JMaths::Vector2D<Type>& _b, Type& _distanceSqrt, JMaths::Vector2D<Type>& _contact);
+
 		static const Vector2D Zero;
 		static const Vector2D Up;
 		static const Vector2D Forward;
@@ -113,6 +116,33 @@ namespace JMaths
 	Type Vector2D<Type>::Cross(const Vector2D& a, const Vector2D& b)
 	{
 		return a.x * b.y - a.y + b.x;
+	}
+
+	template <typename Type>
+	void Vector2D<Type>::PointSegmentDistance(const Vector2D<Type>& _p, const Vector2D<Type>& _a,
+		const Vector2D<Type>& _b, Type& _distanceSqrt, Vector2D<Type>& _contact)
+	{
+		Vector2D<Type> ab = _b - _a;
+		Vector2D<Type> ap = _p - _a;
+
+		Type projection = ap.dotProduct(ab);
+		Type abLengSqrt = ab.squareLength();
+		Type distance = projection / abLengSqrt;
+
+		if (distance <= 0.f)
+		{
+			_contact = _a;
+		}
+		else if (distance >= 1.f)
+		{
+			_contact = _b;
+		}
+		else
+		{
+			_contact = _a + ab * distance;
+		}
+
+		_distanceSqrt = Vector2D<Type>::DistanceSquare(_p, _contact);
 	}
 
 	template <typename Type>

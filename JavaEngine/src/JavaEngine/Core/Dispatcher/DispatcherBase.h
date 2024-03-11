@@ -1,7 +1,5 @@
 #pragma once
 
-#include <assert.h>
-
 #include "jepch.h"
 #include "JavaEngine/Core/Core.h"
 
@@ -9,7 +7,7 @@ namespace JavaEngine
 {
 	template <typename Lhs, typename Rhs = Lhs,
 		typename ReturnType = void, typename Callable = std::function<ReturnType(Lhs&, Rhs&)>>
-		class DispatcherBase
+		class JE_API DispatcherBase
 	{
 	public:
 		using key_type = std::pair<std::string, std::string>;

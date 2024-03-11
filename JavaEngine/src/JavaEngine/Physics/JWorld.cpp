@@ -10,10 +10,10 @@ namespace JPhysics
 	JWorld::JWorld()
 		: m_gravity(JMaths::Vector2Df(0, 9.81f)), m_colliderIntersect(new ColliderIntersect<float>), m_contactPoints(new ContactPoints<float>)
 	{
-		fnDispatcher.add<JavaEngine::CircleCollider, JavaEngine::CircleCollider>(m_colliderIntersect.get(), &ColliderIntersect<float>::OnCircleColliderIntersectCallback);
-		fnDispatcher.add<JavaEngine::PolygonCollider, JavaEngine::PolygonCollider>(m_colliderIntersect.get(), &ColliderIntersect<float>::OnPolygonColliderIntersectCallback);
-		fnDispatcher.add<JavaEngine::CircleCollider, JavaEngine::PolygonCollider>(m_colliderIntersect.get(), &ColliderIntersect<float>::OnCircleToPolygonColliderIntersectCallback);
-		fnDispatcher.add<JavaEngine::PolygonCollider, JavaEngine::CircleCollider>(m_colliderIntersect.get(), &ColliderIntersect<float>::OnPolygonToCircleColliderIntersectCallback);
+		collideIntersectionDispatcher.add<JavaEngine::CircleCollider, JavaEngine::CircleCollider>(m_colliderIntersect.get(), &ColliderIntersect<float>::OnCircleColliderIntersectCallback);
+		collideIntersectionDispatcher.add<JavaEngine::PolygonCollider, JavaEngine::PolygonCollider>(m_colliderIntersect.get(), &ColliderIntersect<float>::OnPolygonColliderIntersectCallback);
+		collideIntersectionDispatcher.add<JavaEngine::CircleCollider, JavaEngine::PolygonCollider>(m_colliderIntersect.get(), &ColliderIntersect<float>::OnCircleToPolygonColliderIntersectCallback);
+		collideIntersectionDispatcher.add<JavaEngine::PolygonCollider, JavaEngine::CircleCollider>(m_colliderIntersect.get(), &ColliderIntersect<float>::OnPolygonToCircleColliderIntersectCallback);
 
 		contactPointsDispatcher.add<JavaEngine::CircleCollider, JavaEngine::CircleCollider>(m_contactPoints.get(), &ContactPoints<float>::OnCircleContactPointsCallback);
 		contactPointsDispatcher.add<JavaEngine::PolygonCollider, JavaEngine::PolygonCollider>(m_contactPoints.get(), &ContactPoints<float>::OnPolygonContactPointsCallback);
@@ -140,7 +140,7 @@ namespace JPhysics
 			JMaths::Vector2Df normal{};
 			float depth{ 0 };
 
-			const IntersectInfo<float> m_intersectInfo = fnDispatcher(*bodyA->collider, *bodyB->collider);
+			const IntersectInfo<float> m_intersectInfo = collideIntersectionDispatcher(*bodyA->collider, *bodyB->collider);
 			normal = m_intersectInfo.normal;
 			depth = m_intersectInfo.depth;
 

@@ -1,9 +1,13 @@
 #pragma once
 
+#include "ColliderBase.h"
+#include "ColliderIntersect.h"
+#include "IntersectInfo.h"
 #include "jepch.h"
 #include "Manifold.h"
 #include "RigidBody.h"
 #include "JavaEngine/Core/Core.h"
+#include "JavaEngine/Core/Dispatcher/FnDispatcher.h"
 #include "JavaEngine/Core/Math/Vector2D.h"
 
 namespace JPhysics
@@ -40,6 +44,8 @@ namespace JPhysics
 		void ResolveCollisionWithRotation(Manifold<float>& _contact);
 		void ResolveCollisionWithRotationAndFriction(Manifold<float>& _contact);
 
+		JavaEngine::FnDispatcher<JavaEngine::ColliderBase, JavaEngine::ColliderBase, IntersectInfo<float>> fnDispatcher;
+
 	private:
 		std::vector<RigidBody<float>*> m_rigidbodyList;
 		JMaths::Vector2Df m_gravity;
@@ -52,5 +58,8 @@ namespace JPhysics
 		JMaths::Vector2Df raList[2];
 		JMaths::Vector2Df rbList[2];
 		float jList[2];
+
+		IntersectInfo<float> m_intersectInfo;
+		ColliderIntersect<float>* m_colliderIntersect;
 	};
 }

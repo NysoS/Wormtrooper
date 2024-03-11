@@ -36,7 +36,7 @@ namespace JavaEngine
 		std::unique_ptr<class Scene> m_BasicScene;
 
 		static Application* s_Instance;
-		static constexpr float MaxFPS = 0.5f / 75.f;
+		static constexpr float MaxFPS = 1.f / 60.f;
 	};
 
 	Application* CreateApplication();

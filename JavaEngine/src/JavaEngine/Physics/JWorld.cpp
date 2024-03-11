@@ -8,13 +8,17 @@
 namespace JPhysics
 {
 	JWorld::JWorld()
-		: m_gravity(JMaths::Vector2Df(0, 9.81f)), m_colliderIntersect(new ColliderIntersect<float>)
+		: m_gravity(JMaths::Vector2Df(0, 9.81f)), m_colliderIntersect(new ColliderIntersect<float>), m_contactPoints(new ContactPoints<float>)
 	{
 		fnDispatcher.add<JavaEngine::CircleCollider, JavaEngine::CircleCollider>(m_colliderIntersect, &ColliderIntersect<float>::OnCircleColliderIntersectCallback);
 		fnDispatcher.add<JavaEngine::PolygonCollider, JavaEngine::PolygonCollider>(m_colliderIntersect, &ColliderIntersect<float>::OnPolygonColliderIntersectCallback);
 		fnDispatcher.add<JavaEngine::CircleCollider, JavaEngine::PolygonCollider>(m_colliderIntersect, &ColliderIntersect<float>::OnCircleToPolygonColliderIntersectCallback);
 		fnDispatcher.add<JavaEngine::PolygonCollider, JavaEngine::CircleCollider>(m_colliderIntersect, &ColliderIntersect<float>::OnPolygonToCircleColliderIntersectCallback);
 
+		contactPointsDispatcher.add<JavaEngine::CircleCollider, JavaEngine::CircleCollider>(m_contactPoints, &ContactPoints<float>::OnCircleContactPointsCallback);
+		contactPointsDispatcher.add<JavaEngine::PolygonCollider, JavaEngine::PolygonCollider>(m_contactPoints, &ContactPoints<float>::OnPolygonContactPointsCallback);
+		contactPointsDispatcher.add<JavaEngine::CircleCollider, JavaEngine::PolygonCollider>(m_contactPoints, &ContactPoints<float>::OnCircleToPolygonContactPointsCallback);
+		contactPointsDispatcher.add<JavaEngine::PolygonCollider, JavaEngine::CircleCollider>(m_contactPoints, &ContactPoints<float>::OnPolygonToCirlceContactPointsCallback);
 	}
 
 	JWorld::~JWorld()
@@ -74,7 +78,6 @@ namespace JPhysics
 
 		for (int it = 0; it < iterations; ++it)
 		{
-			//m_contactList.clear();
 			m_contactPair.clear();
 
 			//Movement step
@@ -150,13 +153,10 @@ namespace JPhysics
 			if (m_intersectInfo.isIntersect)
 			{
 				SeparateBodies(*bodyA,*bodyB, normal, depth);
-				
-				JMaths::Vector2Df contact1;
-				JMaths::Vector2Df contact2;
-				float contactCount;
 
-				Collisions<float>::FindContactPoints(*bodyA,*bodyB, contact1, contact2, contactCount);
-				auto contact = Manifold<float>{ *bodyA, *bodyB, normal, depth, contact1, contact2, contactCount };
+				ContactPointsInfo<float> m_contactPointsInfo = contactPointsDispatcher(*bodyA->collider, *bodyB->collider);
+				
+				auto contact = Manifold<float>{ *bodyA, *bodyB, normal, depth, m_contactPointsInfo.contact1, m_contactPointsInfo.contact2, m_contactPointsInfo.contactCount };
 				ResolveCollisionWithRotation(contact);
 			}
 		}

@@ -41,17 +41,17 @@ namespace JPhysics
 	struct ColliderIntersect
 	{
 		template <typename Lhs, typename Rhs>
-		IntersectInfo<float> OnColliderIntersectCallback(Lhs&, Rhs&)
+		IntersectInfo<ValueType> OnColliderIntersectCallback(Lhs&, Rhs&)
 		{
-			return IntersectInfo<float>{};
+			return IntersectInfo<ValueType>{};
 		}
 
 		IntersectInfo<ValueType> OnCircleColliderIntersectCallback(JavaEngine::ColliderBase& lhs, JavaEngine::ColliderBase& rhs)
 		{
 			IntersectInfo<float> intersectInfo{};
 
-			JavaEngine::CircleCollider& circleColliderLhs = dynamic_cast<JavaEngine::CircleCollider&>(lhs);
-			JavaEngine::CircleCollider& circleColliderRhs = dynamic_cast<JavaEngine::CircleCollider&>(rhs);
+			JavaEngine::CircleCollider circleColliderLhs = dynamic_cast<JavaEngine::CircleCollider&>(lhs);
+			JavaEngine::CircleCollider circleColliderRhs = dynamic_cast<JavaEngine::CircleCollider&>(rhs);
 
 			float distance = Vec2D<float>::Distance(circleColliderLhs.position, circleColliderRhs.position);
 			float radius = circleColliderLhs.radius + circleColliderRhs.radius;
@@ -75,8 +75,8 @@ namespace JPhysics
 		{
 			IntersectInfo<ValueType> intersectInfo{};
 
-			JavaEngine::PolygonCollider& lshPolygon = dynamic_cast<JavaEngine::PolygonCollider&>(lhs);
-			JavaEngine::PolygonCollider& rshPolygon = dynamic_cast<JavaEngine::PolygonCollider&>(rhs);
+			JavaEngine::PolygonCollider lshPolygon = dynamic_cast<JavaEngine::PolygonCollider&>(lhs);
+			JavaEngine::PolygonCollider rshPolygon = dynamic_cast<JavaEngine::PolygonCollider&>(rhs);
 
 			auto firstShapeVertices = lshPolygon.getTransformVertices();
 			auto secondShapeVertices= rshPolygon.getTransformVertices();

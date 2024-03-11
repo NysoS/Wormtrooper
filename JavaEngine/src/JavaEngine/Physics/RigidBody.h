@@ -1,7 +1,9 @@
 #pragma once
 
 #include "AABB.h"
+#include "CircleCollider.h"
 #include "jepch.h"
+#include "PolygonCollider.h"
 #include "JavaEngine/Core/Core.h"
 #include "JavaEngine/Core/Math/Math.h"
 #include "JavaEngine/Core/Math/Vector2D.h"
@@ -30,7 +32,8 @@ namespace JPhysics
 
 		RigidBody(
 			Type _density, Type _mass, Type _inertia, Type _resistution, Type area,
-			bool _isStatic, Type _radius, Type _width, Type _height, std::vector<JMaths::Vector2D<Type>> _vertices, ShapeType _shapeType
+			bool _isStatic, ShapeType _shapeType,
+			JavaEngine::ColliderBase* collider
 		);
 		virtual ~RigidBody() = default;
 
@@ -45,7 +48,7 @@ namespace JPhysics
 
 		static std::vector<JMaths::Vector2D<Type>> CreateBoxVertices(Type _width, Type _height);
 		static std::vector<Type> CreateBoxTriangles();
-		std::vector<JMaths::Vector2D<Type>> GetTransformVertices();
+		std::vector<JMaths::Vector2D<Type>> getTransformVertices();
 
 		void Step(Type _time, const JMaths::Vector2D<Type>& _gravity, const Type& _iteratoons);
 		void Move(JMaths::Vector2D<Type> _amount);
@@ -57,8 +60,8 @@ namespace JPhysics
 		AABB<Type> GetAABB();
 
 	protected:
-		JMaths::Vector2D<Type> m_position;
-		Type m_angle;
+		JMaths::Vector2D<Type> m_position; //Transform
+		Type m_angle; //Transform
 
 		JMaths::Vector2D<Type> m_force;
 
@@ -82,10 +85,6 @@ namespace JPhysics
 
 		bool isStatic;
 
-		Type radius;
-		Type width;
-		Type height;
-
 		ShapeType shapeType;
 
 		JMaths::Vector2D<Type> m_linearVelocity;
@@ -93,22 +92,19 @@ namespace JPhysics
 
 		Type staticFriction;
 		Type dynamicFriction;
+
+		class JavaEngine::ColliderBase* collider;
+
 	};
 
 	template <typename Type>
 	RigidBody<Type>::RigidBody(Type _density, Type _mass, Type _inertia,
-		Type _resistution, Type _area, bool _isStatic, Type _radius, 
-		Type _width, Type _height, std::vector<JMaths::Vector2D<Type>> _vertices, ShapeType _shapeType)
+		Type _resistution, Type _area, bool _isStatic, ShapeType _shapeType, 
+		JavaEngine::ColliderBase* collider)
 			: m_position(JMaths::Vector2D<Type>::Zero), m_linearVelocity(JMaths::Vector2D<Type>::Zero), m_angle(0.f), angularVelocity(0.f), density(_density), mass(_mass), restitution(_resistution), area(_area), isStatic(_isStatic),
-			radius(_radius), width(_width), height(_height), shapeType(_shapeType), m_transformUpdateRequired(true), m_aabbUpdateRequired(true), m_aabb(AABB<Type>(0,0,0,0)), invMass(_mass > 0 ? 1.f / mass : 0.f), inertia(_inertia), invInertia(0.f),
-			staticFriction(1.6f), dynamicFriction(1.4f)
+			shapeType(_shapeType), m_transformUpdateRequired(true), m_aabbUpdateRequired(true), m_aabb(AABB<Type>(0,0,0,0)), invMass(_mass > 0 ? 1.f / mass : 0.f), inertia(_inertia), invInertia(0.f),
+			staticFriction(1.6f), dynamicFriction(1.4f), collider(collider)
 	{
-		if(shapeType == ShapeType::Box)
-		{
-			m_vertices = _vertices;
-			m_transformVertices.resize(m_vertices.size());
-		}
-
 		m_force = JMaths::Vector2D<Type>::Zero;
 
 		if(!_isStatic)
@@ -116,7 +112,7 @@ namespace JPhysics
 			invInertia = 1.f/inertia;
 		}
 
-		m_transformUpdateRequired = true;
+		collider->transformUpdateRequired = true;
 		m_aabbUpdateRequired = true;
 	}
 
@@ -142,7 +138,9 @@ namespace JPhysics
 			inertia = (1.f / 2) * mass * (_radius * _radius);
 		}
 
-		return new RigidBody(_density, mass, inertia, _resitution, area, _isStatic, _radius, 0.f, 0.f, std::vector<JMaths::Vector2D<Type>>{}, ShapeType::Circle);
+		JavaEngine::ColliderBase* circleCollider = new JavaEngine::CircleCollider(_radius);
+
+		return new RigidBody(_density, mass, inertia, _resitution, area, _isStatic, ShapeType::Circle, circleCollider);
 	}
 
 	template <typename Type>
@@ -167,15 +165,15 @@ namespace JPhysics
 			inertia = (1.f / 12) * mass * (_height * _height + _width * _width);
 		}
 
-		std::vector<JMaths::Vector2D<Type>> vertices = CreateBoxVertices(_width, _height);
+		JavaEngine::ColliderBase* polygonCollider = new JavaEngine::PolygonCollider(_width, _height);
 
-		return new RigidBody(_density, mass, inertia, _resitution, area, _isStatic, 0.f, _width, _height, vertices, ShapeType::Box);
+		return new RigidBody(_density, mass, inertia, _resitution, area, _isStatic, ShapeType::Box, polygonCollider);
 	}
 
 	template <typename Type>
 	JMaths::Vector2D<Type> RigidBody<Type>::GetPosition() const
 	{
-		return m_position;
+		return collider->position;
 	}
 
 	template <typename Type>
@@ -207,22 +205,14 @@ namespace JPhysics
 	}
 
 	template <typename Type>
-	std::vector<JMaths::Vector2D<Type>> RigidBody<Type>::GetTransformVertices()
+	std::vector<JMaths::Vector2D<Type>> RigidBody<Type>::getTransformVertices()
 	{
-		if(m_transformUpdateRequired)
+		if(JavaEngine::PolygonCollider* polygonCollider = static_cast<JavaEngine::PolygonCollider*>(collider))
 		{
-			JavaEngine::Transform<Type>* transform = new JavaEngine::Transform<Type>();
-			transform->setPosition(m_position);
-			transform->setRotation(m_angle);
-
-			for(int i = 0; i < m_vertices.size(); ++i)
-			{
-				JMaths::Vector2D<Type> vector = m_vertices[i];
-				m_transformVertices[i] = transform->vector(vector);
-			}
+			return polygonCollider->getTransformVertices();
 		}
 
-		return m_transformVertices;
+		return std::vector<JMaths::Vector2D<Type>>{};
 	}
 
 	template <typename Type>
@@ -243,44 +233,44 @@ namespace JPhysics
 
 		m_linearVelocity += _gravity * _time;
 
-		m_position += m_linearVelocity * time;
-		m_angle += angularVelocity * time;
+		collider->position += m_linearVelocity * time;
+		collider->angle += angularVelocity * time;
 
 		m_force = JMaths::Vector2D<Type>::Zero;
-		m_transformUpdateRequired = true;
+		collider->transformUpdateRequired = true;
 		m_aabbUpdateRequired = true;
 	}
 
 	template <typename Type>
 	void RigidBody<Type>::Move(JMaths::Vector2D<Type> _amount)
 	{
-		m_position.x += _amount.x;
-		m_position.y += _amount.y;
-		m_transformUpdateRequired = true;
+		collider->position.x += _amount.x;
+		collider->position.y += _amount.y;
+		collider->transformUpdateRequired = true;
 		m_aabbUpdateRequired = true;
 	}
 
 	template <typename Type>
 	void RigidBody<Type>::MoveTo(JMaths::Vector2D<Type> _position)
 	{
-		m_position = _position;
-		m_transformUpdateRequired = true;
+		collider->position = _position;
+		collider->transformUpdateRequired = true;
 		m_aabbUpdateRequired = true;
 	}
 
 	template <typename Type>
 	void RigidBody<Type>::Rotate(Type _amount)
 	{
-		m_angle += _amount;
-		m_transformUpdateRequired = true;
+		collider->angle += _amount;
+		collider->transformUpdateRequired = true;
 		m_aabbUpdateRequired = true;
 	}
 
 	template <typename Type>
 	void RigidBody<Type>::RotataTo(Type angle)
 	{
-		m_angle = angle;
-		m_transformUpdateRequired = true;
+		collider->angle = angle;
+		collider->transformUpdateRequired = true;
 		m_aabbUpdateRequired = true;
 	}
 
@@ -302,7 +292,7 @@ namespace JPhysics
 
 			if (shapeType == ShapeType::Box)
 			{
-				std::vector<JMaths::Vector2D<Type>> vertices = GetTransformVertices();
+				std::vector<JMaths::Vector2D<Type>> vertices = getTransformVertices();
 				for (int i = 0; i < vertices.size(); ++i)
 				{
 					if (vertices[i].x < minX)
@@ -327,12 +317,14 @@ namespace JPhysics
 				}
 
 			}
-			else if (shapeType == ShapeType::Circle)
+			
+			if(dynamic_cast<JavaEngine::CircleCollider*>(collider))
 			{
-				minX = m_position.x - radius;
-				minY = m_position.y - radius;
-				maxX = m_position.x + radius;
-				maxY = m_position.y + radius;
+				const JavaEngine::CircleCollider* circleCollider = dynamic_cast<JavaEngine::CircleCollider*>(collider);
+				minX = collider->position.x - circleCollider->radius;
+				minY = collider->position.y - circleCollider->radius;
+				maxX = collider->position.x + circleCollider->radius;
+				maxY = collider->position.y + circleCollider->radius;
 			}
 
 			m_aabb = AABB<Type>(minX, minY, maxX, maxY);

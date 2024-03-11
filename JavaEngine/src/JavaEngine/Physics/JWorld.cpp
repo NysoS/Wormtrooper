@@ -2,16 +2,34 @@
 
 #include "Collisions.h"
 #include "JavaEngine/Core/Log.h"
+#include "JavaEngine/Core/Dispatcher/FnDispatcher.h"
+#include "JavaEngine/Physics/ColliderIntersect.h"
 
 namespace JPhysics
 {
 	JWorld::JWorld()
-		: m_gravity(JMaths::Vector2Df(0, 9.81f))
+		: m_gravity(JMaths::Vector2Df(0, 9.81f)), m_colliderIntersect(new ColliderIntersect<float>)
 	{
+		fnDispatcher.add<JavaEngine::CircleCollider, JavaEngine::CircleCollider>(m_colliderIntersect, &ColliderIntersect<float>::OnCircleColliderIntersectCallback);
+		fnDispatcher.add<JavaEngine::PolygonCollider, JavaEngine::PolygonCollider>(m_colliderIntersect, &ColliderIntersect<float>::OnPolygonColliderIntersectCallback);
+		fnDispatcher.add<JavaEngine::CircleCollider, JavaEngine::PolygonCollider>(m_colliderIntersect, &ColliderIntersect<float>::OnCircleToPolygonColliderIntersectCallback);
+		fnDispatcher.add<JavaEngine::PolygonCollider, JavaEngine::CircleCollider>(m_colliderIntersect, &ColliderIntersect<float>::OnPolygonToCircleColliderIntersectCallback);
+
 	}
 
 	JWorld::~JWorld()
 	{
+		for(auto* rbody : m_rigidbodyList)
+		{
+			delete rbody;
+			rbody = nullptr;
+		}
+
+		if(m_colliderIntersect)
+		{
+			delete m_colliderIntersect;
+			m_colliderIntersect = nullptr;
+		}
 	}
 
 	void JWorld::AddRigidbody(RigidBody<float>* _rigidbody)
@@ -125,17 +143,21 @@ namespace JPhysics
 			JMaths::Vector2Df normal{};
 			float depth{ 0 };
 
-			if (Collisions<float>::Collide(*bodyA,*bodyB, normal, depth))
+			m_intersectInfo = fnDispatcher(*bodyA->collider, *bodyB->collider);
+			normal = m_intersectInfo.normal;
+			depth = m_intersectInfo.depth;
+
+			if (m_intersectInfo.isIntersect)
 			{
 				SeparateBodies(*bodyA,*bodyB, normal, depth);
-
+				
 				JMaths::Vector2Df contact1;
 				JMaths::Vector2Df contact2;
 				float contactCount;
 
 				Collisions<float>::FindContactPoints(*bodyA,*bodyB, contact1, contact2, contactCount);
 				auto contact = Manifold<float>{ *bodyA, *bodyB, normal, depth, contact1, contact2, contactCount };
-				ResolveCollisionBasic(contact);
+				ResolveCollisionWithRotation(contact);
 			}
 		}
 	}
@@ -173,8 +195,8 @@ namespace JPhysics
 
 		for(int i = 0; i < contactCount; ++i)
 		{
-			JMaths::Vector2Df ra = contactList[i] - _contact.bodyA.GetPosition();
-			JMaths::Vector2Df rb = contactList[i] - _contact.bodyB.GetPosition();
+			JMaths::Vector2Df ra = contactList[i] - _contact.bodyA.collider->position;
+			JMaths::Vector2Df rb = contactList[i] - _contact.bodyB.collider->position;
 
 			raList[i] = ra;
 			rbList[i] = rb;

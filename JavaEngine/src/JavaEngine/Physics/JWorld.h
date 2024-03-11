@@ -2,6 +2,7 @@
 
 #include "ColliderBase.h"
 #include "ColliderIntersect.h"
+#include "ContactPoints.h"
 #include "IntersectInfo.h"
 #include "jepch.h"
 #include "Manifold.h"
@@ -45,6 +46,7 @@ namespace JPhysics
 		void ResolveCollisionWithRotationAndFriction(Manifold<float>& _contact);
 
 		JavaEngine::FnDispatcher<JavaEngine::ColliderBase, JavaEngine::ColliderBase, IntersectInfo<float>> fnDispatcher;
+		JavaEngine::FnDispatcher<JavaEngine::ColliderBase, JavaEngine::ColliderBase, ContactPointsInfo<float>> contactPointsDispatcher;
 
 	private:
 		std::vector<RigidBody<float>*> m_rigidbodyList;
@@ -61,5 +63,6 @@ namespace JPhysics
 
 		IntersectInfo<float> m_intersectInfo;
 		ColliderIntersect<float>* m_colliderIntersect;
+		ContactPoints<float>* m_contactPoints;
 	};
 }

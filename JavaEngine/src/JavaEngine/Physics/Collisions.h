@@ -1,11 +1,8 @@
 #pragma once
 
-#include "CircleCollider.h"
 #include "jepch.h"
 #include "ColliderIntersect.h"
-#include "ContactPoints.h"
 #include "JavaEngine/Core/Core.h"
-#include "JavaEngine/Core/Math/Math.h"
 #include "JavaEngine/Core/Math/Vector2D.h"
 
 namespace JPhysics
@@ -19,12 +16,6 @@ namespace JPhysics
 			Type& _distanceSqrt, JMaths::Vector2D<Type>& _contact);
 
 		static bool IntersectAABB(const AABB<Type>& _bodyA, const AABB<Type>& _bodyB);
-
-		static void FindContactPoints(
-			const RigidBody<Type>& _bodyA, const RigidBody<Type>& _bodyB,
-			JMaths::Vector2D<Type>& _contact1, JMaths::Vector2D<Type>& _contact2, Type& _contactCount);
-
-		static bool Collide(const RigidBody<Type>& _bodyA, const RigidBody<Type>& _bodyB, JMaths::Vector2D<Type>& _normal, Type& _depth);
 
 		static JMaths::Vector2D<Type> FindArithmeticMean(const std::vector<JMaths::Vector2D<Type>>& _vertices);
 		static Type FindClosePointOnPolygon(const JMaths::Vector2D<Type>& _circleCenter, const std::vector<JMaths::Vector2D<Type>>& _vertices);
@@ -64,64 +55,6 @@ namespace JPhysics
 		}
 
 		return true;
-	}
-
-	template <typename Type>
-	void Collisions<Type>::FindContactPoints(const RigidBody<Type>& _bodyA, const RigidBody<Type>& _bodyB,
-		JMaths::Vector2D<Type>& _contact1, JMaths::Vector2D<Type>& _contact2, Type& _contactCount)
-	{
-		_contact1 = JMaths::Vector2D<Type>::Zero;
-		_contact2 = JMaths::Vector2D<Type>::Zero;
-		_contactCount = 0;
-
-		ShapeType shapeTypeA = _bodyA.shapeType;
-		ShapeType shapeTypeB = _bodyB.shapeType;
-
-		RigidBody<Type> bodyA = _bodyA;
-		RigidBody<Type> bodyB = _bodyB;
-
-		ContactPointsInfo<Type> contactPointsInfo{};
-
-		if (shapeTypeA == ShapeType::Box)
-		{
-			if (shapeTypeB == ShapeType::Box)
-			{
-				JavaEngine::PolygonCollider* polygonCollider = dynamic_cast<JavaEngine::PolygonCollider*>(bodyA.collider);
-				JavaEngine::PolygonCollider* polygonColliderRhs = dynamic_cast<JavaEngine::PolygonCollider*>(bodyB.collider);
-				contactPointsInfo = ContactPoints<Type, JavaEngine::PolygonCollider>().find(polygonCollider->getTransformVertices(), polygonColliderRhs->getTransformVertices());
-			}
-			else if (shapeTypeB == ShapeType::Circle)
-			{
-				JavaEngine::PolygonCollider* polygonCollider = static_cast<JavaEngine::PolygonCollider*>(bodyA.collider);
-				JavaEngine::CircleCollider* circleCollider = dynamic_cast<JavaEngine::CircleCollider*>(bodyB.collider);
-				contactPointsInfo = ContactPoints<Type, JavaEngine::PolygonCollider, JavaEngine::CircleCollider>().find(circleCollider->position, circleCollider->radius, polygonCollider->position, polygonCollider->getTransformVertices());
-			}
-		}
-		else if (shapeTypeA == ShapeType::Circle)
-		{
-			if (shapeTypeB == ShapeType::Box)
-			{
-				JavaEngine::PolygonCollider* polygonCollider = dynamic_cast<JavaEngine::PolygonCollider*>(bodyA.collider);
-				JavaEngine::CircleCollider* circleCollider = dynamic_cast<JavaEngine::CircleCollider*>(bodyB.collider);
-
-				if(!polygonCollider && !circleCollider)
-				{
-					return;
-				}
-
-				contactPointsInfo = ContactPoints<Type, JavaEngine::CircleCollider, JavaEngine::PolygonCollider>().find(circleCollider->position, circleCollider->radius, polygonCollider->position, polygonCollider->getTransformVertices());
-			}
-			else if (shapeTypeB == ShapeType::Circle)
-			{
-				JavaEngine::CircleCollider* circleCollider = dynamic_cast<JavaEngine::CircleCollider*>(bodyA.collider);
-				JavaEngine::CircleCollider* circleColliderB = dynamic_cast<JavaEngine::CircleCollider*>(bodyB.collider);
-				contactPointsInfo = ContactPoints<Type, JavaEngine::CircleCollider>().find(circleCollider->position, circleCollider->radius, circleColliderB->position);
-			}
-		}
-
-		_contactCount = contactPointsInfo.contactCount;
-		_contact1 = contactPointsInfo.contact1;
-		_contact2 = contactPointsInfo.contact2;
 	}
 
 	template <typename Type>

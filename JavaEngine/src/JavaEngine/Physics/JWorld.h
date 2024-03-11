@@ -23,7 +23,7 @@ namespace JPhysics
 	{
 	public:
 		JWorld();
-		~JWorld();
+		virtual ~JWorld();
 
 		void AddRigidbody(RigidBody<float>* _rigidbody);
 		bool RemoveRigidbody(RigidBody<float>* _rigidbody);
@@ -61,8 +61,7 @@ namespace JPhysics
 		JMaths::Vector2Df rbList[2];
 		float jList[2];
 
-		IntersectInfo<float> m_intersectInfo;
-		ColliderIntersect<float>* m_colliderIntersect;
-		ContactPoints<float>* m_contactPoints;
+		std::unique_ptr<ColliderIntersect<float>> m_colliderIntersect;
+		std::unique_ptr<ContactPoints<float>> m_contactPoints;
 	};
 }

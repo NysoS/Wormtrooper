@@ -7,33 +7,6 @@
 namespace JPhysics
 {
 	template <typename Type>
-	void PointSegmentDistance(const JMaths::Vector2D<Type>& _p, const JMaths::Vector2D<Type>& _a,
-		const JMaths::Vector2D<Type>& _b, Type& _distanceSqrt, JMaths::Vector2D<Type>& _contact)
-	{
-		JMaths::Vector2D<Type> ab = _b - _a;
-		JMaths::Vector2D<Type> ap = _p - _a;
-
-		Type projection = ap.dotProduct(ab);
-		Type abLengSqrt = ab.squareLength();
-		Type distance = projection / abLengSqrt;
-
-		if (distance <= 0.f)
-		{
-			_contact = _a;
-		}
-		else if (distance >= 1.f)
-		{
-			_contact = _b;
-		}
-		else
-		{
-			_contact = _a + ab * distance;
-		}
-
-		_distanceSqrt = JMaths::Vector2D<Type>::DistanceSquare(_p, _contact);
-	}
-
-	template <typename Type>
 	using Vect2D = JMaths::Vector2D<Type>;
 
 	template <typename Type>
@@ -82,16 +55,16 @@ namespace JPhysics
 
 			for (int i = 0; i < polygonVerticesA.size(); ++i)
 			{
-				JMaths::Vector2D<Type> currentVerticeA = polygonVerticesA[i];
+				Vect2D<Type> currentVerticeA = polygonVerticesA[i];
 
 				for (int j = 0; j < polygonVerticesB.size(); ++j)
 				{
-					JMaths::Vector2D<Type> va = polygonVerticesB[j];
-					JMaths::Vector2D<Type> vb = polygonVerticesB[(j + 1) % polygonVerticesB.size()];
+					Vect2D<Type> va = polygonVerticesB[j];
+					Vect2D<Type> vb = polygonVerticesB[(j + 1) % polygonVerticesB.size()];
 
 					Type distanceSqrt = 0.f;
-					JMaths::Vector2D<Type> contact;
-					PointSegmentDistance(currentVerticeA, va, vb, distanceSqrt, contact);
+					Vect2D<Type> contact;
+					Vect2D<Type>::PointSegmentDistance(currentVerticeA, va, vb, distanceSqrt, contact);
 
 					if (JMaths::JMath<Type>::NearlyEqual(distanceSqrt, minDistanceSqrt))
 					{
@@ -112,16 +85,16 @@ namespace JPhysics
 
 			for (int i = 0; i < polygonVerticesB.size(); ++i)
 			{
-				JMaths::Vector2D<Type> currentVerticeB = polygonVerticesB[i];
+				Vect2D<Type> currentVerticeB = polygonVerticesB[i];
 
 				for (int j = 0; j < polygonVerticesA.size(); ++j)
 				{
-					JMaths::Vector2D<Type> va = polygonVerticesA[j];
-					JMaths::Vector2D<Type> vb = polygonVerticesA[(j + 1) % polygonVerticesA.size()];
+					Vect2D<Type> va = polygonVerticesA[j];
+					Vect2D<Type> vb = polygonVerticesA[(j + 1) % polygonVerticesA.size()];
 
 					Type distanceSqrt = 0.f;
-					JMaths::Vector2D<Type> contact;
-					PointSegmentDistance(currentVerticeB, va, vb, distanceSqrt, contact);
+					Vect2D<Type> contact;
+					Vect2D<Type>::PointSegmentDistance(currentVerticeB, va, vb, distanceSqrt, contact);
 
 					if (JMaths::JMath<Type>::NearlyEqual(distanceSqrt, minDistanceSqrt))
 					{
@@ -156,12 +129,12 @@ namespace JPhysics
 
 			for (int i = 0; i < polygonVertices.size(); ++i)
 			{
-				JMaths::Vector2D<Type> va = polygonVertices[i];
-				JMaths::Vector2D<Type> vb = polygonVertices[(i + 1) % polygonVertices.size()];
+				Vect2D<Type> va = polygonVertices[i];
+				Vect2D<Type> vb = polygonVertices[(i + 1) % polygonVertices.size()];
 
 				Type distanceSqrt = 0.f;
-				JMaths::Vector2D<Type> contact;
-				PointSegmentDistance(lhsCircle.position, va, vb, distanceSqrt, contact);
+				Vect2D<Type> contact;
+				Vect2D<Type>::PointSegmentDistance(lhsCircle.position, va, vb, distanceSqrt, contact);
 
 				if (distanceSqrt < minDistanceSqrt)
 				{
@@ -179,132 +152,4 @@ namespace JPhysics
 			return OnCircleToPolygonContactPointsCallback(rhs, lhs);
 		}
 	};
-
-	/*template <typename Type>
-	struct ContactPoints<Type, JavaEngine::CircleCollider>
-	{
-		ContactPointsInfo<Type> find(const Vect2D<Type>& circleCenterA, const Type& circleRadiusA, const Vect2D<Type>& circleCenterB)
-		{
-			ContactPointsInfo<Type> contactPointsInfo{};
-
-			Vect2D<Type> ab = circleCenterB - circleCenterA;
-			Vect2D<Type> direction = ab.getNormarlized();
-			contactPointsInfo.contact1 = circleCenterA + direction * circleRadiusA;
-			contactPointsInfo.contactCount = 1;
-
-			return contactPointsInfo;
-		}
-	};*/
-
-	/*template <typename Type>
-	struct ContactPoints<Type, JavaEngine::PolygonCollider>
-	{
-		ContactPointsInfo<Type> find(const std::vector<JMaths::Vector2D<Type>>& polygonVerticesA, const std::vector<JMaths::Vector2D<Type>>& polygonVerticesB)
-		{
-			ContactPointsInfo<Type> contactPointsInfo{};
-
-			Type minDistanceSqrt = std::numeric_limits<Type>::max();
-
-			for (int i = 0; i < polygonVerticesA.size(); ++i)
-			{
-				JMaths::Vector2D<Type> currentVerticeA = polygonVerticesA[i];
-
-				for (int j = 0; j < polygonVerticesB.size(); ++j)
-				{
-					JMaths::Vector2D<Type> va = polygonVerticesB[j];
-					JMaths::Vector2D<Type> vb = polygonVerticesB[(j + 1) % polygonVerticesB.size()];
-
-					Type distanceSqrt = 0.f;
-					JMaths::Vector2D<Type> contact;
-					PointSegmentDistance(currentVerticeA, va, vb, distanceSqrt, contact);
-
-					if (JMaths::JMath<Type>::NearlyEqual(distanceSqrt, minDistanceSqrt))
-					{
-						if (!JMaths::JMath<Type>::NearlyEqual(contact, contactPointsInfo.contact1))
-						{
-							contactPointsInfo.contact2 = contact;
-							contactPointsInfo.contactCount = 2;
-						}
-					}
-					else if (distanceSqrt < minDistanceSqrt)
-					{
-						minDistanceSqrt = distanceSqrt;
-						contactPointsInfo.contact1 = contact;
-						contactPointsInfo.contactCount = 1;
-					}
-				}
-			}
-
-			for (int i = 0; i < polygonVerticesB.size(); ++i)
-			{
-				JMaths::Vector2D<Type> currentVerticeB = polygonVerticesB[i];
-
-				for (int j = 0; j < polygonVerticesA.size(); ++j)
-				{
-					JMaths::Vector2D<Type> va = polygonVerticesA[j];
-					JMaths::Vector2D<Type> vb = polygonVerticesA[(j + 1) % polygonVerticesA.size()];
-
-					Type distanceSqrt = 0.f;
-					JMaths::Vector2D<Type> contact;
-					PointSegmentDistance(currentVerticeB, va, vb, distanceSqrt, contact);
-
-					if (JMaths::JMath<Type>::NearlyEqual(distanceSqrt, minDistanceSqrt))
-					{
-						if (!JMaths::JMath<Type>::NearlyEqual(contact, contactPointsInfo.contact1))
-						{
-							contactPointsInfo.contact2 = contact;
-							contactPointsInfo.contactCount = 2;
-						}
-					}
-					else if (distanceSqrt < minDistanceSqrt)
-					{
-						minDistanceSqrt = distanceSqrt;
-						contactPointsInfo.contact1 = contact;
-						contactPointsInfo.contactCount = 1;
-					}
-				}
-			}
-
-			return contactPointsInfo;
-		}
-	};*/
-
-	/*template <typename Type>
-	struct ContactPoints<Type, JavaEngine::CircleCollider, JavaEngine::PolygonCollider>
-	{
-		ContactPointsInfo<Type> find(const JMaths::Vector2D<Type>& circleCenter, const Type& circleRadius, const JMaths::Vector2D<Type>& polygonCenter, const std::vector<JMaths::Vector2D<Type>>& polygonVertices)
-		{
-			ContactPointsInfo<Type> contactPointsInfo{};
-
-			Type minDistanceSqrt = std::numeric_limits<Type>::max();
-
-			for (int i = 0; i < polygonVertices.size(); ++i)
-			{
-				JMaths::Vector2D<Type> va = polygonVertices[i];
-				JMaths::Vector2D<Type> vb = polygonVertices[(i + 1) % polygonVertices.size()];
-
-				Type distanceSqrt = 0.f;
-				JMaths::Vector2D<Type> contact;
-				PointSegmentDistance(circleCenter, va, vb, distanceSqrt, contact);
-
-				if (distanceSqrt < minDistanceSqrt)
-				{
-					minDistanceSqrt = distanceSqrt;
-					contactPointsInfo.contact1 = contact;
-					contactPointsInfo.contactCount = 1;
-				}
-			}
-
-			return contactPointsInfo;
-		}
-	};*/
-
-	/*template <typename Type>
-	struct ContactPoints<Type, JavaEngine::PolygonCollider, JavaEngine::CircleCollider>
-	{
-		ContactPointsInfo<Type> find(const JMaths::Vector2D<Type>& circleCenter, const Type& circleRadius, const JMaths::Vector2D<Type>& polygonCenter, const std::vector<JMaths::Vector2D<Type>>& polygonVertices)
-		{
-			return ContactPoints<Type, JavaEngine::CircleCollider, JavaEngine::PolygonCollider>().find(circleCenter, circleRadius, polygonCenter, polygonVertices);
-		}
-	};*/
 }

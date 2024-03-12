@@ -25,12 +25,12 @@ namespace JPhysics
 	};
 
 	template<typename Type>
-	class JE_API RigidBody
+	class JE_API RigidBody : public JavaEngine::JObjectComponent
 	{
 	public:
 		RigidBody() = default;
 
-		RigidBody(
+		RigidBody(const std::string& name,
 			Type _density, Type _mass, Type _inertia, Type _resistution, Type area,
 			bool _isStatic, ShapeType _shapeType,
 			JavaEngine::ColliderBase* collider
@@ -98,10 +98,10 @@ namespace JPhysics
 	};
 
 	template <typename Type>
-	RigidBody<Type>::RigidBody(Type _density, Type _mass, Type _inertia,
+	RigidBody<Type>::RigidBody(const std::string& name, Type _density, Type _mass, Type _inertia,
 		Type _resistution, Type _area, bool _isStatic, ShapeType _shapeType, 
 		JavaEngine::ColliderBase* collider)
-			: m_position(JMaths::Vector2D<Type>::Zero), m_linearVelocity(JMaths::Vector2D<Type>::Zero), m_angle(0.f), angularVelocity(0.f), density(_density), mass(_mass), restitution(_resistution), area(_area), isStatic(_isStatic),
+			: JObjectComponent(name), m_position(JMaths::Vector2D<Type>::Zero), m_linearVelocity(JMaths::Vector2D<Type>::Zero), m_angle(0.f), angularVelocity(0.f), density(_density), mass(_mass), restitution(_resistution), area(_area), isStatic(_isStatic),
 			shapeType(_shapeType), m_transformUpdateRequired(true), m_aabbUpdateRequired(true), m_aabb(AABB<Type>(0,0,0,0)), invMass(_mass > 0 ? 1.f / mass : 0.f), inertia(_inertia), invInertia(0.f),
 			staticFriction(1.6f), dynamicFriction(1.4f), collider(collider)
 	{
@@ -140,7 +140,7 @@ namespace JPhysics
 
 		JavaEngine::ColliderBase* circleCollider = new JavaEngine::CircleCollider(_radius);
 
-		return new RigidBody(_density, mass, inertia, _resitution, area, _isStatic, ShapeType::Circle, circleCollider);
+		return new RigidBody("Rigidbody", _density, mass, inertia, _resitution, area, _isStatic, ShapeType::Circle, circleCollider);
 	}
 
 	template <typename Type>
@@ -167,7 +167,7 @@ namespace JPhysics
 
 		JavaEngine::ColliderBase* polygonCollider = new JavaEngine::PolygonCollider(_width, _height);
 
-		return new RigidBody(_density, mass, inertia, _resitution, area, _isStatic, ShapeType::Box, polygonCollider);
+		return new RigidBody("Rigidbody", _density, mass, inertia, _resitution, area, _isStatic, ShapeType::Box, polygonCollider);
 	}
 
 	template <typename Type>

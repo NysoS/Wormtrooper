@@ -1,18 +1,17 @@
-#ifndef MOUSE_BUTTON_H
-#define MOUSE_BUTTON_H
+#pragma once
 
-using MouseButton = uint16_t;
+#include <cstdint> // For using uint16_t
 
 namespace JavaEngine
 {
-	enum MouseButton
-	{
-        MouseLeft,   
-        MouseRight,  
-        MouseMiddle, 
-        MouseExtra1, 
-        MouseExtra2  
-	};
-}
+    using MButton = uint16_t;
 
-#endif
+    enum MouseButton : MButton
+    {
+        MouseLeft,
+        MouseRight,
+        MouseMiddle,
+        MouseExtra1,
+        MouseExtra2
+    };
+}

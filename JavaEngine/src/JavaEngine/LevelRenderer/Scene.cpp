@@ -9,6 +9,7 @@
 
 #include "JavaEngine/Core/Application.h"
 #include "JavaEngine/Core/Log.h"
+#include "JavaEngine/Core/Dispatcher/FnDispatcher.h"
 #include "JavaEngine/Gameplay/JActor.h"
 #include "JavaEngine/Physics/Collisions.h"
 #include "JavaEngine/Physics/RigidBody.h"
@@ -189,6 +190,9 @@ namespace JavaEngine
 
 		//JE_INFO("Move {0} {1}", rigidBodyList[0]->GetPosition().x, rigidBodyList[0]->GetPosition().y);
 
+		sf::CircleShape circleShape;
+		sf::ConvexShape convShape{ 4 };
+
 		for(int i = 0; i < m_World->RigidbodyCount(); ++i)
 		{
 			auto* body = m_World->GetRigidbody(i);
@@ -199,37 +203,40 @@ namespace JavaEngine
 
 			if(body->shapeType == JPhysics::Circle)
 			{
-				sf::CircleShape shape{};
-				shape.setRadius(body->radius);
-				shape.setOutlineThickness(1);
-				shape.setPosition(body->GetPosition().x, body->GetPosition().y);
-				shape.setOutlineColor(sf::Color(250, 150, 100));
+				CircleCollider* circleCollider = dynamic_cast<CircleCollider*>(body->collider);
+
+				circleShape.setRadius(circleCollider->radius);
+				circleShape.setOutlineThickness(1);
+				circleShape.setPosition(body->GetPosition().x, body->GetPosition().y);
+				circleShape.setOutlineColor(sf::Color(250, 150, 100));
 
 				if(body->isStatic)
 				{
-					shape.setFillColor(sf::Color::Red);
+					circleShape.setFillColor(sf::Color::Red);
 				}
 
-				window.Draw(shape);
-			}else if(body->shapeType == JPhysics::Box)
+				window.Draw(circleShape);
+			}
+			else if(body->shapeType == JPhysics::Box)
 			{
-				sf::ConvexShape shape{ 4 };
 				for(int i = 0; i < 4; ++i)
 				{
-					shape.setPoint(i, sf::Vector2f(body->GetTransformVertices()[i].x, body->GetTransformVertices()[i].y));
+					if(body->getTransformVertices().size() > 0)
+					{
+						convShape.setPoint(i, sf::Vector2f(body->getTransformVertices()[i].x, body->getTransformVertices()[i].y));
+					}
 				}
-				shape.setOrigin(body->GetPosition().x - 10.f, body->GetPosition().y - 10.f);
-				shape.setOutlineThickness(1);
-				shape.setPosition(body->GetPosition().x, body->GetPosition().y);
-				shape.setOutlineColor(sf::Color(250, 150, 100));
+				convShape.setOrigin(body->collider->position.x - 10.f, body->collider->position.y - 10.f);
+				convShape.setOutlineThickness(1);
+				convShape.setPosition(body->collider->position.x, body->collider->position.y);
+				convShape.setOutlineColor(sf::Color(250, 150, 100));
 
 				if (body->isStatic)
 				{
-					shape.setFillColor(sf::Color::Red);
+					convShape.setFillColor(sf::Color::Red);
 				}
-				window.Draw(shape);
+				window.Draw(convShape);
 			}
-			
 		}
 	}
 

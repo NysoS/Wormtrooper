@@ -1,9 +1,14 @@
 #pragma once
 
+#include "ColliderBase.h"
+#include "ColliderIntersect.h"
+#include "ContactPoints.h"
+#include "IntersectInfo.h"
 #include "jepch.h"
 #include "Manifold.h"
 #include "RigidBody.h"
 #include "JavaEngine/Core/Core.h"
+#include "JavaEngine/Core/Dispatcher/FnDispatcher.h"
 #include "JavaEngine/Core/Math/Vector2D.h"
 
 namespace JPhysics
@@ -18,7 +23,7 @@ namespace JPhysics
 	{
 	public:
 		JWorld();
-		~JWorld();
+		virtual ~JWorld();
 
 		void AddRigidbody(RigidBody<float>* _rigidbody);
 		bool RemoveRigidbody(RigidBody<float>* _rigidbody);
@@ -40,6 +45,9 @@ namespace JPhysics
 		void ResolveCollisionWithRotation(Manifold<float>& _contact);
 		void ResolveCollisionWithRotationAndFriction(Manifold<float>& _contact);
 
+		JavaEngine::FnDispatcher<JavaEngine::ColliderBase, JavaEngine::ColliderBase, IntersectInfo<float>> collideIntersectionDispatcher;
+		JavaEngine::FnDispatcher<JavaEngine::ColliderBase, JavaEngine::ColliderBase, ContactPointsInfo<float>> contactPointsDispatcher;
+
 	private:
 		std::vector<RigidBody<float>*> m_rigidbodyList;
 		JMaths::Vector2Df m_gravity;
@@ -52,5 +60,8 @@ namespace JPhysics
 		JMaths::Vector2Df raList[2];
 		JMaths::Vector2Df rbList[2];
 		float jList[2];
+
+		std::unique_ptr<ColliderIntersect<float>> m_colliderIntersect;
+		std::unique_ptr<ContactPoints<float>> m_contactPoints;
 	};
 }

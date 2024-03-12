@@ -4,11 +4,17 @@
 
 namespace JavaEngine
 {
-	JObject::JObject()
+	JObject::JObject(JPhysics::JWorld* world)
+		: m_world(world)
 	{
+
 	}
 
 	JObject::~JObject()
+	{
+	}
+
+	void JObject::Update()
 	{
 	}
 
@@ -17,4 +23,8 @@ namespace JavaEngine
 		JE_INFO("JObject : {0} renderer", m_Name);
 	}
 
+	JPhysics::JWorld* JObject::getWorld() const
+	{
+		return m_world;
+	}
 }

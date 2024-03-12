@@ -37,7 +37,7 @@ namespace JavaEngine
 				return nullptr;
 			}
 
-			ObjectType* element = new ObjectType();
+			ObjectType* element = new ObjectType(m_World.get());
 			m_ObjectList.push_back(element);
 
 			return element;

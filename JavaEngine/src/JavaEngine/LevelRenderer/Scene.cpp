@@ -19,37 +19,11 @@ namespace JavaEngine
 	Scene::Scene()
 		:	m_Name("Scene"), m_World(std::make_unique<JPhysics::JWorld>())
 	{
-		////TODO: Remove test
-		//JObject* tomate = AddObjectToScene<JActor>();
-		//tomate->m_Name = "Tomate";
+
 
 		////TODO: Remove test
 		//JObject* pomme = AddObjectToScene<JActor>();
 		//pomme->m_Name = "Pomme";
-
-
-
-		//for(int i = 0; i < 10; ++i)
-		//{
-		//	std::random_device rd;
-		//	std::mt19937 gen(rd());
-		//	std::uniform_real_distribution<> dist(10, 600);
-
-		//	std::uniform_int_distribution<> bo(0, 1);
-
-		//	float x = dist(gen);
-		//	float y = dist(gen);
-
-		//	bool isStatic = false;
-
-		//	if(i > 0)
-		//		isStatic = bo(gen)==0?false:true;
-
-
-		//	JPhysics::RigidBodyf* simpleBall = JPhysics::RigidBodyf::CreateCircleBody(10.f, 10.f, isStatic, 0.5f);
-		//	simpleBall->MoveTo(JMaths::Vector2Df(x, y));
-		//	m_World->AddRigidbody(simpleBall);
-		//}
 
 		float maxWidth = Application::Get().GetWindow().GetWidth();
 		float maxHeight = Application::Get().GetWindow().GetHeight();
@@ -68,10 +42,9 @@ namespace JavaEngine
 		rotatePlateform2->Rotate(6.28f / -30.f);
 		m_World->AddRigidbody(rotatePlateform2);
 
-		// PLAYER 01
-		JPhysics::RigidBodyf* player1 = JPhysics::RigidBodyf::CreateBoxBody(20.f, 20.f, 10.f, false, 0);
-		player1->MoveTo(JMaths::Vector2Df(400., 400.f));
-		m_World->AddRigidbody(player1);
+		////TODO: Remove test
+		JActor* tomate = AddObjectToScene<JActor>();
+		tomate->m_Name = "Tomate";
 
 		// PLAYER 02
 		JPhysics::RigidBodyf* player2 = JPhysics::RigidBodyf::CreateBoxBody(20.f, 20.f, 10.f, false, 0);
@@ -91,13 +64,13 @@ namespace JavaEngine
 	void Scene::OnUpate(const float& deltaTime)
 	{
 		//JE_INFO("Scene Update");
-		/*for(const auto& object : m_ObjectList)
+		for(const auto& object : m_ObjectList)
 		{
 			if(object->IsTickableObject())
 			{
 				object->Update();
 			}
-		}*/
+		}
 
 		if(sf::Mouse::isButtonPressed(sf::Mouse::Left))
 		{

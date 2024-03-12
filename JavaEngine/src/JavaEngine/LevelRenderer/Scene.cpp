@@ -59,7 +59,7 @@ namespace JavaEngine
 		m_World->AddRigidbody(flatGround);
 
 		JPhysics::RigidBodyf* rotatePlateform = JPhysics::RigidBodyf::CreateBoxBody(400, 20.f, 10.f, true, 0);
-		rotatePlateform->MoveTo(JMaths::Vector2Df(240.f, 400.f));
+		rotatePlateform->MoveTo(JMaths::Vector2Df(240.f, 300.f));
 		rotatePlateform->Rotate(6.28f / 30.f);
 		m_World->AddRigidbody(rotatePlateform);
 
@@ -67,6 +67,16 @@ namespace JavaEngine
 		rotatePlateform2->MoveTo(JMaths::Vector2Df(840.f, 200.f));
 		rotatePlateform2->Rotate(6.28f / -30.f);
 		m_World->AddRigidbody(rotatePlateform2);
+
+		// PLAYER 01
+		JPhysics::RigidBodyf* player1 = JPhysics::RigidBodyf::CreateBoxBody(20.f, 20.f, 10.f, false, 0);
+		player1->MoveTo(JMaths::Vector2Df(400., 400.f));
+		m_World->AddRigidbody(player1);
+
+		// PLAYER 02
+		JPhysics::RigidBodyf* player2 = JPhysics::RigidBodyf::CreateBoxBody(20.f, 20.f, 10.f, false, 0);
+		player2->MoveTo(JMaths::Vector2Df(600., 400.f));
+		m_World->AddRigidbody(player2);
 	}
 
 	Scene::~Scene()
@@ -114,6 +124,38 @@ namespace JavaEngine
 			m_World->AddRigidbody(Ball);
 
 		}
+
+		// ALLOWS TO MOVE PLAYER TO RIGT
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
+		{
+			// TODO
+			JMaths::Vector2Df playerP(/*player pos*/);
+		}
+
+		// ALLOWS TO MOVE PLAYER TO LEFT
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Q))
+		{
+			// TODO
+			JMaths::Vector2Df playerP(/*player pos*/);
+		}
+
+		// CREATE A PULSE THAT ALLOWS PLAYER TO JUMP
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
+		{
+			// TODO
+			JMaths::Vector2Df playerP(/*player pos*/);
+		}
+
+		// GENERATE STELLAR OBJECT
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Enter))
+		{
+			JMaths::Vector2Df mouseP(sf::Mouse::getPosition().x - 320.f, sf::Mouse::getPosition().y - 250.f);
+
+			JPhysics::RigidBodyf* Ball = JPhysics::RigidBodyf::CreateCircleBody(10.f, 2.f, false, .6f);
+			Ball->MoveTo(mouseP);
+			m_World->AddRigidbody(Ball);
+		}
+
 
 		m_World->Step(deltaTime, 20);
 		totalWorldStepTime += deltaTime;

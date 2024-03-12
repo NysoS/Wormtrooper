@@ -9,8 +9,8 @@ namespace JavaEngine
 	class JE_API JActor : public JObject
 	{
 	public:
-		JActor();
-		virtual ~JActor();
+		JActor(JPhysics::JWorld* world);
+		~JActor() override;
 
 		void Update() override;
 	};

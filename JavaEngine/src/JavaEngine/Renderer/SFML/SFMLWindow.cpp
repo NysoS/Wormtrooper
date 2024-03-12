@@ -74,59 +74,64 @@ namespace JavaEngine
 		{
 			//ImGui::SFML::ProcessEvent(*m_Window, sfEvent);
 
-			if(sfEvent.type == sf::Event::Resized)
+			switch (sfEvent.type)
+			{
+			case sf::Event::Resized:
 			{
 				m_Data.Width = sfEvent.size.width;
 				m_Data.Height = sfEvent.size.height;
 
 				WindowResizeEvent event(sfEvent.size.width, sfEvent.size.height);
 				m_Data.EventCallack(event);
+				break;
 			}
-
-			if(sfEvent.type == sf::Event::Closed)
+			case sf::Event::Closed:
 			{
 				WindowCloseEvent event;
 				m_Data.EventCallack(event);
+				break;
 			}
-
-			if (sfEvent.type == sf::Event::KeyPressed)
+			case sf::Event::KeyPressed:
 			{
 				KeyPressedEvent event(static_cast<KeyCode>(sfEvent.key.scancode), 0);
 				m_Data.EventCallack(event);
+				break;
 			}
-
-			if(sfEvent.type == sf::Event::KeyReleased)
+			case sf::Event::KeyReleased:
 			{
 				KeyReleasedEvent event(static_cast<KeyCode>(sfEvent.key.scancode));
 				m_Data.EventCallack(event);
+				break;
 			}
-
-			if(sfEvent.type == sf::Event::MouseWheelScrolled)
+			case sf::Event::MouseWheelScrolled:
 			{
 				MouseScrolledEvent event(sfEvent.mouseWheelScroll.x, sfEvent.mouseWheelScroll.y);
 				m_Data.EventCallack(event);
+				break;
 			}
-
-			if(sfEvent.type == sf::Event::MouseMoved)
+			case sf::Event::MouseMoved:
 			{
 				MouseMovedEvent event(sfEvent.mouseMove.x, sfEvent.mouseMove.y);
 				m_Data.EventCallack(event);
+				break;
 			}
-
-			if(sfEvent.type == sf::Event::MouseButtonPressed)
+			case sf::Event::MouseButtonPressed:
 			{
 				MouseButtonPressedEvent event(static_cast<MouseButton>(sfEvent.mouseButton.button));
 				m_Data.EventCallack(event);
+				break;
 			}
-
-			if(sfEvent.type == sf::Event::MouseButtonReleased)
+			case sf::Event::MouseButtonReleased:
 			{
 				MouseButtonReleasedEvent event(static_cast<MouseButton>(sfEvent.mouseButton.button));
 				m_Data.EventCallack(event);
+				break;
+			}
+			default:
+				break;
 			}
 		}
 	}
-
 
 	void SFMLWindow::SetVSync(bool enable)
 	{

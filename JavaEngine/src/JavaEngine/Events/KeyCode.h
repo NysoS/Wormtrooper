@@ -1,14 +1,15 @@
-#ifndef KEY_CODE_H
-#define KEY_CODE_H
+#pragma once
 
-using KeyCode = uint16_t;
+#include <cstdint>
 
 namespace JavaEngine
 {
-	enum KeyCode
+	using KeyCode = uint16_t;
+
+	enum class Key
 	{
 		Unknown = -1, //!< Unhandled key
-		A = 0,  //!< The A key
+		A = 0,        //!< The A key
 		B,            //!< The B key
 		C,            //!< The C key
 		D,            //!< The D key
@@ -243,5 +244,3 @@ namespace JavaEngine
 
 
 }
-
-#endif

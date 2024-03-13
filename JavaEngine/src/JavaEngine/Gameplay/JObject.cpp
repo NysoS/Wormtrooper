@@ -14,7 +14,7 @@ namespace JavaEngine
 	{
 	}
 
-	void JObject::Update()
+	void JObject::Update(const float& deltaTime)
 	{
 	}
 

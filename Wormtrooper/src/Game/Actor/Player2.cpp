@@ -1,8 +1,8 @@
-#include "Player.h"
+#include "Player2.h"
 
 #include <SFML/Window/Keyboard.hpp>
 
-Player::Player(JPhysics::JWorld* world)
+Player2::Player2(JPhysics::JWorld* world)
 	: JActor(world)
 {
 	JPhysics::RigidBodyf* rigid = JPhysics::RigidBodyf::CreateBoxBody(20.f, 20.f, 10.f, false, 0);
@@ -14,27 +14,27 @@ Player::Player(JPhysics::JWorld* world)
 	AddObjectComponent(rigid);
 }
 
-Player::~Player()
+Player2::~Player2()
 {
 }
 
-void Player::Update(const float& deltaTime)
+void Player2::Update(const float& deltaTime)
 {
 	JActor::Update(deltaTime);
 
 	JPhysics::RigidBodyf* rigid = GetObjectComponent<JPhysics::RigidBodyf>("Rigidbody");
 
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
 	{
 		// TODO
-		if(rigid)
+		if (rigid)
 		{
 			rigid->Move(JMaths::Vector2Df{ 5.f,0 });
 		}
 	}
 
 	// ALLOWS TO MOVE PLAYER TO LEFT
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Q))
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
 	{
 		if (rigid)
 		{
@@ -42,7 +42,7 @@ void Player::Update(const float& deltaTime)
 		}
 	}
 
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::LControl))
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::RControl))
 	{
 		if (rigid)
 		{
@@ -50,20 +50,21 @@ void Player::Update(const float& deltaTime)
 		}
 	}
 
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::LShift))
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Numpad0))
 	{
-		if(timer >= fireRate)
+		if (timer >= fireRate)
 		{
 			JPhysics::RigidBodyf* Ball = JPhysics::RigidBodyf::CreateCircleBody(10.f, 2.f, false, .6f);
-			Ball->MoveTo(rigid->collider->position + JMaths::Vector2Df{ 10.f,0.f });
+			Ball->MoveTo(rigid->collider->position + JMaths::Vector2Df{ -10.f,0.f });
 			if (getWorld())
 			{
 				getWorld()->AddRigidbody(Ball);
 			}
-			Ball->AddForce(JMaths::Vector2Df{ 250.f, -250.f });
+			Ball->AddForce(JMaths::Vector2Df{ -250.f, -250.f });
 
 			timer = 0.f;
-		}else
+		}
+		else
 		{
 			timer += deltaTime;
 		}

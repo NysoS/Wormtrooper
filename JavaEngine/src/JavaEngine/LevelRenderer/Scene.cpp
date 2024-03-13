@@ -39,7 +39,7 @@ namespace JavaEngine
 		{
 			if(object->IsTickableObject())
 			{
-				object->Update();
+				object->Update(deltaTime);
 			}
 		}
 
@@ -69,28 +69,6 @@ namespace JavaEngine
 		}*/
 
 		//TODO: move to game
-		// ALLOWS TO MOVE PLAYER TO RIGT
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
-		{
-			// TODO
-			JMaths::Vector2Df playerP(/*player pos*/);
-		}
-
-		// ALLOWS TO MOVE PLAYER TO LEFT
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Q))
-		{
-			// TODO
-			JMaths::Vector2Df playerP(/*player pos*/);
-		}
-
-		// CREATE A PULSE THAT ALLOWS PLAYER TO JUMP
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
-		{
-			// TODO
-			JMaths::Vector2Df playerP(/*player pos*/);
-		}
-
-		//TODO: move to game
 		// GENERATE STELLAR OBJECT
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Enter))
 		{
@@ -100,7 +78,6 @@ namespace JavaEngine
 			Ball->MoveTo(mouseP);
 			m_World->AddRigidbody(Ball);
 		}
-
 
 		m_World->Step(deltaTime, 20);
 		totalWorldStepTime += deltaTime;

@@ -17,7 +17,7 @@ namespace JavaEngine
 		explicit JObject(JPhysics::JWorld* world);
 		virtual ~JObject();
 
-		virtual void Update();
+		virtual void Update(const float& deltaTime);
 		virtual void Renderer(); //Move to renderer component
 
 		template<typename Component>

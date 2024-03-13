@@ -17,7 +17,7 @@ FlatGround::~FlatGround()
 {
 }
 
-void FlatGround::Update()
+void FlatGround::Update(const float& deltaTime)
 {
-	JActor::Update();
+	JActor::Update(deltaTime);
 }

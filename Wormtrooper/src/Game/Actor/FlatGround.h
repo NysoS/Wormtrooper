@@ -7,5 +7,5 @@ public:
 	FlatGround(JPhysics::JWorld* world);
 	~FlatGround() override;
 
-	void Update() override;
+	void Update(const float& deltaTime) override;
 };

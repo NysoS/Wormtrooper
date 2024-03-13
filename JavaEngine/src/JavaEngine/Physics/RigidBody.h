@@ -232,6 +232,7 @@ namespace JPhysics
 		//m_linearVelocity += acceleration * _time;
 
 		m_linearVelocity += _gravity * _time;
+		m_linearVelocity += m_force;
 
 		collider->position += m_linearVelocity * time;
 		collider->angle += angularVelocity * time;

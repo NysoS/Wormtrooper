@@ -25,7 +25,7 @@ namespace JPhysics
 	};
 
 	template<typename Type>
-	class JE_API RigidBody : public JavaEngine::JObjectComponent
+	class RigidBody : public JavaEngine::JObjectComponent
 	{
 	public:
 		RigidBody() = default;

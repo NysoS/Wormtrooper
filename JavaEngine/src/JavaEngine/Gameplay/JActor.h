@@ -12,6 +12,6 @@ namespace JavaEngine
 		JActor(JPhysics::JWorld* world);
 		~JActor() override;
 
-		void Update() override;
+		virtual void Update() override;
 	};
 }

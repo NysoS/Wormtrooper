@@ -4,14 +4,11 @@
 #include "JObjectComponent.h"
 #include "JavaEngine/Core/Core.h"
 #include "JavaEngine/Core/Math/Vector2D.h"
-#include "JavaEngine/Physics/RigidBody.h"
-#include "JavaEngine/Physics/RigidBody.h"
-#include "JavaEngine/Physics/RigidBody.h"
 
 namespace JavaEngine
 {
 	template <typename Type>
-	class JE_API Transform : public JObjectComponent
+	class Transform : public JObjectComponent
 	{
 	public:
 		Transform();

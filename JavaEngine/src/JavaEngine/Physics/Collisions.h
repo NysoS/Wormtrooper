@@ -8,7 +8,7 @@
 namespace JPhysics
 {
 	template<typename Type>
-	class JE_API Collisions
+	class Collisions
 	{
 	public:
 		static void PointSegmentDistance(

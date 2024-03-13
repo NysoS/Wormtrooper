@@ -6,7 +6,7 @@
 namespace JMaths
 {
 	template<typename Type>
-	struct JE_API Vector2D
+	struct Vector2D
 	{
 		explicit Vector2D(const Type& _x = 0.f, const Type& _y = 0.f);
 

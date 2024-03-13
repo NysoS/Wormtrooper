@@ -18,12 +18,16 @@ namespace JavaEngine
 		m_Window->SetEventRenderCallback(BIND_CALLBACK(Application::OnRenderer));
 		m_Window->SetUpdateCallback(BIND_CALLBACK_ONE_PARAM(Application::OnUpdate));
 
-		m_BasicScene = std::make_unique<Scene>();
+		//m_BasicScene = std::make_unique<Scene>();
 	}
 
 	Application::~Application()
 	{
-	
+		if(m_BasicScene)
+		{
+			delete m_BasicScene;
+			m_BasicScene = nullptr;
+		}
 	}
 
 	void Application::Run()
@@ -52,7 +56,10 @@ namespace JavaEngine
 		EventDispatcher dispatcher(event);
 		dispatcher.Dispatch<WindowCloseEvent>(BIND_CALLBACK_ONE_PARAM(Application::OnCloseWindow));
 
-		m_BasicScene->OnEvent(event);
+		if(m_BasicScene)
+		{
+			m_BasicScene->OnEvent(event);
+		}
 
 		for(auto it = m_LayerStack.end(); it != m_LayerStack.begin(); )
 		{
@@ -65,10 +72,23 @@ namespace JavaEngine
 	}
 
 
+	void Application::AddScene(Scene* scene)
+	{
+		if(!scene)
+		{
+			return;
+		}
+
+		m_BasicScene = scene;
+	}
+
 	void Application::OnUpdate(const float& deltaTime)
 	{
 		//JE_CORE_INFO("Application Update");
-		m_BasicScene->OnUpate(deltaTime);
+		if (m_BasicScene)
+		{
+			m_BasicScene->OnUpate(deltaTime);
+		}
 
 		for (auto it = m_LayerStack.end(); it != m_LayerStack.begin(); )
 		{
@@ -78,7 +98,10 @@ namespace JavaEngine
 
 	void Application::OnRenderer()
 	{
-		m_BasicScene->OnRenderer(*m_Window.get());
+		if (m_BasicScene)
+		{
+			m_BasicScene->OnRenderer(*m_Window.get());
+		}
 
 		for (auto it = m_LayerStack.end(); it != m_LayerStack.begin(); )
 		{

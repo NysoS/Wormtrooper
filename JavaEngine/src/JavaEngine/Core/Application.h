@@ -9,6 +9,8 @@
 
 namespace JavaEngine
 {
+	class Scene;
+
 	class JE_API Application
 	{
 	public:
@@ -23,6 +25,7 @@ namespace JavaEngine
 
 		inline static Application& Get() { return *s_Instance; }
 		inline Window& GetWindow() { return *m_Window; }
+		void AddScene(Scene* scene);
 
 	private:
 		void OnUpdate(const float& deltaTime);
@@ -33,7 +36,7 @@ namespace JavaEngine
 		std::unique_ptr<Window> m_Window;
 		bool m_isRunning = true;
 		LayerStack m_LayerStack;
-		std::unique_ptr<class Scene> m_BasicScene;
+		Scene* m_BasicScene = nullptr;
 
 		static Application* s_Instance;
 		static constexpr float MaxFPS = 1.f / 60.f;

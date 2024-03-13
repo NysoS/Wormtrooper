@@ -19,37 +19,8 @@ namespace JavaEngine
 	Scene::Scene()
 		:	m_Name("Scene"), m_World(std::make_unique<JPhysics::JWorld>())
 	{
-
-
-		////TODO: Remove test
-		//JObject* pomme = AddObjectToScene<JActor>();
-		//pomme->m_Name = "Pomme";
-
 		float maxWidth = Application::Get().GetWindow().GetWidth();
 		float maxHeight = Application::Get().GetWindow().GetHeight();
-
-		JPhysics::RigidBodyf* flatGround = JPhysics::RigidBodyf::CreateBoxBody(1000.f, 20.f, 10.f, true, 0);
-		flatGround->MoveTo(JMaths::Vector2Df(640.f, 500.f));
-		m_World->AddRigidbody(flatGround);
-
-		JPhysics::RigidBodyf* rotatePlateform = JPhysics::RigidBodyf::CreateBoxBody(400, 20.f, 10.f, true, 0);
-		rotatePlateform->MoveTo(JMaths::Vector2Df(240.f, 300.f));
-		rotatePlateform->Rotate(6.28f / 30.f);
-		m_World->AddRigidbody(rotatePlateform);
-
-		JPhysics::RigidBodyf* rotatePlateform2 = JPhysics::RigidBodyf::CreateBoxBody(400, 20.f, 10.f, true, 0);
-		rotatePlateform2->MoveTo(JMaths::Vector2Df(840.f, 200.f));
-		rotatePlateform2->Rotate(6.28f / -30.f);
-		m_World->AddRigidbody(rotatePlateform2);
-
-		////TODO: Remove test
-		JActor* tomate = AddObjectToScene<JActor>();
-		tomate->m_Name = "Tomate";
-
-		// PLAYER 02
-		JPhysics::RigidBodyf* player2 = JPhysics::RigidBodyf::CreateBoxBody(20.f, 20.f, 10.f, false, 0);
-		player2->MoveTo(JMaths::Vector2Df(600., 400.f));
-		m_World->AddRigidbody(player2);
 	}
 
 	Scene::~Scene()
@@ -72,7 +43,7 @@ namespace JavaEngine
 			}
 		}
 
-		if(sf::Mouse::isButtonPressed(sf::Mouse::Left))
+		/*if(sf::Mouse::isButtonPressed(sf::Mouse::Left))
 		{
 			std::random_device rd;
 			std::mt19937 gen(rd());
@@ -95,9 +66,9 @@ namespace JavaEngine
 			JPhysics::RigidBodyf* Ball = JPhysics::RigidBodyf::CreateCircleBody(10.f, 2.f, false, .6f);
 			Ball->MoveTo(mouseP);
 			m_World->AddRigidbody(Ball);
+		}*/
 
-		}
-
+		//TODO: move to game
 		// ALLOWS TO MOVE PLAYER TO RIGT
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
 		{
@@ -119,6 +90,7 @@ namespace JavaEngine
 			JMaths::Vector2Df playerP(/*player pos*/);
 		}
 
+		//TODO: move to game
 		// GENERATE STELLAR OBJECT
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Enter))
 		{

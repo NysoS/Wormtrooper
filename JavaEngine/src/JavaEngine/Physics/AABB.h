@@ -9,7 +9,7 @@ namespace JPhysics
 {
 
 	template <typename Type>
-	struct JE_API AABB
+	struct AABB
 	{
 		JMaths::Vector2D<Type> min;
 		JMaths::Vector2D<Type> max;

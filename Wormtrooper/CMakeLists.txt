@@ -6,9 +6,12 @@ set (PATH_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src)
 
 # )
 
-set(SOURCES
-	"${PATH_DIR}/GameApp.cpp"
-)
+# set(SOURCES
+#	"${PATH_DIR}/GameApp.cpp"
+# )
+
+file(GLOB_RECURSE PROJECT_HEADER_FILES "*.h" "*.hxx")
+file(GLOB_RECURSE PROJECT_SOURCE_FILES "*.cpp")
 
 # not stolen at all
 macro(GroupSources curdir)
@@ -31,7 +34,7 @@ GroupSources(src)
 
 include_directories(JavaEngine)
 
-add_executable(${PROJECT_NAME} ${SOURCES})
+add_executable(${PROJECT_NAME} ${PROJECT_HEADER_FILES} ${PROJECT_SOURCE_FILES})
 
 set(VCPKG_INSTALLED ${CMAKE_SOURCE_DIR}/vendor/vcpkg_installed/x64-windows)
 

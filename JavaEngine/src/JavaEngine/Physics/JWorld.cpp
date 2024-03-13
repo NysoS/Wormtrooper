@@ -99,14 +99,28 @@ namespace JPhysics
 
 	void JWorld::BroadPhase()
 	{
+		if(m_rigidbodyList.size() <= 0)
+		{
+			return;	
+		}
+
 		for (int i = 0; i < m_rigidbodyList.size() - 1; ++i)
 		{
 			RigidBodyf* bodyA = m_rigidbodyList[i];
+			if(!bodyA)
+			{
+				return;
+			}
+
 			AABB<float> aabb_bodyA = bodyA->GetAABB();
 
 			for (int j = 1; j < m_rigidbodyList.size(); ++j)
 			{
 				RigidBodyf* bodyB = m_rigidbodyList[j];
+				if(!bodyB)
+				{
+					return;
+				}
 				AABB<float> aabb_bodyB = bodyB->GetAABB();
 
 				if (bodyA->isStatic && bodyB->isStatic)

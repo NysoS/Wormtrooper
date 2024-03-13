@@ -15,10 +15,10 @@ namespace JavaEngine
 		JE_CORE_INFO("Actor Delete");
 	}
 
-	void JActor::Update()
+	void JActor::Update(const float& deltaTime)
 	{
-		JObject::Update();
-		JE_CORE_INFO("Actor {0} Tickable", m_Name);
+		JObject::Update(deltaTime);
+		//JE_CORE_INFO("Actor {0} Tickable", m_Name);
 	}
 
 }

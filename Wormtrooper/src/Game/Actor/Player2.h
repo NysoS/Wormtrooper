@@ -1,11 +1,11 @@
 #pragma once
 #include "JavaEngine/Gameplay/JActor.h"
 
-class Player : public JavaEngine::JActor
+class Player2 : public JavaEngine::JActor
 {
 public:
-	Player(JPhysics::JWorld* world);
-	~Player();
+	Player2(JPhysics::JWorld* world);
+	~Player2();
 	void Update(const float& deltaTime) override;
 
 	float timer = 0.f;
